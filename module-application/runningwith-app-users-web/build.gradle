@@ -1,11 +1,12 @@
 jar.enabled = false
 
 dependencies {
+    implementation project(":module-core")
     implementation project(":module-domain-rds")
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.0'
-
-    // test
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 

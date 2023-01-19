@@ -2,13 +2,17 @@ package com.runningwith.users;
 
 import com.runningwith.account.AccountEntity;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 
+import java.time.LocalDateTime;
+
+@EqualsAndHashCode(of = "id")
 @Entity
 @Table(name = "users")
 public class UsersEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_users", nullable = false)
     private Long id;
 
@@ -22,29 +26,43 @@ public class UsersEntity {
 
     private String nickname;
 
+    @Column(name = "email_verified")
     private boolean emailVerified;
 
+    @Column(name = "email_check_token")
     private String emailCheckToken;
+
+    @Column(name = "email_check_token_generated_at")
+    private LocalDateTime emailCheckTokenGeneratedAt;
 
     private String bio;
 
+    @Column(name = "profile_url")
     private String profileUrl;
 
     private String occupation;
 
     private String location;
 
+    @Column(name = "study_created_by_email")
     private boolean studyCreatedByEmail;
 
+    @Column(name = "study_created_by_web")
     private boolean studyCreatedByWeb = true;
 
+    @Column(name = "study_enrollment_result_by_email")
     private boolean studyEnrollmentResultByEmail;
 
+    @Column(name = "study_enrollment_result_by_web")
     private boolean studyEnrollmentResultByWeb = true;
 
+    @Column(name = "study_updated_by_email")
     private boolean studyUpdatedByEmail;
 
+    @Column(name = "study_updated_by_web")
     private boolean studyUpdatedByWeb = true;
 
+    @Basic(fetch = FetchType.EAGER)
+    @Column(columnDefinition = "longtext",name = "profile_image")
     private String profileImage;
 }

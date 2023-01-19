@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/modules/domain/domain.iml" filepath="$PROJECT_DIR$/modules/domain/domain.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/module-application/runningwith-app-users-web/runningwith.module-application.runningwith-app-users-web.main.iml" filepath="$PROJECT_DIR$/.idea/modules/module-application/runningwith-app-users-web/runningwith.module-application.runningwith-app-users-web.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/module-core/runningwith.module-core.main.iml" filepath="$PROJECT_DIR$/.idea/modules/module-core/runningwith.module-core.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/module-domain-rds/runningwith.module-domain-rds.main.iml" filepath="$PROJECT_DIR$/.idea/modules/module-domain-rds/runningwith.module-domain-rds.main.iml" />
     </modules>
   </component>
 </project>
