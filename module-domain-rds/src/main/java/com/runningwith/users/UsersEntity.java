@@ -2,11 +2,15 @@ package com.runningwith.users;
 
 import com.runningwith.account.AccountEntity;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+@Builder
 @EqualsAndHashCode(of = "id")
+@Getter
 @Entity
 @Table(name = "users")
 public class UsersEntity {
