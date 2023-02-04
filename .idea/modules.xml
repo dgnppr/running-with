@@ -8,6 +8,9 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/module-application/runningwith-app-users-web/runningwith.module-application.runningwith-app-users-web.test.iml" filepath="$PROJECT_DIR$/.idea/modules/module-application/runningwith-app-users-web/runningwith.module-application.runningwith-app-users-web.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/module-core/runningwith.module-core.main.iml" filepath="$PROJECT_DIR$/.idea/modules/module-core/runningwith.module-core.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/module-domain-rds/runningwith.module-domain-rds.main.iml" filepath="$PROJECT_DIR$/.idea/modules/module-domain-rds/runningwith.module-domain-rds.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/module-independent/runningwith.module-independent.main.iml" filepath="$PROJECT_DIR$/.idea/modules/module-independent/runningwith.module-independent.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/module-independent/runningwith.module-independent.test.iml" filepath="$PROJECT_DIR$/.idea/modules/module-independent/runningwith.module-independent.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/module-insystem/runningwith.module-insystem.main.iml" filepath="$PROJECT_DIR$/.idea/modules/module-insystem/runningwith.module-insystem.main.iml" />
     </modules>
   </component>
 </project>

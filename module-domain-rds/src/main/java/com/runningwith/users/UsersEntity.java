@@ -2,14 +2,14 @@ package com.runningwith.users;
 
 import com.runningwith.account.AccountEntity;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
-@Builder
 @EqualsAndHashCode(of = "id")
+@AllArgsConstructor @Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
 @Table(name = "users")
@@ -69,4 +69,8 @@ public class UsersEntity {
     @Basic(fetch = FetchType.EAGER)
     @Column(columnDefinition = "longtext",name = "profile_image")
     private String profileImage;
+
+    public void generateEmailCheckToken() {
+        this.emailCheckToken = UUID.randomUUID().toString();
+    }
 }

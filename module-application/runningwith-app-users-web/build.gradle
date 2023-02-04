@@ -1,6 +1,7 @@
 jar.enabled = false
 
 dependencies {
+    implementation project(":module-insystem")
     implementation project(":module-core")
     implementation project(":module-domain-rds")
     implementation 'org.springframework.boot:spring-boot-starter-web'
