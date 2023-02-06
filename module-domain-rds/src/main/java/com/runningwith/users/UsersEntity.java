@@ -76,6 +76,7 @@ public class UsersEntity {
 
     public void generateEmailCheckToken() {
         this.emailCheckToken = UUID.randomUUID().toString();
+        this.emailCheckTokenGeneratedAt = LocalDateTime.now();
     }
 
     public void updateEmailVerified(boolean emailVerified) {
