@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments.html :: head"></head>
+<head th:replace="~{fragments.html :: head}"></head>
 
 <body class="bg-light">
-
-<div th:replace="fragments.html :: main-nav"></div>
+<div th:replace="~{fragments.html :: main-nav}"></div>
 <div class="container">
     <div class="py-5 text-center">
         <h2>계정 생성</h2>
@@ -60,6 +59,7 @@
         </form>
     </div>
 </div>
-<div class="fragments.html :: footer"></div>
+<th:block th:replace="~{fragments.html :: footer}"></th:block>
+<script th:replace="~{fragments.html :: form-validation}"></script>
 </body>
 </html>
