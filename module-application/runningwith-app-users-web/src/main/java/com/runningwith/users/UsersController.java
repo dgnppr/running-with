@@ -2,6 +2,8 @@ package com.runningwith.users;
 
 import com.runningwith.users.form.SignUpForm;
 import com.runningwith.users.validator.SignUpFormValidator;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -41,17 +43,18 @@ public class UsersController {
     }
 
     @PostMapping(path = URL_SIGN_UP)
-    public String signUpSubmit(@Validated SignUpForm signUpForm, BindingResult bindingResult) {
+    public String signUpSubmit(@Validated SignUpForm signUpForm, BindingResult bindingResult, HttpServletRequest request, HttpServletResponse response) {
         if (bindingResult.hasErrors()) {
             return PAGE_SIGN_UP;
         }
-        usersService.processNewUsers(signUpForm);
+        UsersEntity newUsersEntity = usersService.processNewUsers(signUpForm);
+        usersService.login(newUsersEntity, request, response);
         return "redirect:/";
     }
 
 
     @GetMapping(URL_CHECK_EMAIL_TOKEN)
-    public String checkEmailToken(String token, String email, Model model) {
+    public String checkEmailToken(String token, String email, Model model, HttpServletRequest request, HttpServletResponse response) {
         Optional<UsersEntity> optionalUsersEntity = usersRepository.findByEmail(email);
 
         if (optionalUsersEntity.isEmpty()) {
@@ -61,12 +64,13 @@ public class UsersController {
 
         UsersEntity usersEntity = optionalUsersEntity.get();
 
-        if (!usersEntity.getEmailCheckToken().equals(token)) {
+        if (!usersEntity.isValidEmailToken(token)) {
             model.addAttribute("error", "wrong.token");
             return PAGE_CHECKED_EMAIL;
         }
 
         usersService.completeSignUp(usersEntity);
+        usersService.login(usersEntity, request, response);
         model.addAttribute("nickname", usersEntity.getNickname());
         return PAGE_CHECKED_EMAIL;
 

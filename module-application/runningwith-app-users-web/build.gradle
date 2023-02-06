@@ -1,4 +1,25 @@
-jar.enabled = false
+plugins {
+    id "com.github.node-gradle.node" version "3.5.0"
+}
+
+/**
+ * npm install start
+ */
+node {
+    version = '16.15.0'
+    npmVersion = '8.5.5'
+    download = true
+    nodeModulesDir = file("${projectDir}/src/main/resources/static")
+}
+task copyFrontLib(type: Copy) {
+    from "${projectDir}/src/main/resources/static"
+    into "${projectDir}/build/resources/main/static/."
+}
+copyFrontLib.dependsOn npmInstall
+compileJava.dependsOn copyFrontLib
+/**
+ * npm install end
+ */
 
 dependencies {
     implementation project(":module-insystem")
@@ -6,8 +27,10 @@ dependencies {
     implementation project(":module-domain-rds")
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.1.1.RELEASE'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-devtools'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
@@ -16,3 +39,5 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+jar.enabled = false

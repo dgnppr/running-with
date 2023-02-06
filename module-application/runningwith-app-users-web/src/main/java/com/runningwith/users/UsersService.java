@@ -6,32 +6,42 @@ import com.runningwith.account.AccountType;
 import com.runningwith.mail.EmailMessage;
 import com.runningwith.mail.EmailService;
 import com.runningwith.users.form.SignUpForm;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class UsersService {
+public class UsersService implements UserDetailsService {
 
     private final AccountRepository accountRepository;
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SecurityContextRepository securityContextRepository;
     private final EmailService emailService;
 
-    public void processNewUsers(SignUpForm signUpForm) {
+    public UsersEntity processNewUsers(SignUpForm signUpForm) {
         UsersEntity newUsersEntity = saveNewUsers(signUpForm);
         newUsersEntity.generateEmailCheckToken();
         sendSignUpConfirmEmail(newUsersEntity);
+        return newUsersEntity;
     }
 
     private void sendSignUpConfirmEmail(UsersEntity newUsersEntity) {
@@ -62,15 +72,35 @@ public class UsersService {
     }
 
     public void completeSignUp(UsersEntity usersEntity) {
-        usersEntity.updateEmailVerified(true);
-        usersEntity.updateJoinedAt(LocalDateTime.now());
-        login(usersEntity);
+        usersEntity.completeSignUp();
     }
 
-    private void login(UsersEntity usersEntity) {
+    public void login(UsersEntity usersEntity, HttpServletRequest request, HttpServletResponse response) {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
         UsersContext usersContext = new UsersContext(usersEntity);
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                usersContext, usersContext.getPassword(), usersContext.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(token);
+                usersContext, usersEntity.getPassword(), usersContext.getAuthorities());
+        securityContext.setAuthentication(token);
+        securityContextRepository.saveContext(securityContext, request, response);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public UserDetails loadUserByUsername(String emailOrNickname) throws UsernameNotFoundException {
+
+        Optional<UsersEntity> optionalUsers = usersRepository.findByEmail(emailOrNickname);
+
+        if (optionalUsers.isEmpty()) {
+            optionalUsers = usersRepository.findByNickname(emailOrNickname);
+        }
+
+        if (optionalUsers.isEmpty()) {
+            throw new UsernameNotFoundException(emailOrNickname);
+        }
+
+        UsersEntity usersEntity = optionalUsers.get();
+
+        return new UsersContext(usersEntity);
+
     }
 }

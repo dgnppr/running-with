@@ -79,11 +79,12 @@ public class UsersEntity {
         this.emailCheckTokenGeneratedAt = LocalDateTime.now();
     }
 
-    public void updateEmailVerified(boolean emailVerified) {
-        this.emailVerified = emailVerified;
+    public boolean isValidEmailToken(String emailCheckToken) {
+        return this.emailCheckToken.equals(emailCheckToken);
     }
 
-    public void updateJoinedAt(LocalDateTime joinedAt) {
-        this.joinedAt = joinedAt;
+    public void completeSignUp() {
+        this.emailVerified = true;
+        this.joinedAt = LocalDateTime.now();
     }
 }

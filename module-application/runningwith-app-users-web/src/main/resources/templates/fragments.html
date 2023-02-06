@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head">
+    <meta charset="UTF-8">
+    <title>RunningWith@</title>
+    <link href="https://fonts.googleapis.com/css?family=Noto+Sans+KR:300,400,500&display=swap" rel="stylesheet">
+    <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet"/>
+    <link href="/node_modules/@yaireo/tagify/dist/tagify.css" rel="stylesheet">
+    <link href="/node_modules/summernote/dist/summernote-bs4.min.css" rel="stylesheet">
+    <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/node_modules/jdenticon/dist/jdenticon.min.js"></script>
+    <style>
+        .container {
+            max-width: 100%;
+        }
+    </style>
+</head>
+
+<nav class="navbar navbar-expand-sm navbar-dark bg-secondary" th:fragment="main-nav">
+    <a class="navbar-brand" href="/" th:href="@{/}">
+        <img height="30" src="/images/logo_symbol.png" width="30">
+    </a>
+
+    <button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
+            class="navbar-toggler"
+            data-target="#navbarSupportedContent" data-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <form class="form-inline" method="get" th:action="@{/search/study}">
+                    <input aria-label="Search" class="form-control mr-sm-2" name="keyword" placeholder="스터디 찾기"
+                           type="search"/>
+                </form>
+            </li>
+        </ul>
+    </div>
+
+    <ul class="navbar-nav justify-content-end">
+        <li class="nav-item"><a class="nav-link" href="#" th:href="@{/login}">로그인</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" th:href="@{/signup}">가입</a></li>
+    </ul>
+</nav>
+
+
+<footer th:fragment="footer">
+    <div class="row justify-content-center">
+        <img alt="" class="mb-2" src="/images/logo_kr_horizontal.png" width="100">
+        <small class="d-block mb-3 text-muted">&copy; 2023</small>
+    </div>
+</footer>
+
+</html>

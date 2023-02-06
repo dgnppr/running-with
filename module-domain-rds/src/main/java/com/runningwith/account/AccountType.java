@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum AccountType {
-    ADMIN("ROLE_ADMIN"), USERS("ROLE_USERS"), ANONYMOUS("ROLE_ANONYMOUS");
+    ADMIN("ROLE_ADMIN"), USERS("ROLE_USER"), ANONYMOUS("ROLE_ANONYMOUS");
 
     private String role;
 
