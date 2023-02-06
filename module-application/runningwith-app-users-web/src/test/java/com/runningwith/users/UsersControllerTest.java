@@ -61,7 +61,7 @@ class UsersControllerTest {
         mockMvc.perform(post(URL_SIGN_UP)
                         .param("nickname", "test")
                         .param("email", "email")
-                        .param("password", "1234")
+                        .param("password", "wrongpw")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name(PAGE_SIGN_UP));

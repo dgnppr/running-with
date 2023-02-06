@@ -8,6 +8,8 @@ import com.runningwith.mail.EmailService;
 import com.runningwith.users.form.SignUpForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,8 +38,8 @@ public class UsersService {
         EmailMessage emailMessage = EmailMessage.builder()
                 .to(newUsersEntity.getEmail())
                 .subject("회원 가입 인증")
-                .message("/check-email-token?token="+ newUsersEntity.getEmailCheckToken()+
-                        "&email="+ newUsersEntity.getEmail())
+                .message("/check-email-token?token=" + newUsersEntity.getEmailCheckToken() +
+                        "&email=" + newUsersEntity.getEmail())
                 .build();
         emailService.sendEmail(emailMessage);
     }
@@ -59,4 +61,16 @@ public class UsersService {
         return usersEntity;
     }
 
+    public void completeSignUp(UsersEntity usersEntity) {
+        usersEntity.updateEmailVerified(true);
+        usersEntity.updateJoinedAt(LocalDateTime.now());
+        login(usersEntity);
+    }
+
+    private void login(UsersEntity usersEntity) {
+        UsersContext usersContext = new UsersContext(usersEntity);
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                usersContext, usersContext.getPassword(), usersContext.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(token);
+    }
 }

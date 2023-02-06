@@ -8,7 +8,8 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @EqualsAndHashCode(of = "id")
-@AllArgsConstructor @Builder
+@AllArgsConstructor
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
@@ -44,6 +45,9 @@ public class UsersEntity {
     @Column(name = "profile_url")
     private String profileUrl;
 
+    @Column(name = "joined_at")
+    private LocalDateTime joinedAt;
+
     private String occupation;
 
     private String location;
@@ -67,10 +71,18 @@ public class UsersEntity {
     private boolean studyUpdatedByWeb = true;
 
     @Basic(fetch = FetchType.EAGER)
-    @Column(columnDefinition = "longtext",name = "profile_image")
+    @Column(columnDefinition = "longtext", name = "profile_image")
     private String profileImage;
 
     public void generateEmailCheckToken() {
         this.emailCheckToken = UUID.randomUUID().toString();
+    }
+
+    public void updateEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public void updateJoinedAt(LocalDateTime joinedAt) {
+        this.joinedAt = joinedAt;
     }
 }
