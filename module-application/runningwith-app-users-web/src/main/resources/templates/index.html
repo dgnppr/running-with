@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments.html :: head}"></head>
 
 <body class="bg-light">
 <div th:replace="~{fragments.html :: main-nav}"></div>
-<div class="alert alert-warning" role="alert" th:if="${usersEntity != null && !usersEntity.emailVerified}">
+<div class="alert alert-warning text-center" role="alert" th:if="${usersEntity != null && !usersEntity.emailVerified}">
     가입을 완료하려면 <a class="alert-link" href="#" th:href="@{/check-email}">계정 인증 이메일을 확인</a>하세요.
 </div>
 
@@ -14,7 +14,7 @@
         <p class="lead text-muted">
             온라인,오프라인 스터디 모임 사이트
         </p>
-        <p>
+        <p sec:authorize="!isAuthenticated()">
             <a class="btn btn-primary my-2" th:href="@{/sign-up}">회원 가입</a>
         </p>
     </div>

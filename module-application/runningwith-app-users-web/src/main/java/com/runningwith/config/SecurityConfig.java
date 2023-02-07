@@ -12,14 +12,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer;
+import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.config.annotation.web.configurers.SecurityContextConfigurer;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 
 @RequiredArgsConstructor
@@ -38,13 +37,13 @@ public class SecurityConfig implements WebSecurityCustomizer {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests()
-                .requestMatchers("/", "/login", "/sign-up", "/check-email-token", "/email-login", "/check/email-login", "/login-link", "/login-by-email").permitAll()
+                .requestMatchers("/", "/login", "/sign-up", "/check-email-token", "/check/email-login").permitAll()
                 .requestMatchers(HttpMethod.GET, "/profile/*").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin(getFormLoginConfigurerCustomizer())
-                .logout(withDefaults())
                 .httpBasic(HttpBasicConfigurer::disable)
+                .logout(getLogoutConfigurer())
                 .securityContext(getSecurityContextConfigurer());
 
         return http.build();
@@ -65,8 +64,12 @@ public class SecurityConfig implements WebSecurityCustomizer {
     private Customizer<FormLoginConfigurer<HttpSecurity>> getFormLoginConfigurerCustomizer() {
         return (formLogin) -> formLogin
                 .loginPage("/login")
-                .loginProcessingUrl("/login")
                 .permitAll();
+    }
+
+    private Customizer<LogoutConfigurer<HttpSecurity>> getLogoutConfigurer() {
+        return (logout) -> logout
+                .logoutSuccessUrl("/");
     }
 
     @Bean

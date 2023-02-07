@@ -1,4 +1,4 @@
-package com.runningwith.index;
+package com.runningwith.main;
 
 import com.runningwith.users.CurrentUser;
 import com.runningwith.users.UsersEntity;
@@ -10,7 +10,10 @@ import static com.runningwith.utils.WebUtils.PAGE_INDEX;
 import static com.runningwith.utils.WebUtils.URL_ROOT;
 
 @Controller
-public class IndexController {
+public class MainController {
+
+    public static final String URL_LOGIN = "/login";
+    public static final String PAGE_LOGIN = "login";
 
     @GetMapping(URL_ROOT)
     public String index(@CurrentUser UsersEntity usersEntity, Model model) {
@@ -18,5 +21,10 @@ public class IndexController {
             model.addAttribute(usersEntity);
         }
         return PAGE_INDEX;
+    }
+
+    @GetMapping(URL_LOGIN)
+    public String login() {
+        return PAGE_LOGIN;
     }
 }

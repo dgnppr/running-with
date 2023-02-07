@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -93,6 +94,7 @@ class UsersControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(model().attributeDoesNotExist("error"))
                 .andExpect(model().attributeExists("nickname"))
+                .andExpect(authenticated())
                 .andExpect(view().name(PAGE_CHECKED_EMAIL));
     }
 
@@ -105,15 +107,17 @@ class UsersControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("error"))
                 .andExpect(model().attributeDoesNotExist("nickname"))
+                .andExpect(unauthenticated())
                 .andExpect(view().name(PAGE_CHECKED_EMAIL));
     }
 
     @WithUser(RANDOM_STRING)
-    @DisplayName("인증 메일 뷰")
+    @DisplayName("인증 메일 뷰 - 정상")
     @Test
     void checkEmail() throws Exception {
         mockMvc.perform(get(URL_CHECK_EMAIL))
                 .andExpect(model().attribute("email", RANDOM_STRING + EMAIL))
+                .andExpect(authenticated())
                 .andExpect(view().name(PAGE_CHECK_EMAIL));
     }
 
@@ -125,6 +129,7 @@ class UsersControllerTest {
                 .andExpect(model().attribute("error", "인증 이메일은 1시간에 한번만 전송할 수 있습니다."))
                 .andExpect(model().attribute("email", RANDOM_STRING + EMAIL))
                 .andExpect(status().isOk())
+                .andExpect(authenticated())
                 .andExpect(view().name(PAGE_CHECK_EMAIL));
     }
 
