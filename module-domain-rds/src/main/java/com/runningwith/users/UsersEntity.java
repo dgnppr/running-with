@@ -5,7 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+
+import static com.runningwith.utils.CustomStringUtils.getRandomUUID;
 
 @EqualsAndHashCode(of = "id")
 @AllArgsConstructor
@@ -75,7 +76,7 @@ public class UsersEntity {
     private String profileImage;
 
     public void generateEmailCheckToken() {
-        this.emailCheckToken = UUID.randomUUID().toString();
+        this.emailCheckToken = getRandomUUID();
         this.emailCheckTokenGeneratedAt = LocalDateTime.now();
     }
 
@@ -86,5 +87,9 @@ public class UsersEntity {
     public void completeSignUp() {
         this.emailVerified = true;
         this.joinedAt = LocalDateTime.now();
+    }
+
+    public boolean canSendConfirmEmail() {
+        return this.emailCheckTokenGeneratedAt.isBefore(LocalDateTime.now().minusHours(1));
     }
 }

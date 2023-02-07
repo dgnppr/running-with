@@ -44,7 +44,7 @@ public class UsersService implements UserDetailsService {
         return newUsersEntity;
     }
 
-    private void sendSignUpConfirmEmail(UsersEntity newUsersEntity) {
+    public void sendSignUpConfirmEmail(UsersEntity newUsersEntity) {
         EmailMessage emailMessage = EmailMessage.builder()
                 .to(newUsersEntity.getEmail())
                 .subject("회원 가입 인증")

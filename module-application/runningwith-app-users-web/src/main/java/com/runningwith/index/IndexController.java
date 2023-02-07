@@ -1,4 +1,4 @@
-package com.runningwith;
+package com.runningwith.index;
 
 import com.runningwith.users.CurrentUser;
 import com.runningwith.users.UsersEntity;
@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import static com.runningwith.utils.WebUtils.PAGE_INDEX;
 import static com.runningwith.utils.WebUtils.URL_ROOT;
 
 @Controller
@@ -16,6 +17,6 @@ public class IndexController {
         if (usersEntity != null) {
             model.addAttribute(usersEntity);
         }
-        return "index";
+        return PAGE_INDEX;
     }
 }

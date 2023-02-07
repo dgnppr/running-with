@@ -1,9 +1,8 @@
 package com.runningwith.users;
 
 import com.runningwith.MockMvcTest;
-import com.runningwith.account.AccountEntity;
+import com.runningwith.WithUser;
 import com.runningwith.account.AccountRepository;
-import com.runningwith.account.AccountType;
 import com.runningwith.mail.EmailMessage;
 import com.runningwith.mail.EmailService;
 import org.junit.jupiter.api.DisplayName;
@@ -14,7 +13,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
 
+import static com.runningwith.WithUserSecurityContextFactory.EMAIL;
 import static com.runningwith.users.UsersController.*;
+import static com.runningwith.utils.CustomStringUtils.RANDOM_STRING;
 import static com.runningwith.utils.WebUtils.URL_REDIRECT_ROOT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -79,19 +80,12 @@ class UsersControllerTest {
                 .andExpect(view().name(PAGE_SIGN_UP));
     }
 
+    @WithUser(RANDOM_STRING)
     @DisplayName("인증 메일 확인 - 잆력값 정상")
     @Test
     void checkEmailToken_with_correct_input() throws Exception {
-        AccountEntity accountEntity = new AccountEntity(AccountType.USERS);
-        UsersEntity usersEntity = UsersEntity.builder()
-                .accountEntity(accountEntity)
-                .email("email@email.com")
-                .password("goodpassword")
-                .nickname("randomename")
-                .build();
-        usersEntity.generateEmailCheckToken();
-        accountRepository.save(accountEntity);
-        usersRepository.save(usersEntity);
+
+        UsersEntity usersEntity = usersRepository.findByNickname(RANDOM_STRING).get();
 
         mockMvc.perform(get(URL_CHECK_EMAIL_TOKEN)
                         .param("token", usersEntity.getEmailCheckToken())
@@ -112,6 +106,26 @@ class UsersControllerTest {
                 .andExpect(model().attributeExists("error"))
                 .andExpect(model().attributeDoesNotExist("nickname"))
                 .andExpect(view().name(PAGE_CHECKED_EMAIL));
+    }
+
+    @WithUser(RANDOM_STRING)
+    @DisplayName("인증 메일 뷰")
+    @Test
+    void checkEmail() throws Exception {
+        mockMvc.perform(get(URL_CHECK_EMAIL))
+                .andExpect(model().attribute("email", RANDOM_STRING + EMAIL))
+                .andExpect(view().name(PAGE_CHECK_EMAIL));
+    }
+
+    @WithUser(RANDOM_STRING)
+    @DisplayName("재전송 메일 - 1시간 이내 중복 요청")
+    @Test
+    void resendConfirmEmail() throws Exception {
+        mockMvc.perform(get(URL_RESEND_CONFIRM_EMAIL))
+                .andExpect(model().attribute("error", "인증 이메일은 1시간에 한번만 전송할 수 있습니다."))
+                .andExpect(model().attribute("email", RANDOM_STRING + EMAIL))
+                .andExpect(status().isOk())
+                .andExpect(view().name(PAGE_CHECK_EMAIL));
     }
 
 }

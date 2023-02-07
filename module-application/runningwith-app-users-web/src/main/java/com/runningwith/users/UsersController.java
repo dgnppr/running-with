@@ -29,6 +29,9 @@ public class UsersController {
     public static final String PAGE_CHECKED_EMAIL = "users/checked-email";
     public static final String URL_SIGN_UP = "/sign-up";
     public static final String URL_CHECK_EMAIL_TOKEN = "/check-email-token";
+    public static final String URL_CHECK_EMAIL = "/check-email";
+    public static final String PAGE_CHECK_EMAIL = "users/check-email";
+    public static final String URL_RESEND_CONFIRM_EMAIL = "/resend-confirm-email";
     private final SignUpFormValidator signUpFormValidator;
     private final UsersService usersService;
     private final UsersRepository usersRepository;
@@ -75,7 +78,24 @@ public class UsersController {
         usersService.login(usersEntity, request, response);
         model.addAttribute("nickname", usersEntity.getNickname());
         return PAGE_CHECKED_EMAIL;
+    }
 
+    @GetMapping(URL_CHECK_EMAIL)
+    public String checkEmail(@CurrentUser UsersEntity usersEntity, Model model) {
+        model.addAttribute("email", usersEntity.getEmail());
+        return PAGE_CHECK_EMAIL;
+    }
+
+    @GetMapping(URL_RESEND_CONFIRM_EMAIL)
+    public String resendConfirmEmail(@CurrentUser UsersEntity usersEntity, Model model) {
+        if (!usersEntity.canSendConfirmEmail()) {
+            model.addAttribute("error", "인증 이메일은 1시간에 한번만 전송할 수 있습니다.");
+            model.addAttribute("email", usersEntity.getEmail());
+            return PAGE_CHECK_EMAIL;
+        }
+
+        usersService.sendSignUpConfirmEmail(usersEntity);
+        return URL_REDIRECT_ROOT;
     }
 
 }
