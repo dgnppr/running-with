@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments.html :: head}"></head>
+
 <body class="bg-light">
 <div th:replace="~{fragments.html :: main-nav}"></div>
+<div class="alert alert-warning" role="alert" th:if="${usersEntity != null && !usersEntity.emailVerified}">
+    가입을 완료하려면 <a class="alert-link" href="#" th:href="@{/check-email}">계정 인증 이메일을 확인</a>하세요.
+</div>
+
 <section class="jumbotron text-center">
     <div class="container">
         <h1>RunningWith@</h1>
