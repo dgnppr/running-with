@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Optional;
 
 import static com.runningwith.users.UsersController.*;
+import static com.runningwith.utils.WebUtils.URL_REDIRECT_ROOT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
@@ -57,7 +58,7 @@ class UsersControllerTest {
                         .param("password", "goodpassword")
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/"));
+                .andExpect(view().name(URL_REDIRECT_ROOT));
 
         Optional<UsersEntity> optionalUsersEntity = usersRepository.findByEmail("email@email.com");
         assertThat(optionalUsersEntity.isPresent()).isTrue();

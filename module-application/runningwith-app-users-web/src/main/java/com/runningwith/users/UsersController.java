@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.Optional;
 
+import static com.runningwith.utils.WebUtils.URL_REDIRECT_ROOT;
+
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -49,7 +51,7 @@ public class UsersController {
         }
         UsersEntity newUsersEntity = usersService.processNewUsers(signUpForm);
         usersService.login(newUsersEntity, request, response);
-        return "redirect:/";
+        return URL_REDIRECT_ROOT;
     }
 
 
