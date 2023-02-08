@@ -2,6 +2,11 @@ package com.runningwith.main;
 
 import com.runningwith.MockMvcTest;
 import com.runningwith.WithUser;
+import com.runningwith.users.UsersRepository;
+import com.runningwith.users.UsersService;
+import com.runningwith.users.form.SignUpForm;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +31,26 @@ class MainControllerTest {
     @Autowired
     MockMvc mockMvc;
 
+    @Autowired
+    UsersService usersService;
+
+    @Autowired
+    UsersRepository usersRepository;
+
+    @BeforeEach
+    void setUp() {
+        SignUpForm signUpForm = new SignUpForm();
+        signUpForm.setNickname("nickname");
+        signUpForm.setEmail("nickname" + EMAIL);
+        signUpForm.setPassword(PASSWORD);
+        usersService.processNewUsers(signUpForm);
+    }
+
+    @AfterEach
+    void afterAll() {
+        usersRepository.deleteAll();
+    }
+
     @WithUser(RANDOM_STRING)
     @DisplayName("인덱스 뷰 - 인증 유저")
     @Test
@@ -47,19 +72,16 @@ class MainControllerTest {
                 .andExpect(view().name(PAGE_INDEX));
     }
 
-    @WithUser(RANDOM_STRING)
     @DisplayName("로그인 성공 - 이메일")
     @Test
     void login_with_email() throws Exception {
         mockMvc.perform(post(URL_LOGIN)
-                        .param("username", RANDOM_STRING + EMAIL)
+                        .param("username", "nickname" + EMAIL)
                         .param("password", PASSWORD)
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl(URL_ROOT))
-                .andExpect(authenticated().withUsername(RANDOM_STRING));
-
-
+                .andExpect(authenticated().withUsername("nickname"));
     }
 
 }
