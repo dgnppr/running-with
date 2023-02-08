@@ -111,7 +111,7 @@ class UsersControllerTest {
                 .andExpect(view().name(PAGE_CHECKED_EMAIL));
     }
 
-    @WithUser(RANDOM_STRING)
+    @WithUser
     @DisplayName("인증 메일 뷰 - 정상")
     @Test
     void checkEmail() throws Exception {
@@ -121,7 +121,7 @@ class UsersControllerTest {
                 .andExpect(view().name(PAGE_CHECK_EMAIL));
     }
 
-    @WithUser(RANDOM_STRING)
+    @WithUser
     @DisplayName("재전송 메일 - 1시간 이내 중복 요청")
     @Test
     void resendConfirmEmail() throws Exception {

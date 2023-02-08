@@ -10,12 +10,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.UUID;
 
 import static com.runningwith.WithUserSecurityContextFactory.EMAIL;
 import static com.runningwith.WithUserSecurityContextFactory.PASSWORD;
 import static com.runningwith.main.MainController.URL_LOGIN;
-import static com.runningwith.utils.CustomStringUtils.RANDOM_STRING;
 import static com.runningwith.utils.WebUtils.PAGE_INDEX;
 import static com.runningwith.utils.WebUtils.URL_ROOT;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -51,7 +53,7 @@ class MainControllerTest {
         usersRepository.deleteAll();
     }
 
-    @WithUser(RANDOM_STRING)
+    @WithUser
     @DisplayName("인덱스 뷰 - 인증 유저")
     @Test
     void index_with_authenticated_user() throws Exception {
@@ -83,5 +85,29 @@ class MainControllerTest {
                 .andExpect(redirectedUrl(URL_ROOT))
                 .andExpect(authenticated().withUsername("nickname"));
     }
+
+    @DisplayName("로그인 실패")
+    @Test
+    void login_fail() throws Exception {
+        mockMvc.perform(post(URL_LOGIN)
+                        .param("username", UUID.randomUUID().toString())
+                        .param("password", "wrongpass")
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl(URL_LOGIN + "?error"))
+                .andExpect(unauthenticated());
+    }
+
+    @WithMockUser
+    @DisplayName("로그아웃")
+    @Test
+    void logout() throws Exception {
+        mockMvc.perform(post("/logout")
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"))
+                .andExpect(unauthenticated());
+    }
+
 
 }
