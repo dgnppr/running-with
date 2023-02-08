@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.Optional;
@@ -32,6 +33,8 @@ public class UsersController {
     public static final String URL_CHECK_EMAIL = "/check-email";
     public static final String PAGE_CHECK_EMAIL = "users/check-email";
     public static final String URL_RESEND_CONFIRM_EMAIL = "/resend-confirm-email";
+    public static final String URL_USERS_PROFILE = "/profile";
+    public static final String PAGE_USERS_PROFILE = "users/profile";
     private final SignUpFormValidator signUpFormValidator;
     private final UsersService usersService;
     private final UsersRepository usersRepository;
@@ -98,4 +101,18 @@ public class UsersController {
         return URL_REDIRECT_ROOT;
     }
 
+    @GetMapping(URL_USERS_PROFILE + "/{nickname}")
+    public String viewProfile(@PathVariable String nickname, Model model, @CurrentUser UsersEntity usersEntity) {
+        Optional<UsersEntity> findUsersEntity = usersRepository.findByNickname(nickname);
+
+        if (findUsersEntity.isEmpty()) {
+            throw new IllegalArgumentException("해당 사용자가 없습니다.");
+        }
+
+        UsersEntity entity = findUsersEntity.get();
+        model.addAttribute("user", entity);
+        model.addAttribute("isOwner", entity.equals(usersEntity));
+
+        return PAGE_USERS_PROFILE;
+    }
 }

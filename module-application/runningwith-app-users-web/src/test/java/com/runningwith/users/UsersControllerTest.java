@@ -5,6 +5,7 @@ import com.runningwith.WithUser;
 import com.runningwith.account.AccountRepository;
 import com.runningwith.mail.EmailMessage;
 import com.runningwith.mail.EmailService;
+import com.runningwith.users.form.SignUpForm;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Optional;
 
 import static com.runningwith.WithUserSecurityContextFactory.EMAIL;
+import static com.runningwith.WithUserSecurityContextFactory.PASSWORD;
 import static com.runningwith.users.UsersController.*;
 import static com.runningwith.utils.CustomStringUtils.RANDOM_STRING;
 import static com.runningwith.utils.WebUtils.URL_REDIRECT_ROOT;
@@ -37,6 +39,8 @@ class UsersControllerTest {
     UsersRepository usersRepository;
     @Autowired
     AccountRepository accountRepository;
+    @Autowired
+    UsersService usersService;
     @MockBean
     EmailService emailService;
 
@@ -81,7 +85,7 @@ class UsersControllerTest {
                 .andExpect(view().name(PAGE_SIGN_UP));
     }
 
-    @WithUser(RANDOM_STRING)
+    @WithUser
     @DisplayName("인증 메일 확인 - 잆력값 정상")
     @Test
     void checkEmailToken_with_correct_input() throws Exception {
@@ -132,5 +136,43 @@ class UsersControllerTest {
                 .andExpect(authenticated())
                 .andExpect(view().name(PAGE_CHECK_EMAIL));
     }
+
+    @WithUser
+    @DisplayName("프로필 뷰 성공 - by self")
+    @Test
+    void view_profile_success_by_self() throws Exception {
+        UsersEntity usersEntity = usersRepository.findByNickname(RANDOM_STRING).get();
+        mockMvc.perform(get(URL_USERS_PROFILE + "/" + RANDOM_STRING))
+                .andExpect(model().attribute("user", usersEntity))
+                .andExpect(model().attribute("isOwner", true))
+                .andExpect(status().isOk())
+                .andExpect(authenticated())
+                .andExpect(view().name(PAGE_USERS_PROFILE));
+    }
+
+    @DisplayName("프로필 뷰 성공 - by other")
+    @Test
+    void view_profile_success_by_other() throws Exception {
+        SignUpForm signUpForm = new SignUpForm();
+        signUpForm.setNickname("nickname");
+        signUpForm.setEmail("nickname" + EMAIL);
+        signUpForm.setPassword(PASSWORD);
+        UsersEntity usersEntity = usersService.processNewUsers(signUpForm);
+
+        mockMvc.perform(get(URL_USERS_PROFILE + "/" + "nickname"))
+                .andExpect(model().attribute("user", usersEntity))
+                .andExpect(model().attribute("isOwner", false))
+                .andExpect(status().isOk())
+                .andExpect(unauthenticated())
+                .andExpect(view().name(PAGE_USERS_PROFILE));
+    }
+
+    // TODO 프로필 뷰 실패 테스트 코드 작성
+    @DisplayName("프로필 뷰 실패 - 에러 경로")
+    @Test
+    void view_profile_failure_wrong_path() throws Exception {
+        // mockMvc.perform(get(URL_USERS_PROFILE + "/" + UUID.randomUUID()))
+    }
+
 
 }

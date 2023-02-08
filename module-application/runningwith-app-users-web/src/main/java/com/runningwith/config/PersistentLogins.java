@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+// TODO RDS 도메인에서 분리
 @Table(name = "persistent_logins")
 @Entity
 @Getter
