@@ -92,4 +92,11 @@ public class UsersEntity {
     public boolean canSendConfirmEmail() {
         return this.emailCheckTokenGeneratedAt.isBefore(LocalDateTime.now().minusHours(1));
     }
+
+    public void updateProfile(String bio, String profileUrl, String occupation, String location) {
+        this.bio = bio;
+        this.profileUrl = profileUrl;
+        this.occupation = occupation;
+        this.location = location;
+    }
 }

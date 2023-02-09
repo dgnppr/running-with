@@ -11,8 +11,11 @@
             <div th:replace="~{fragments.html :: settings-menu(currentMenu='profile')}"></div>
         </div>
         <div class="col-8">
+            <div class="alert alert-info alert-dismissible fade show mt-3" role="alert" th:if="${message}">
+                <span th:text="${message}">메시지</span>
+            </div>
             <div class="row">
-                <h2 class="col-sm-12" th:text="${profile.nickname}">nickname</h2>
+                <h2 class="col-sm-12" th:text="${nickname}">nickname</h2>
             </div>
             <div class="row mt-3">
                 <form action="#" class="col-sm-6"
@@ -33,7 +36,7 @@
                         <label for="profileUrl">링크</label>
                         <input aria-describedby="urlHelp" class="form-control" id="profileUrl"
                                placeholder="https://runningwith.com"
-                               required th:field="*{profileUrl}" type="profileUrl">
+                               required th:field="*{profileUrl}" type="url">
                         <small class="form-text text-muted" id="profileUrlHelp">
                             링크를 추가하세요.
                         </small>
