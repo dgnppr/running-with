@@ -17,7 +17,7 @@ import java.util.Optional;
 import static com.runningwith.WithUserSecurityContextFactory.EMAIL;
 import static com.runningwith.WithUserSecurityContextFactory.PASSWORD;
 import static com.runningwith.users.UsersController.*;
-import static com.runningwith.utils.CustomStringUtils.RANDOM_STRING;
+import static com.runningwith.utils.CustomStringUtils.WITH_USER_NICKNAME;
 import static com.runningwith.utils.WebUtils.URL_REDIRECT_ROOT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -90,7 +90,7 @@ class UsersControllerTest {
     @Test
     void checkEmailToken_with_correct_input() throws Exception {
 
-        UsersEntity usersEntity = usersRepository.findByNickname(RANDOM_STRING).get();
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
 
         mockMvc.perform(get(URL_CHECK_EMAIL_TOKEN)
                         .param("token", usersEntity.getEmailCheckToken())
@@ -120,7 +120,7 @@ class UsersControllerTest {
     @Test
     void checkEmail() throws Exception {
         mockMvc.perform(get(URL_CHECK_EMAIL))
-                .andExpect(model().attribute("email", RANDOM_STRING + EMAIL))
+                .andExpect(model().attribute("email", WITH_USER_NICKNAME + EMAIL))
                 .andExpect(authenticated())
                 .andExpect(view().name(PAGE_CHECK_EMAIL));
     }
@@ -131,7 +131,7 @@ class UsersControllerTest {
     void resendConfirmEmail() throws Exception {
         mockMvc.perform(get(URL_RESEND_CONFIRM_EMAIL))
                 .andExpect(model().attribute("error", "인증 이메일은 1시간에 한번만 전송할 수 있습니다."))
-                .andExpect(model().attribute("email", RANDOM_STRING + EMAIL))
+                .andExpect(model().attribute("email", WITH_USER_NICKNAME + EMAIL))
                 .andExpect(status().isOk())
                 .andExpect(authenticated())
                 .andExpect(view().name(PAGE_CHECK_EMAIL));
@@ -141,8 +141,8 @@ class UsersControllerTest {
     @DisplayName("프로필 뷰 성공 - by self")
     @Test
     void view_profile_success_by_self() throws Exception {
-        UsersEntity usersEntity = usersRepository.findByNickname(RANDOM_STRING).get();
-        mockMvc.perform(get(URL_USERS_PROFILE + "/" + RANDOM_STRING))
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        mockMvc.perform(get(URL_USERS_PROFILE + "/" + WITH_USER_NICKNAME))
                 .andExpect(model().attribute("user", usersEntity))
                 .andExpect(model().attribute("isOwner", true))
                 .andExpect(status().isOk())

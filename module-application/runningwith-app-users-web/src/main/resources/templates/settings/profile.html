@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments.html :: head}"></head>
+
+<body class="bg-light">
+<div th:replace="~{fragments.html :: main-nav}"></div>
+
+<div class="container">
+    <div class="row mt-5 justify-content-center">
+        <div class="col-2">
+            <div th:replace="~{fragments.html :: settings-menu(currentMenu='profile')}"></div>
+        </div>
+        <div class="col-8">
+            <div class="row">
+                <h2 class="col-sm-12" th:text="${profile.nickname}">nickname</h2>
+            </div>
+            <div class="row mt-3">
+                <form action="#" class="col-sm-6"
+                      method="post" novalidate th:action th:object="${profile}">
+                    <div class="form-group">
+                        <label for="bio">한 줄 소개</label>
+                        <input aria-describedby="bioHelp" class="form-control" id="bio" placeholder="자신을 표현해보세요."
+                               required th:field="*{bio}" type="text">
+                        <small class="form-text text-muted" id="bioHelp">
+                            35자 이내로 입력하세요.
+                        </small>
+                        <small class="form-text text-danger" th:errors="*{bio}" th:if="${#fields.hasErrors('bio')}">
+                            35자 이내로 입력하세요.
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profileUrl">링크</label>
+                        <input aria-describedby="urlHelp" class="form-control" id="profileUrl"
+                               placeholder="https://runningwith.com"
+                               required th:field="*{profileUrl}" type="profileUrl">
+                        <small class="form-text text-muted" id="profileUrlHelp">
+                            링크를 추가하세요.
+                        </small>
+                        <small class="form-text text-danger" th:errors="*{profileUrl}"
+                               th:if="${#fields.hasErrors('profileUrl')}">
+                            올바른 링크로 작성해주세요.
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="company">직업</label>
+                        <input aria-describedby="occupationHelp" class="form-control" id="company"
+                               placeholder="어떤 직무를 하고 계신가요?"
+                               required th:field="*{occupation}" type="text">
+                        <small class="form-text text-muted" id="occupationHelp">
+                            프론트엔드,백엔드,데이터 엔지니어
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">활동 지역</label>
+                        <input aria-describedby="locationdHelp" class="form-control" id="location"
+                               placeholder="Seoul, South Korea" required th:field="*{location}" type="text">
+                        <small class="form-text text-muted" id="locationdHelp">
+                            주요 활동 지역의 도시 이름을 알려주세요.
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <button aria-describedby="submitHelp" class="btn btn-primary btn-block"
+                                type="submit">수정하기
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block th:replace="~{fragments.html :: footer}"></th:block>
+</body>
+</html>
