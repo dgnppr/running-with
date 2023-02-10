@@ -1,8 +1,12 @@
 package com.runningwith.users.form;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class PasswordForm {
 
@@ -11,5 +15,6 @@ public class PasswordForm {
 
     @Length(min = 8, max = 50)
     private String newPasswordConfirm;
+
 
 }

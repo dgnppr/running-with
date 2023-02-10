@@ -66,10 +66,17 @@ public class SettingsController {
         return VIEW_SETTINGS_PASSWORD;
     }
 
-    // TODO updatePassword
     @PostMapping(URL_SETTINGS_PASSWORD)
-    public String updatePassword(@CurrentUser UsersEntity usersEntity, @Validated PasswordForm passwordForm, BindingResult bindingResult) {
-        return null;
+    public String updatePassword(@CurrentUser UsersEntity usersEntity, @Validated PasswordForm passwordForm, BindingResult bindingResult
+            , Model model, RedirectAttributes attributes) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("user", usersEntity);
+            return VIEW_SETTINGS_PASSWORD;
+        }
+
+        usersService.updatePassword(usersEntity, passwordForm);
+        attributes.addFlashAttribute("message", "비밀번호 변경 완료");
+        return REDIRECT + URL_SETTINGS_PASSWORD;
     }
 
 }

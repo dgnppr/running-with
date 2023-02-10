@@ -2,6 +2,7 @@ package com.runningwith.users;
 
 import com.runningwith.MockMvcTest;
 import com.runningwith.WithUser;
+import com.runningwith.users.form.PasswordForm;
 import com.runningwith.users.form.Profile;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -109,5 +110,29 @@ class SettingsControllerTest {
                 .andExpect(authenticated())
                 .andExpect(view().name(VIEW_SETTINGS_PASSWORD));
     }
+
+    @WithUser
+    @DisplayName("비밀번호 수정 - 입력값 정상")
+    @Test
+    void update_password_with_correct_inputs() throws Exception {
+
+        PasswordForm passwordForm = new PasswordForm("correctpassword", "correctpassword");
+        mockMvc.perform(post(URL_SETTINGS_PASSWORD)
+                        .param("newPassword", passwordForm.getNewPassword())
+                        .param("newPasswordConfirm", passwordForm.getNewPasswordConfirm())
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(authenticated())
+                .andExpect(view().name(REDIRECT + URL_SETTINGS_PASSWORD));
+
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+
+        String beforeChangedPW = "password";
+        assertThat(usersEntity.getPassword()).isNotEqualTo(beforeChangedPW); // check whether password is changed
+        assertThat(usersEntity.getPassword()).isNotEqualTo(passwordForm.getNewPassword()); // check whether password is encoded
+        // check whether password is changed
+    }
+
+    // TODO update password with wrong inputs
 
 }

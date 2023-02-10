@@ -5,6 +5,7 @@ import com.runningwith.account.AccountRepository;
 import com.runningwith.account.AccountType;
 import com.runningwith.mail.EmailMessage;
 import com.runningwith.mail.EmailService;
+import com.runningwith.users.form.PasswordForm;
 import com.runningwith.users.form.Profile;
 import com.runningwith.users.form.SignUpForm;
 import jakarta.servlet.http.HttpServletRequest;
@@ -107,6 +108,12 @@ public class UsersService implements UserDetailsService {
 
     public void updateProfile(UsersEntity usersEntity, Profile profile) {
         usersEntity.updateProfile(profile.getBio(), profile.getProfileUrl(), profile.getOccupation(), profile.getLocation(), profile.getProfileImage());
+        usersRepository.save(usersEntity);
+    }
+
+    public void updatePassword(UsersEntity usersEntity, PasswordForm passwordForm) {
+        String encodedNewPassword = passwordEncoder.encode(passwordForm.getNewPassword());
+        usersEntity.updatePassword(encodedNewPassword);
         usersRepository.save(usersEntity);
     }
 }

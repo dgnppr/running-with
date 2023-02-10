@@ -100,4 +100,8 @@ public class UsersEntity {
         this.location = location;
         this.profileImage = profileImage;
     }
+
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
 }

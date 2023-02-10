@@ -66,13 +66,13 @@
         <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
             <a aria-expanded="false" class="nav-link btn-secondary dropdown-toggle" data-bs-toggle="dropdown" href="#"
                role="button">
-                <svg class="rounded border bg-light"
-                     height="24"
-                     th:data-jdenticon-value="${#authentication.name}"
-                     th:if="${#strings.isEmpty(usersEntity?.profileImage)}" width="24"></svg>
-                <img class="rounded border" height="24"
-                     th:if="${!#strings.isEmpty(usersEntity?.profileImage)}" th:src="${usersEntity.profileImage}"
-                     width="24"/>
+                <svg class="rounded border bg-light" height="36"
+                     justify-content-center th:data-jdenticon-value="${#authentication.name}"
+                     th:if="${#strings.isEmpty(usersEntity?.profileImage)}"
+                     width="36"></svg>
+                <img class="rounded border" height="36" justify-content-center
+                     th:if="${!#strings.isEmpty(usersEntity?.profileImage)}"
+                     th:src="${usersEntity.profileImage}" width="36"/>
                 프로필
             </a>
 
