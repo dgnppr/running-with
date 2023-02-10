@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static com.runningwith.users.SettingsController.URL_SETTINGS_PROFILE;
-import static com.runningwith.users.SettingsController.VIEW_SETTINGS_PROFILE;
+import static com.runningwith.users.SettingsController.*;
 import static com.runningwith.users.form.Profile.toProfile;
 import static com.runningwith.utils.CustomStringUtils.RANDOM_STRING;
 import static com.runningwith.utils.CustomStringUtils.WITH_USER_NICKNAME;
@@ -33,7 +32,7 @@ class SettingsControllerTest {
     @WithUser
     @DisplayName("프로필 수정 뷰 테스트")
     @Test
-    void settings_profile_view() throws Exception {
+    void view_settings_profile() throws Exception {
 
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
 
@@ -94,7 +93,21 @@ class SettingsControllerTest {
                 .andExpect(model().attribute("nickname", WITH_USER_NICKNAME))
                 .andExpect(authenticated())
                 .andExpect(view().name(VIEW_SETTINGS_PROFILE));
+    }
 
+    @WithUser
+    @DisplayName("비밀번호 수정 뷰 테스트")
+    @Test
+    void view_update_password() throws Exception {
+
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+
+        mockMvc.perform(get(URL_SETTINGS_PASSWORD))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("user", usersEntity))
+                .andExpect(model().attributeExists(PASSWORD_FORM))
+                .andExpect(authenticated())
+                .andExpect(view().name(VIEW_SETTINGS_PASSWORD));
     }
 
 }

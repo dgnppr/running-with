@@ -46,7 +46,7 @@ class UsersControllerTest {
 
     @DisplayName("회원가입 뷰 - 정상")
     @Test
-    void signUpForm() throws Exception {
+    void view_signUp() throws Exception {
         mockMvc.perform(get(URL_SIGN_UP))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -57,7 +57,7 @@ class UsersControllerTest {
 
     @DisplayName("회원가입 처리 - 입력값 정상")
     @Test
-    void signUpSubmit_with_correct_input() throws Exception {
+    void signUp_submit_with_correct_input() throws Exception {
         mockMvc.perform(post(URL_SIGN_UP)
                         .param("nickname", "test")
                         .param("email", "email@email.com")
@@ -75,7 +75,7 @@ class UsersControllerTest {
 
     @DisplayName("회원가입 처리 - 입력값 실패")
     @Test
-    void signUpSubmit_with_wrong_input() throws Exception {
+    void signUp_submit_with_wrong_input() throws Exception {
         mockMvc.perform(post(URL_SIGN_UP)
                         .param("nickname", "test")
                         .param("email", "email")
@@ -88,7 +88,7 @@ class UsersControllerTest {
     @WithUser
     @DisplayName("인증 메일 확인 - 잆력값 정상")
     @Test
-    void checkEmailToken_with_correct_input() throws Exception {
+    void check_email_token_with_correct_input() throws Exception {
 
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
 
@@ -104,7 +104,7 @@ class UsersControllerTest {
 
     @DisplayName("인증 메일 확인 - 입력값 오류")
     @Test
-    void checkEmailToken_with_wrong_input() throws Exception {
+    void check_email_token_with_wrong_input() throws Exception {
         mockMvc.perform(get(URL_CHECK_EMAIL_TOKEN)
                         .param("token", "wrong-token")
                         .param("email", "email@email.com"))
@@ -118,7 +118,7 @@ class UsersControllerTest {
     @WithUser
     @DisplayName("인증 메일 뷰 - 정상")
     @Test
-    void checkEmail() throws Exception {
+    void view_check_email() throws Exception {
         mockMvc.perform(get(URL_CHECK_EMAIL))
                 .andExpect(model().attribute("email", WITH_USER_NICKNAME + EMAIL))
                 .andExpect(authenticated())
@@ -128,7 +128,7 @@ class UsersControllerTest {
     @WithUser
     @DisplayName("재전송 메일 - 1시간 이내 중복 요청")
     @Test
-    void resendConfirmEmail() throws Exception {
+    void resend_confirm_email_within_one_hour() throws Exception {
         mockMvc.perform(get(URL_RESEND_CONFIRM_EMAIL))
                 .andExpect(model().attribute("error", "인증 이메일은 1시간에 한번만 전송할 수 있습니다."))
                 .andExpect(model().attribute("email", WITH_USER_NICKNAME + EMAIL))

@@ -1,13 +1,17 @@
 package com.runningwith.users;
 
+import com.runningwith.users.form.PasswordForm;
 import com.runningwith.users.form.Profile;
+import com.runningwith.users.validator.PasswordFormValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -21,8 +25,16 @@ public class SettingsController {
 
     public static final String URL_SETTINGS_PROFILE = "/settings/profile";
     public static final String VIEW_SETTINGS_PROFILE = "settings/profile";
+    public static final String PASSWORD_FORM = "passwordForm";
+    public static final String URL_SETTINGS_PASSWORD = "/settings/password";
+    public static final String VIEW_SETTINGS_PASSWORD = "settings/password";
 
     private final UsersService usersService;
+
+    @InitBinder(PASSWORD_FORM)
+    public void initBinder(WebDataBinder webDataBinder) {
+        webDataBinder.addValidators(new PasswordFormValidator());
+    }
 
     @GetMapping(URL_SETTINGS_PROFILE)
     public String profileUpdateView(@CurrentUser UsersEntity usersEntity, Model model) {
@@ -46,4 +58,18 @@ public class SettingsController {
         attributes.addFlashAttribute("message", "프로필 수정 완료");
         return REDIRECT + URL_SETTINGS_PROFILE;
     }
+
+    @GetMapping(URL_SETTINGS_PASSWORD)
+    public String updatePasswordView(@CurrentUser UsersEntity usersEntity, Model model) {
+        model.addAttribute("user", usersEntity);
+        model.addAttribute(new PasswordForm());
+        return VIEW_SETTINGS_PASSWORD;
+    }
+
+    // TODO updatePassword
+    @PostMapping(URL_SETTINGS_PASSWORD)
+    public String updatePassword(@CurrentUser UsersEntity usersEntity, @Validated PasswordForm passwordForm, BindingResult bindingResult) {
+        return null;
+    }
+
 }
