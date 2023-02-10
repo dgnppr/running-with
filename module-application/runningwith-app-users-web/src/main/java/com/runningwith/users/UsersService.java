@@ -106,7 +106,7 @@ public class UsersService implements UserDetailsService {
     }
 
     public void updateProfile(UsersEntity usersEntity, Profile profile) {
-        usersEntity.updateProfile(profile.getBio(), profile.getProfileUrl(), profile.getOccupation(), profile.getLocation());
+        usersEntity.updateProfile(profile.getBio(), profile.getProfileUrl(), profile.getOccupation(), profile.getLocation(), profile.getProfileImage());
         usersRepository.save(usersEntity);
     }
 }

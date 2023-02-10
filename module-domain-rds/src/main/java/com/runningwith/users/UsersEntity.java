@@ -93,10 +93,11 @@ public class UsersEntity {
         return this.emailCheckTokenGeneratedAt.isBefore(LocalDateTime.now().minusHours(1));
     }
 
-    public void updateProfile(String bio, String profileUrl, String occupation, String location) {
+    public void updateProfile(String bio, String profileUrl, String occupation, String location, String profileImage) {
         this.bio = bio;
         this.profileUrl = profileUrl;
         this.occupation = occupation;
         this.location = location;
+        this.profileImage = profileImage;
     }
 }

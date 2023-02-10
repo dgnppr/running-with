@@ -68,8 +68,7 @@ class SettingsControllerTest {
         assertThat(usersEntity.getProfileUrl()).isEqualTo(profile.getProfileUrl());
         assertThat(usersEntity.getOccupation()).isEqualTo(profile.getOccupation());
         assertThat(usersEntity.getLocation()).isEqualTo(profile.getLocation());
-        // TODO assert profileImage field
-        // assertThat(usersEntity.getProfileImage()).isEqualTo(profile.getProfileImage());
+        assertThat(usersEntity.getProfileImage()).isEqualTo(profile.getProfileImage());
     }
 
     @WithUser
