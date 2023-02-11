@@ -154,4 +154,18 @@ class SettingsControllerTest {
                 .andExpect(view().name(VIEW_SETTINGS_PASSWORD));
     }
 
+    @WithUser
+    @DisplayName("알림 수정 뷰 테스트")
+    @Test
+    void update_notifications_view() throws Exception {
+
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        mockMvc.perform(get(URL_SETTINGS_NOTIFICATIONS))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("user", usersEntity))
+                .andExpect(model().attributeExists("notifications"))
+                .andExpect(authenticated())
+                .andExpect(view().name(VIEW_SETTINGS_NOTIFICATIONS));
+    }
+
 }

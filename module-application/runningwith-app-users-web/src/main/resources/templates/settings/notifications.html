@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments.html :: head}"></head>
+
+<body class="bg-light">
+<div th:replace="~{fragments.html :: main-nav}"></div>
+
+<div class="container">
+    <div class="row mt-5 justify-content-center">
+        <div class="col-2">
+            <div th:replace="~{fragments.html :: settings-menu(currentMenu='notifications')}"></div>
+        </div>
+        <div class="col-8">
+            <div class="alert alert-info alert-dismissible fade show mt-3" role="alert" th:if="${message}">
+                <span th:text="${message}">메시지</span>
+            </div>
+            <div class="row">
+                <h2 class="col-12">알림 설정</h2>
+            </div>
+
+            <div class="row mt-3" th:fragment="profile-form">
+                <form action="#" class="col-12" method="post" novalidate th:action th:object="${notifications}">
+                    <div class="alert alert-light" role="alert">
+                        <strong><a href="#" th:href="@{/settings/locations}">주요 활동 지역 , </a>
+                            <a href="#" th:href="@{/settings/keywords}">관심 주제</a> </strong> 알림 설정
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-control custom-switch custom-control-inline">
+                            <input class="custom-control-input" id="studyCreatedByEmail"
+                                   th:field="*{studyCreatedByEmail}"
+                                   type="checkbox">
+                            <label class="custom-control-label" for="studyCreatedByEmail">이메일로 받기</label>
+                        </div>
+                        <div class="custom-control custom-switch custom-control-inline">
+                            <input class="custom-control-input" id="studyCreatedByWeb" th:field="*{studyCreatedByWeb}"
+                                   type="checkbox">
+                            <label class="custom-control-label" for="studyCreatedByWeb">웹으로 받기</label>
+                        </div>
+                    </div>
+                    <div class="alert alert-light" role="alert">
+                        <strong>스터디 모임 참여 신청 결과</strong> 알림 설정
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-control custom-switch custom-control-inline">
+                            <input class="custom-control-input" id="studyEnrollmentResultByEmil"
+                                   th:field="*{studyEnrollmentResultByEmail}" type="checkbox">
+                            <label class="custom-control-label" for="studyEnrollmentResultByEmil">이메일로 받기</label>
+                        </div>
+                        <div class="custom-control custom-switch custom-control-inline">
+                            <input class="custom-control-input" id="studyEnrollmentResultByWeb"
+                                   th:field="*{studyEnrollmentResultByWeb}"
+                                   type="checkbox">
+                            <label class="custom-control-label" for="studyEnrollmentResultByWeb">웹으로 받기</label>
+                        </div>
+                    </div>
+                    <div class="alert alert-light" role="alert">
+                        <strong>참여중인 스터디</strong> 알림 설정
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-control custom-switch custom-control-inline">
+                            <input class="custom-control-input" id="studyWatchByEmail" th:field="*{studyUpdatedByEmail}"
+                                   type="checkbox">
+                            <label class="custom-control-label" for="studyWatchByEmail">이메일로 받기</label>
+                        </div>
+                        <div class="custom-control custom-switch custom-control-inline">
+                            <input class="custom-control-input" id="studyWatchByWeb" th:field="*{studyUpdatedByWeb}"
+                                   type="checkbox">
+                            <label class="custom-control-label" for="studyWatchByWeb">웹으로 받기</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button aria-describedby="submitHelp" class="btn btn-outline-primary" type="submit">저장하기
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+<th:block th:replace="~{fragments.html :: footer}"></th:block>
+</body>
+</html>

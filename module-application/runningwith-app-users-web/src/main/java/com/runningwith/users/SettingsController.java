@@ -1,5 +1,6 @@
 package com.runningwith.users;
 
+import com.runningwith.users.form.Notifications;
 import com.runningwith.users.form.PasswordForm;
 import com.runningwith.users.form.Profile;
 import com.runningwith.users.validator.PasswordFormValidator;
@@ -28,6 +29,8 @@ public class SettingsController {
     public static final String PASSWORD_FORM = "passwordForm";
     public static final String URL_SETTINGS_PASSWORD = "/settings/password";
     public static final String VIEW_SETTINGS_PASSWORD = "settings/password";
+    public static final String URL_SETTINGS_NOTIFICATIONS = "/settings/notifications";
+    public static final String VIEW_SETTINGS_NOTIFICATIONS = "settings/notifications";
 
     private final UsersService usersService;
 
@@ -77,6 +80,13 @@ public class SettingsController {
         usersService.updatePassword(usersEntity, passwordForm);
         attributes.addFlashAttribute("message", "비밀번호 변경 완료");
         return REDIRECT + URL_SETTINGS_PASSWORD;
+    }
+
+    @GetMapping(URL_SETTINGS_NOTIFICATIONS)
+    public String updateNotificationsView(@CurrentUser UsersEntity usersEntity, Model model) {
+        model.addAttribute("user", usersEntity);
+        model.addAttribute(new Notifications(usersEntity));
+        return VIEW_SETTINGS_NOTIFICATIONS;
     }
 
 }
