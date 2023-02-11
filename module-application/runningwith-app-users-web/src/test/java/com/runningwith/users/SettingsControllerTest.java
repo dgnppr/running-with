@@ -91,6 +91,7 @@ class SettingsControllerTest {
                         .param("profileImage", profile.getProfileImage())
                         .with(csrf()))
                 .andExpect(status().isOk())
+                .andExpect(model().hasErrors())
                 .andExpect(model().attribute("nickname", WITH_USER_NICKNAME))
                 .andExpect(authenticated())
                 .andExpect(view().name(VIEW_SETTINGS_PROFILE));
@@ -116,6 +117,8 @@ class SettingsControllerTest {
     @Test
     void update_password_with_correct_inputs() throws Exception {
 
+        String beforeChangedPW = usersRepository.findByNickname(WITH_USER_NICKNAME).get().getPassword();
+
         PasswordForm passwordForm = new PasswordForm("correctpassword", "correctpassword");
         mockMvc.perform(post(URL_SETTINGS_PASSWORD)
                         .param("newPassword", passwordForm.getNewPassword())
@@ -127,12 +130,28 @@ class SettingsControllerTest {
 
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
 
-        String beforeChangedPW = "password";
         assertThat(usersEntity.getPassword()).isNotEqualTo(beforeChangedPW); // check whether password is changed
         assertThat(usersEntity.getPassword()).isNotEqualTo(passwordForm.getNewPassword()); // check whether password is encoded
-        // check whether password is changed
     }
 
-    // TODO update password with wrong inputs
+    @WithUser
+    @DisplayName("비밀번호 수정 - 입력값 에러")
+    @Test
+    void update_password_with_wrong_inputs() throws Exception {
+
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+
+        PasswordForm passwordForm = new PasswordForm("1111", "1234");
+        mockMvc.perform(post(URL_SETTINGS_PASSWORD)
+                        .param("newPassword", passwordForm.getNewPassword())
+                        .param("newPasswordConfirm", passwordForm.getNewPasswordConfirm())
+                        .with(csrf()))
+                .andExpect(model().hasErrors())
+                .andExpect(model().attribute("user", usersEntity))
+                .andExpect(model().attributeExists(PASSWORD_FORM))
+                .andExpect(status().isOk())
+                .andExpect(authenticated())
+                .andExpect(view().name(VIEW_SETTINGS_PASSWORD));
+    }
 
 }

@@ -82,6 +82,7 @@ class UsersControllerTest {
                         .param("password", "wrongpw")
                         .with(csrf()))
                 .andExpect(status().isOk())
+                .andExpect(model().hasErrors())
                 .andExpect(view().name(PAGE_SIGN_UP));
     }
 

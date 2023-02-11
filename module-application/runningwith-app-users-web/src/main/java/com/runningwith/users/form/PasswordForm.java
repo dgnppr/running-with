@@ -10,6 +10,7 @@ import org.hibernate.validator.constraints.Length;
 @Data
 public class PasswordForm {
 
+    // TODO additional password validation
     @Length(min = 8, max = 50)
     private String newPassword;
 
