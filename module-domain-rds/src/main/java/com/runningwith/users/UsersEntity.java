@@ -113,4 +113,8 @@ public class UsersEntity {
         this.studyUpdatedByEmail = studyUpdatedByEmail;
         this.studyUpdatedByWeb = studyUpdatedByWeb;
     }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }

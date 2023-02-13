@@ -123,12 +123,17 @@ public class UsersService implements UserDetailsService {
 
     public void updateNotifications(UsersEntity usersEntity, Notifications notifications) {
         usersEntity.updateNotifications(
-                notifications.isStudyUpdatedByEmail(),
-                notifications.isStudyUpdatedByWeb(),
                 notifications.isStudyCreatedByEmail(),
                 notifications.isStudyCreatedByWeb(),
                 notifications.isStudyEnrollmentResultByEmail(),
-                notifications.isStudyEnrollmentResultByWeb());
+                notifications.isStudyEnrollmentResultByWeb(),
+                notifications.isStudyUpdatedByEmail(),
+                notifications.isStudyUpdatedByWeb());
+        usersRepository.save(usersEntity);
+    }
+
+    public void updateNickname(UsersEntity usersEntity, String nickname) {
+        usersEntity.updateNickname(nickname);
         usersRepository.save(usersEntity);
     }
 }

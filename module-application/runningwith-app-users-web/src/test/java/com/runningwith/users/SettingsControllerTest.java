@@ -2,6 +2,7 @@ package com.runningwith.users;
 
 import com.runningwith.MockMvcTest;
 import com.runningwith.WithUser;
+import com.runningwith.users.form.NicknameForm;
 import com.runningwith.users.form.Notifications;
 import com.runningwith.users.form.PasswordForm;
 import com.runningwith.users.form.Profile;
@@ -164,7 +165,7 @@ class SettingsControllerTest {
         mockMvc.perform(get(URL_SETTINGS_NOTIFICATIONS))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("user", usersEntity))
-                .andExpect(model().attributeExists("notifications"))
+                .andExpect(model().attributeExists(NOTIFICATIONS_FORM))
                 .andExpect(authenticated())
                 .andExpect(view().name(VIEW_SETTINGS_NOTIFICATIONS));
     }
@@ -196,7 +197,40 @@ class SettingsControllerTest {
         assertThat(changed.isStudyEnrollmentResultByWeb()).isEqualTo(false);
         assertThat(changed.isStudyUpdatedByEmail()).isEqualTo(false);
         assertThat(changed.isStudyUpdatedByWeb()).isEqualTo(false);
+    }
+
+    @WithUser
+    @DisplayName("계정 업데이트 뷰")
+    @Test
+    void view_update_users() throws Exception {
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        mockMvc.perform(get(URL_SETTINGS_USERS))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("user", usersEntity))
+                .andExpect(model().attributeExists(NICKNAME_FORM))
+                .andExpect(authenticated())
+                .andExpect(view().name(VIEW_SETTINGS_USERS));
+    }
+
+    @WithUser
+    @DisplayName("닉네임 업데이트 - 입력값 정상")
+    @Test
+    void update_nickname_with_correct_input() throws Exception {
+        String originNickname = usersRepository.findByNickname(WITH_USER_NICKNAME).get().getNickname();
+        String change = "correctnickname";
+        NicknameForm nicknameForm = new NicknameForm(change);
+        mockMvc.perform(post(URL_SETTINGS_USERS)
+                        .param("nickname", nicknameForm.getNickname())
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(authenticated())
+                .andExpect(view().name(REDIRECT + URL_SETTINGS_USERS));
+
+        String changedNickname = usersRepository.findByNickname(change).get().getNickname();
+        assertThat(originNickname).isNotEqualTo(changedNickname);
+        assertThat(changedNickname).isEqualTo(change);
 
     }
+
 
 }

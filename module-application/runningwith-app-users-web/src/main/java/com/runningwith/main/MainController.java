@@ -18,7 +18,7 @@ public class MainController {
     @GetMapping(URL_ROOT)
     public String index(@CurrentUser UsersEntity usersEntity, Model model) {
         if (usersEntity != null) {
-            model.addAttribute(usersEntity);
+            model.addAttribute("user", usersEntity);
         }
         return PAGE_INDEX;
     }

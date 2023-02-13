@@ -1,9 +1,13 @@
 package com.runningwith.users;
 
+import com.runningwith.users.form.NicknameForm;
 import com.runningwith.users.form.Notifications;
 import com.runningwith.users.form.PasswordForm;
 import com.runningwith.users.form.Profile;
+import com.runningwith.users.validator.NicknameFormValidator;
 import com.runningwith.users.validator.PasswordFormValidator;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -30,14 +34,23 @@ public class SettingsController {
     public static final String VIEW_SETTINGS_PASSWORD = "settings/password";
     public static final String URL_SETTINGS_NOTIFICATIONS = "/settings/notifications";
     public static final String VIEW_SETTINGS_NOTIFICATIONS = "settings/notifications";
+    public static final String URL_SETTINGS_USERS = "/settings/users";
     public static final String PASSWORD_FORM = "passwordForm";
+    public static final String VIEW_SETTINGS_USERS = "settings/users";
     public static final String NOTIFICATIONS_FORM = "notifications";
+    public static final String NICKNAME_FORM = "nicknameForm";
 
     private final UsersService usersService;
+    private final NicknameFormValidator nicknameFormValidator;
 
-    @InitBinder(PASSWORD_FORM)
-    public void initBinder(WebDataBinder webDataBinder) {
+    @InitBinder({PASSWORD_FORM})
+    public void passwordFormInitBinder(WebDataBinder webDataBinder) {
         webDataBinder.addValidators(new PasswordFormValidator());
+    }
+
+    @InitBinder(NICKNAME_FORM)
+    public void nicknameFormInitBinder(WebDataBinder webDataBinder) {
+        webDataBinder.addValidators(nicknameFormValidator);
     }
 
     @GetMapping(URL_SETTINGS_PROFILE)
@@ -45,6 +58,7 @@ public class SettingsController {
 
         model.addAttribute("profile", toProfile(usersEntity));
         model.addAttribute("nickname", usersEntity.getNickname());
+        model.addAttribute("user", usersEntity);
 
         return VIEW_SETTINGS_PROFILE;
     }
@@ -101,6 +115,27 @@ public class SettingsController {
         usersService.updateNotifications(usersEntity, notifications);
         attributes.addFlashAttribute("message", "알림 설정을 변경했습니다.");
         return REDIRECT + URL_SETTINGS_NOTIFICATIONS;
+    }
+
+    @GetMapping(URL_SETTINGS_USERS)
+    public String updateUsersView(@CurrentUser UsersEntity usersEntity, Model model) {
+        model.addAttribute("user", usersEntity);
+        model.addAttribute(new NicknameForm(usersEntity.getNickname()));
+        return VIEW_SETTINGS_USERS;
+    }
+
+    @PostMapping(URL_SETTINGS_USERS)
+    public String updateUsersForm(@CurrentUser UsersEntity usersEntity, @Validated NicknameForm nicknameForm, BindingResult bindingResult,
+                                  Model model, RedirectAttributes attributes, HttpServletRequest request, HttpServletResponse response) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("user", usersEntity);
+            return VIEW_SETTINGS_USERS;
+        }
+
+        usersService.updateNickname(usersEntity, nicknameForm.getNickname());
+        usersService.login(usersEntity, request, response);
+        attributes.addFlashAttribute("message", "닉네임 변경 완료");
+        return REDIRECT + URL_SETTINGS_USERS;
     }
 
 }
