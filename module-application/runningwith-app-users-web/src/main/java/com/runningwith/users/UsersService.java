@@ -5,6 +5,7 @@ import com.runningwith.account.AccountRepository;
 import com.runningwith.account.AccountType;
 import com.runningwith.mail.EmailMessage;
 import com.runningwith.mail.EmailService;
+import com.runningwith.users.form.Notifications;
 import com.runningwith.users.form.PasswordForm;
 import com.runningwith.users.form.Profile;
 import com.runningwith.users.form.SignUpForm;
@@ -66,6 +67,9 @@ public class UsersService implements UserDetailsService {
                 .studyCreatedByWeb(true)
                 .studyEnrollmentResultByWeb(true)
                 .studyUpdatedByWeb(true)
+                .studyCreatedByEmail(false)
+                .studyEnrollmentResultByEmail(false)
+                .studyUpdatedByEmail(false)
                 .accountEntity(new AccountEntity(AccountType.USERS))
                 .build();
         accountRepository.save(usersEntity.getAccountEntity());
@@ -114,6 +118,17 @@ public class UsersService implements UserDetailsService {
     public void updatePassword(UsersEntity usersEntity, PasswordForm passwordForm) {
         String encodedNewPassword = passwordEncoder.encode(passwordForm.getNewPassword());
         usersEntity.updatePassword(encodedNewPassword);
+        usersRepository.save(usersEntity);
+    }
+
+    public void updateNotifications(UsersEntity usersEntity, Notifications notifications) {
+        usersEntity.updateNotifications(
+                notifications.isStudyUpdatedByEmail(),
+                notifications.isStudyUpdatedByWeb(),
+                notifications.isStudyCreatedByEmail(),
+                notifications.isStudyCreatedByWeb(),
+                notifications.isStudyEnrollmentResultByEmail(),
+                notifications.isStudyEnrollmentResultByWeb());
         usersRepository.save(usersEntity);
     }
 }

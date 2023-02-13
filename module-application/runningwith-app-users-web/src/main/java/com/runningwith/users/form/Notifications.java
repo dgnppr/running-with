@@ -1,10 +1,14 @@
 package com.runningwith.users.form;
 
 import com.runningwith.users.UsersEntity;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+@EqualsAndHashCode(of = {"studyCreatedByEmail", "studyCreatedByWeb", "studyEnrollmentResultByEmail", "studyEnrollmentResultByWeb", "studyUpdatedByEmail", "studyUpdatedByWeb"})
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 public class Notifications {
 

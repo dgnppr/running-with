@@ -2,6 +2,7 @@ package com.runningwith.users;
 
 import com.runningwith.MockMvcTest;
 import com.runningwith.WithUser;
+import com.runningwith.users.form.Notifications;
 import com.runningwith.users.form.PasswordForm;
 import com.runningwith.users.form.Profile;
 import org.junit.jupiter.api.DisplayName;
@@ -166,6 +167,36 @@ class SettingsControllerTest {
                 .andExpect(model().attributeExists("notifications"))
                 .andExpect(authenticated())
                 .andExpect(view().name(VIEW_SETTINGS_NOTIFICATIONS));
+    }
+
+    @WithUser
+    @DisplayName("알림 수정 - 입력값 정상")
+    @Test
+    void update_notifications() throws Exception {
+        Notifications original = new Notifications(usersRepository.findByNickname(WITH_USER_NICKNAME).get());
+        mockMvc.perform(post(URL_SETTINGS_NOTIFICATIONS)
+                        .param("studyCreatedByEmail", "false")
+                        .param("studyCreatedByWeb", "false")
+                        .param("studyEnrollmentResultByEmail", "false")
+                        .param("studyEnrollmentResultByWeb", "false")
+                        .param("studyUpdatedByEmail", "false")
+                        .param("studyUpdatedByWeb", "false")
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(authenticated())
+                .andExpect(view().name(REDIRECT + URL_SETTINGS_NOTIFICATIONS));
+
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        Notifications changed = new Notifications(usersEntity);
+
+        assertThat(original).isNotEqualTo(changed);
+        assertThat(changed.isStudyCreatedByEmail()).isEqualTo(false);
+        assertThat(changed.isStudyCreatedByWeb()).isEqualTo(false);
+        assertThat(changed.isStudyEnrollmentResultByEmail()).isEqualTo(false);
+        assertThat(changed.isStudyEnrollmentResultByWeb()).isEqualTo(false);
+        assertThat(changed.isStudyUpdatedByEmail()).isEqualTo(false);
+        assertThat(changed.isStudyUpdatedByWeb()).isEqualTo(false);
+
     }
 
 }

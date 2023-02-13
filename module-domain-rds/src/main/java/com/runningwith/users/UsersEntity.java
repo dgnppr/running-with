@@ -54,19 +54,19 @@ public class UsersEntity {
     private String location;
 
     @Column(name = "study_created_by_email")
-    private boolean studyCreatedByEmail;
+    private boolean studyCreatedByEmail = false;
 
     @Column(name = "study_created_by_web")
     private boolean studyCreatedByWeb = true;
 
     @Column(name = "study_enrollment_result_by_email")
-    private boolean studyEnrollmentResultByEmail;
+    private boolean studyEnrollmentResultByEmail = false;
 
     @Column(name = "study_enrollment_result_by_web")
     private boolean studyEnrollmentResultByWeb = true;
 
     @Column(name = "study_updated_by_email")
-    private boolean studyUpdatedByEmail;
+    private boolean studyUpdatedByEmail = false;
 
     @Column(name = "study_updated_by_web")
     private boolean studyUpdatedByWeb = true;
@@ -103,5 +103,14 @@ public class UsersEntity {
 
     public void updatePassword(String newPassword) {
         this.password = newPassword;
+    }
+
+    public void updateNotifications(boolean studyCreatedByEmail, boolean studyCreatedByWeb, boolean studyEnrollmentResultByEmail, boolean studyEnrollmentResultByWeb, boolean studyUpdatedByEmail, boolean studyUpdatedByWeb) {
+        this.studyCreatedByEmail = studyCreatedByEmail;
+        this.studyCreatedByWeb = studyCreatedByWeb;
+        this.studyEnrollmentResultByEmail = studyEnrollmentResultByEmail;
+        this.studyEnrollmentResultByWeb = studyEnrollmentResultByWeb;
+        this.studyUpdatedByEmail = studyUpdatedByEmail;
+        this.studyUpdatedByWeb = studyUpdatedByWeb;
     }
 }

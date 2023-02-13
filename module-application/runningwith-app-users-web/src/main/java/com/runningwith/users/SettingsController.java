@@ -26,11 +26,12 @@ public class SettingsController {
 
     public static final String URL_SETTINGS_PROFILE = "/settings/profile";
     public static final String VIEW_SETTINGS_PROFILE = "settings/profile";
-    public static final String PASSWORD_FORM = "passwordForm";
     public static final String URL_SETTINGS_PASSWORD = "/settings/password";
     public static final String VIEW_SETTINGS_PASSWORD = "settings/password";
     public static final String URL_SETTINGS_NOTIFICATIONS = "/settings/notifications";
     public static final String VIEW_SETTINGS_NOTIFICATIONS = "settings/notifications";
+    public static final String PASSWORD_FORM = "passwordForm";
+    public static final String NOTIFICATIONS_FORM = "notifications";
 
     private final UsersService usersService;
 
@@ -87,6 +88,19 @@ public class SettingsController {
         model.addAttribute("user", usersEntity);
         model.addAttribute(new Notifications(usersEntity));
         return VIEW_SETTINGS_NOTIFICATIONS;
+    }
+
+    @PostMapping(URL_SETTINGS_NOTIFICATIONS)
+    public String updateNotifications(@CurrentUser UsersEntity usersEntity, @Validated Notifications notifications, BindingResult bindingResult,
+                                      Model model, RedirectAttributes attributes) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("user", usersEntity);
+            return VIEW_SETTINGS_NOTIFICATIONS;
+        }
+
+        usersService.updateNotifications(usersEntity, notifications);
+        attributes.addFlashAttribute("message", "알림 설정을 변경했습니다.");
+        return REDIRECT + URL_SETTINGS_NOTIFICATIONS;
     }
 
 }
