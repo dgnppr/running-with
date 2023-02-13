@@ -9,6 +9,7 @@ import com.runningwith.users.form.Profile;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static com.runningwith.users.SettingsController.*;
@@ -31,6 +32,9 @@ class SettingsControllerTest {
 
     @Autowired
     UsersRepository usersRepository;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @WithUser
     @DisplayName("프로필 수정 뷰 테스트")
@@ -120,8 +124,9 @@ class SettingsControllerTest {
     void update_password_with_correct_inputs() throws Exception {
 
         String beforeChangedPW = usersRepository.findByNickname(WITH_USER_NICKNAME).get().getPassword();
+        String correctpassword = "correctpassword";
 
-        PasswordForm passwordForm = new PasswordForm("correctpassword", "correctpassword");
+        PasswordForm passwordForm = new PasswordForm(correctpassword, correctpassword);
         mockMvc.perform(post(URL_SETTINGS_PASSWORD)
                         .param("newPassword", passwordForm.getNewPassword())
                         .param("newPasswordConfirm", passwordForm.getNewPasswordConfirm())
@@ -134,6 +139,7 @@ class SettingsControllerTest {
 
         assertThat(usersEntity.getPassword()).isNotEqualTo(beforeChangedPW); // check whether password is changed
         assertThat(usersEntity.getPassword()).isNotEqualTo(passwordForm.getNewPassword()); // check whether password is encoded
+        assertThat(passwordEncoder.matches(passwordForm.getNewPassword(), usersEntity.getPassword())).isTrue();
     }
 
     @WithUser
@@ -229,7 +235,6 @@ class SettingsControllerTest {
         String changedNickname = usersRepository.findByNickname(change).get().getNickname();
         assertThat(originNickname).isNotEqualTo(changedNickname);
         assertThat(changedNickname).isEqualTo(change);
-
     }
 
 
