@@ -16,7 +16,7 @@
                  th:src="${user.profileImage}" width="125"/>
         </div>
         <div class="col-8">
-            <h1 class="display-4 " th:text="${user.nickname}">RunningWith</h1>
+            <h1 class="display-4 " th:text="${user.nickname}"></h1>
             <p class="lead" th:if="${!#strings.isEmpty(user.bio)}" th:text="${user.bio}">bio</p>
             <p class="lead" th:if="${#strings.isEmpty(user.bio) && isOwner}">
                 한 줄 소개

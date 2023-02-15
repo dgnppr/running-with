@@ -7,13 +7,13 @@
 
 <div class="container">
     <div class="py-5 text-center" th:if="${error != null}">
-        <p class="lead">RunningWith@ 이메일 인증</p>
+        <p class="lead"><span th:text="#{domain.name}"></span> 이메일 인증</p>
         <div class="alert alert-danger" role="alert" th:text="${error}"></div>
         <p class="lead" th:text="${email}">email@email.com</p>
     </div>
 
     <div class="py-5 text-center" th:if="${error == null}">
-        <p class="lead">RunningWith@ 이메일 인증</p>
+        <p class="lead"><span th:text="#{domain.name}"></span> 이메일 인증</p>
 
         <h2>인증 이메일을 확인하세요.</h2>
 

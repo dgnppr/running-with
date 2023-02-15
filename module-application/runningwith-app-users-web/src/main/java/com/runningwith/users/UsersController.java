@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Optional;
 
+import static com.runningwith.utils.WebUtils.REDIRECT;
 import static com.runningwith.utils.WebUtils.URL_REDIRECT_ROOT;
 
 @Slf4j
@@ -35,6 +37,10 @@ public class UsersController {
     public static final String URL_RESEND_CONFIRM_EMAIL = "/resend-confirm-email";
     public static final String URL_USERS_PROFILE = "/profile";
     public static final String PAGE_USERS_PROFILE = "users/profile";
+    public static final String URL_EMAIL_LOGIN = "/email-login";
+    public static final String VIEW_EMAIL_LOGIN = "users/email-login";
+    public static final String URL_LOGIN_BY_EMAIL = "/login-by-email";
+    public static final String VIEW_USERS_LOGGED_IN_BY_EMAIL = "users/logged-in-by-email";
     private final SignUpFormValidator signUpFormValidator;
     private final UsersService usersService;
     private final UsersRepository usersRepository;
@@ -115,4 +121,51 @@ public class UsersController {
 
         return PAGE_USERS_PROFILE;
     }
+
+    @GetMapping(URL_EMAIL_LOGIN)
+    public String emailLoginView() {
+        return VIEW_EMAIL_LOGIN;
+    }
+
+    @PostMapping(URL_EMAIL_LOGIN)
+    public String sendEmailLoginLink(String email, Model model, RedirectAttributes attributes) {
+        Optional<UsersEntity> optionalUsersEntity = usersRepository.findByEmail(email);
+
+        if (optionalUsersEntity.isEmpty()) {
+            model.addAttribute("error", "유효한 이메일 주소가 아닙니다.");
+            return VIEW_EMAIL_LOGIN;
+        }
+
+        UsersEntity usersEntity = optionalUsersEntity.get();
+
+        if (!usersEntity.canSendConfirmEmail()) {
+            model.addAttribute("error", "이메일 발송은 1시간에 1회 전송가능 합니다.");
+            return VIEW_EMAIL_LOGIN;
+        }
+
+        usersService.sendLoginLink(usersEntity);
+        attributes.addFlashAttribute("message", "이메일 인증 메일 발송 완료");
+        return REDIRECT + URL_EMAIL_LOGIN;
+    }
+
+    @GetMapping(URL_LOGIN_BY_EMAIL)
+    public String loginByEmail(String token, String email, Model model, HttpServletRequest request, HttpServletResponse response) {
+        Optional<UsersEntity> optionalUsersEntity = usersRepository.findByEmail(email);
+
+        if (optionalUsersEntity.isEmpty()) {
+            model.addAttribute("error", "해당 링크로 로그인할 수 없습니다.");
+            return VIEW_USERS_LOGGED_IN_BY_EMAIL;
+        }
+
+        UsersEntity usersEntity = optionalUsersEntity.get();
+
+        if (!usersEntity.isValidEmailToken(token)) {
+            model.addAttribute("error", "해당 링크로 로그인할 수 없습니다.");
+            return VIEW_USERS_LOGGED_IN_BY_EMAIL;
+        }
+
+        usersService.login(usersEntity, request, response);
+        return VIEW_USERS_LOGGED_IN_BY_EMAIL;
+    }
+
 }

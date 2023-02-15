@@ -7,13 +7,13 @@
 
 <div class="container">
     <div class="py-5 text-center">
-        <p class="lead">RunningWith@</p>
+        <p class="lead"><span th:text="#{domain.name}"></span></p>
         <h2>로그인</h2>
     </div>
     <div class="row justify-content-center">
-        <div class="alert alert-danger" role="alert" th:if="${param.error}">
-            <p>이메일(닉네임),패스워드가 정확하지 않습니다.</p>
-            <a href="#" th:href="@{/find-passsword}">패스워드 찾기</a>
+        <div class="alert alert-danger text-center" role="alert" th:if="${param.error}">
+            <p>이메일, 패스워드가 정확하지 않습니다.</p>
+            <a th:href="@{/email-login}">패스워드 찾기</a>
         </div>
 
         <form action="#" class="needs-validation col-sm-6" method="post" novalidate th:action="@{/login}">

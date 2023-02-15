@@ -37,7 +37,7 @@ public class CustomWebSecurityCustomizer implements WebSecurityCustomizer {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests()
-                .requestMatchers("/", "/login", "/sign-up", "/check-email-token", "/check/email-login").permitAll()
+                .requestMatchers("/", "/login", "/sign-up", "/check-email-token", "/check/email-login", "/email-login", "/login-by-email").permitAll()
                 .requestMatchers(HttpMethod.GET, "/profile/*").permitAll()
                 .anyRequest().authenticated()
                 .and()
@@ -46,7 +46,7 @@ public class CustomWebSecurityCustomizer implements WebSecurityCustomizer {
                 .rememberMe(getRememberMeConfigurer())
                 .logout(getLogoutConfigurer())
                 .securityContext(getSecurityContextConfigurer());
-
+        // TODO session id change
         return http.build();
     }
 

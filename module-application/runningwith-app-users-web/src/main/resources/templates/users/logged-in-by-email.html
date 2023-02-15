@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments.html :: head}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments.html :: main-nav}"></div>
+
+<div class="container">
+    <div class="py-5 text-center" th:if="${error}">
+        <p class="lead"><span th:text="#{domain.name}"></span> 이메일 로그인</p>
+        <div class="alert alert-danger" role="alert" th:text="${error}">
+            로그인 할 수 없습니다.
+        </div>
+    </div>
+
+    <div class="py-5 text-center" th:if="${error == null}">
+        <p class="lead"><span th:text="#{domain.name}"></span> 이메일 로그인</p>
+        <h2>로그인 성공 <a th:href="@{/settings/password}">패스워드를 변경</a>하세요.</h2>
+    </div>
+</div>
+<th:block th:replace="~{fragments.html :: footer}"></th:block>
+</body>
+</html>

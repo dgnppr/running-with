@@ -2,6 +2,7 @@ package com.runningwith.main;
 
 import com.runningwith.MockMvcTest;
 import com.runningwith.WithUser;
+import com.runningwith.users.UsersEntity;
 import com.runningwith.users.UsersRepository;
 import com.runningwith.users.UsersService;
 import com.runningwith.users.form.SignUpForm;
@@ -18,6 +19,7 @@ import java.util.UUID;
 import static com.runningwith.WithUserSecurityContextFactory.EMAIL;
 import static com.runningwith.WithUserSecurityContextFactory.PASSWORD;
 import static com.runningwith.main.MainController.URL_LOGIN;
+import static com.runningwith.utils.CustomStringUtils.WITH_USER_NICKNAME;
 import static com.runningwith.utils.WebUtils.PAGE_INDEX;
 import static com.runningwith.utils.WebUtils.URL_ROOT;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -57,9 +59,10 @@ class MainControllerTest {
     @DisplayName("인덱스 뷰 - 인증 유저")
     @Test
     void index_with_authenticated_user() throws Exception {
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
         mockMvc.perform(get(URL_ROOT))
                 .andExpect(status().isOk())
-                .andExpect(model().attributeExists("usersEntity"))
+                .andExpect(model().attribute("user", usersEntity))
                 .andExpect(authenticated())
                 .andExpect(view().name(PAGE_INDEX));
     }
