@@ -29,7 +29,7 @@ public class WithUserSecurityContextFactory implements WithSecurityContextFactor
         signUpForm.setNickname(nickname);
         usersService.processNewUsers(signUpForm);
 
-        UserDetails principals = usersService.loadUserByUsername(nickname);
+        UserDetails principals = usersService.loadUserByUsername(nickname + EMAIL);
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(principals, principals.getPassword(), principals.getAuthorities());
 

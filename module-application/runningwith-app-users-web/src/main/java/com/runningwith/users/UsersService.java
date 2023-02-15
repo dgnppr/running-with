@@ -92,16 +92,12 @@ public class UsersService implements UserDetailsService {
 
     @Transactional(readOnly = true)
     @Override
-    public UserDetails loadUserByUsername(String emailOrNickname) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        Optional<UsersEntity> optionalUsers = usersRepository.findByEmail(emailOrNickname);
-
-        if (optionalUsers.isEmpty()) {
-            optionalUsers = usersRepository.findByNickname(emailOrNickname);
-        }
+        Optional<UsersEntity> optionalUsers = usersRepository.findByEmail(email);
 
         if (optionalUsers.isEmpty()) {
-            throw new UsernameNotFoundException(emailOrNickname);
+            throw new UsernameNotFoundException(email);
         }
 
         UsersEntity usersEntity = optionalUsers.get();
@@ -135,5 +131,15 @@ public class UsersService implements UserDetailsService {
     public void updateNickname(UsersEntity usersEntity, String nickname) {
         usersEntity.updateNickname(nickname);
         usersRepository.save(usersEntity);
+    }
+
+    public void sendLoginLink(UsersEntity usersEntity) {
+        usersEntity.generateEmailCheckToken();
+        EmailMessage message = EmailMessage.builder()
+                .to(usersEntity.getEmail())
+                .subject("RunningWith@ login link")
+                .message("/login-by-email?token=" + usersEntity.getEmailCheckToken() + "&email=" + usersEntity.getEmail())
+                .build();
+        emailService.sendEmail(message);
     }
 }
