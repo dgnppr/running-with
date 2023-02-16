@@ -1,10 +1,13 @@
 package com.runningwith.users;
 
 import com.runningwith.account.AccountEntity;
+import com.runningwith.tag.TagEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.runningwith.utils.CustomStringUtils.getRandomUUID;
 
@@ -25,6 +28,10 @@ public class UsersEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_account")
     private AccountEntity accountEntity;
+
+    @ManyToMany
+    @JoinTable(name = "users_tags", joinColumns = @JoinColumn(name = "id_users"), inverseJoinColumns = @JoinColumn(name = "id_tag"))
+    private Set<TagEntity> tags = new HashSet<>();
 
     private String email;
 
