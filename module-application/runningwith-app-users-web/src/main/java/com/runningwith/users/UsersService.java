@@ -5,6 +5,7 @@ import com.runningwith.account.AccountRepository;
 import com.runningwith.account.AccountType;
 import com.runningwith.mail.EmailMessage;
 import com.runningwith.mail.EmailService;
+import com.runningwith.tag.TagEntity;
 import com.runningwith.users.form.Notifications;
 import com.runningwith.users.form.PasswordForm;
 import com.runningwith.users.form.Profile;
@@ -141,5 +142,10 @@ public class UsersService implements UserDetailsService {
                 .message("/login-by-email?token=" + usersEntity.getEmailCheckToken() + "&email=" + usersEntity.getEmail())
                 .build();
         emailService.sendEmail(message);
+    }
+
+    public void addTag(UsersEntity usersEntity, TagEntity tagEntity) {
+        Optional<UsersEntity> byId = usersRepository.findById(usersEntity.getId());
+        byId.ifPresent(user -> user.getTags().add(tagEntity));
     }
 }

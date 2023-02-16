@@ -237,5 +237,8 @@ class SettingsControllerTest {
         assertThat(changedNickname).isEqualTo(change);
     }
 
+    // TODO tag setting view test
+    // TODO tag add test
+
 
 }

@@ -1,5 +1,8 @@
 package com.runningwith.users;
 
+import com.runningwith.tag.TagEntity;
+import com.runningwith.tag.TagForm;
+import com.runningwith.tag.TagRepository;
 import com.runningwith.users.form.NicknameForm;
 import com.runningwith.users.form.Notifications;
 import com.runningwith.users.form.PasswordForm;
@@ -10,15 +13,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Optional;
 
 import static com.runningwith.users.form.Profile.toProfile;
 import static com.runningwith.utils.WebUtils.REDIRECT;
@@ -27,7 +31,6 @@ import static com.runningwith.utils.WebUtils.REDIRECT;
 @Controller
 @RequiredArgsConstructor
 public class SettingsController {
-
     public static final String URL_SETTINGS_PROFILE = "/settings/profile";
     public static final String VIEW_SETTINGS_PROFILE = "settings/profile";
     public static final String URL_SETTINGS_PASSWORD = "/settings/password";
@@ -41,7 +44,8 @@ public class SettingsController {
     public static final String NICKNAME_FORM = "nicknameForm";
     public static final String URL_SETTINGS_TAGS = "/settings/tags";
     public static final String VIEW_SETTINGS_TAGS = "settings/tags";
-
+    public static final String URL_SETTINGS_TAGS_ADD = "/settings/tags/add";
+    private final TagRepository tagRepository;
     private final UsersService usersService;
     private final NicknameFormValidator nicknameFormValidator;
 
@@ -144,6 +148,24 @@ public class SettingsController {
     public String updateTagsView(@CurrentUser UsersEntity usersEntity, Model model) {
         model.addAttribute("user", usersEntity);
         return VIEW_SETTINGS_TAGS;
+    }
+
+    @PostMapping(URL_SETTINGS_TAGS_ADD)
+    @ResponseBody
+    public ResponseEntity addTags(@CurrentUser UsersEntity usersEntity, @RequestBody TagForm tagForm) {
+        String title = tagForm.getTagTitle();
+
+        Optional<TagEntity> optionalTagEntity = tagRepository.findByTitle(title);
+        TagEntity tagEntity;
+        if (optionalTagEntity.isEmpty()) {
+            tagEntity = tagRepository.save(TagEntity.builder().title(title).build());
+        } else {
+            tagEntity = optionalTagEntity.get();
+        }
+
+        usersService.addTag(usersEntity, tagEntity);
+        return ResponseEntity.ok().build();
+
     }
 
 }
