@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -147,5 +148,10 @@ public class UsersService implements UserDetailsService {
     public void addTag(UsersEntity usersEntity, TagEntity tagEntity) {
         Optional<UsersEntity> byId = usersRepository.findById(usersEntity.getId());
         byId.ifPresent(user -> user.getTags().add(tagEntity));
+    }
+
+    public Set<TagEntity> getTags(UsersEntity usersEntity) {
+        Optional<UsersEntity> byId = usersRepository.findById(usersEntity.getId());
+        return byId.orElseThrow().getTags();
     }
 }

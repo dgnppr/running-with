@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.runningwith.users.form.Profile.toProfile;
 import static com.runningwith.utils.WebUtils.REDIRECT;
@@ -147,6 +149,8 @@ public class SettingsController {
     @GetMapping(URL_SETTINGS_TAGS)
     public String updateTagsView(@CurrentUser UsersEntity usersEntity, Model model) {
         model.addAttribute("user", usersEntity);
+        Set<TagEntity> tags = usersService.getTags(usersEntity);
+        model.addAttribute("tags", tags.stream().map(TagEntity::getTitle).collect(Collectors.toList()));
         return VIEW_SETTINGS_TAGS;
     }
 

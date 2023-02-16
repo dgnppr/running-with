@@ -1,10 +1,7 @@
 package com.runningwith.tag;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @EqualsAndHashCode(of = "id")
 @AllArgsConstructor
@@ -12,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "tag")
+@Getter
 public class TagEntity {
 
     @Id
