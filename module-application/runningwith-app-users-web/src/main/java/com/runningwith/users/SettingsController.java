@@ -39,6 +39,8 @@ public class SettingsController {
     public static final String VIEW_SETTINGS_USERS = "settings/users";
     public static final String NOTIFICATIONS_FORM = "notifications";
     public static final String NICKNAME_FORM = "nicknameForm";
+    public static final String URL_SETTINGS_TAGS = "/settings/tags";
+    public static final String VIEW_SETTINGS_TAGS = "settings/tags";
 
     private final UsersService usersService;
     private final NicknameFormValidator nicknameFormValidator;
@@ -136,6 +138,12 @@ public class SettingsController {
         usersService.login(usersEntity, request, response);
         attributes.addFlashAttribute("message", "닉네임 변경 완료");
         return REDIRECT + URL_SETTINGS_USERS;
+    }
+
+    @GetMapping(URL_SETTINGS_TAGS)
+    public String updateTagsView(@CurrentUser UsersEntity usersEntity, Model model) {
+        model.addAttribute("user", usersEntity);
+        return VIEW_SETTINGS_TAGS;
     }
 
 }
