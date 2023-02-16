@@ -1,5 +1,7 @@
 package com.runningwith.users;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.runningwith.tag.TagEntity;
 import com.runningwith.tag.TagForm;
 import com.runningwith.tag.TagRepository;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -48,9 +51,11 @@ public class SettingsController {
     public static final String VIEW_SETTINGS_TAGS = "settings/tags";
     public static final String URL_SETTINGS_TAGS_ADD = "/settings/tags/add";
     public static final String URL_SETTINGS_TAGS_REMOVE = "/settings/tags/remove";
+
     private final TagRepository tagRepository;
     private final UsersService usersService;
     private final NicknameFormValidator nicknameFormValidator;
+    private final ObjectMapper objectMapper;
 
     @InitBinder({PASSWORD_FORM})
     public void passwordFormInitBinder(WebDataBinder webDataBinder) {
@@ -147,11 +152,18 @@ public class SettingsController {
         return REDIRECT + URL_SETTINGS_USERS;
     }
 
+
+    // TODO whitelist view https://yaireo.github.io/tagify/
     @GetMapping(URL_SETTINGS_TAGS)
-    public String updateTagsView(@CurrentUser UsersEntity usersEntity, Model model) {
+    public String updateTagsView(@CurrentUser UsersEntity usersEntity, Model model) throws JsonProcessingException {
         model.addAttribute("user", usersEntity);
+
         Set<TagEntity> tags = usersService.getTags(usersEntity);
         model.addAttribute("tags", tags.stream().map(TagEntity::getTitle).collect(Collectors.toList()));
+
+        List<String> allTags = tagRepository.findAll().stream().map(TagEntity::getTitle).collect(Collectors.toList());
+        model.addAttribute("whitelist", objectMapper.writeValueAsString(allTags));
+
         return VIEW_SETTINGS_TAGS;
     }
 
