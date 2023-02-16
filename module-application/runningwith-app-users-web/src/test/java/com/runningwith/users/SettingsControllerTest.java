@@ -239,6 +239,7 @@ class SettingsControllerTest {
 
     // TODO tag setting view test
     // TODO tag add test
+    // TODO tag remove test
 
 
 }

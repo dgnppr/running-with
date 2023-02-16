@@ -47,6 +47,7 @@ public class SettingsController {
     public static final String URL_SETTINGS_TAGS = "/settings/tags";
     public static final String VIEW_SETTINGS_TAGS = "settings/tags";
     public static final String URL_SETTINGS_TAGS_ADD = "/settings/tags/add";
+    public static final String URL_SETTINGS_TAGS_REMOVE = "/settings/tags/remove";
     private final TagRepository tagRepository;
     private final UsersService usersService;
     private final NicknameFormValidator nicknameFormValidator;
@@ -169,7 +170,21 @@ public class SettingsController {
 
         usersService.addTag(usersEntity, tagEntity);
         return ResponseEntity.ok().build();
+    }
 
+    @PostMapping(URL_SETTINGS_TAGS_REMOVE)
+    @ResponseBody
+    public ResponseEntity removeTag(@CurrentUser UsersEntity usersEntity, @RequestBody TagForm tagForm) {
+        String title = tagForm.getTagTitle();
+        Optional<TagEntity> optionalTagEntity = tagRepository.findByTitle(title);
+        if (optionalTagEntity.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        TagEntity tagEntity = optionalTagEntity.get();
+
+        usersService.removeTag(usersEntity, tagEntity);
+        return ResponseEntity.ok().build();
     }
 
 }

@@ -154,4 +154,9 @@ public class UsersService implements UserDetailsService {
         Optional<UsersEntity> byId = usersRepository.findById(usersEntity.getId());
         return byId.orElseThrow().getTags();
     }
+
+    public void removeTag(UsersEntity usersEntity, TagEntity tagEntity) {
+        Optional<UsersEntity> byId = usersRepository.findById(usersEntity.getId());
+        byId.filter(user -> user.getTags().remove(tagEntity));
+    }
 }
