@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.runningwith.tag.TagEntity;
 import com.runningwith.tag.TagForm;
 import com.runningwith.tag.TagRepository;
-import com.runningwith.users.form.NicknameForm;
-import com.runningwith.users.form.Notifications;
-import com.runningwith.users.form.PasswordForm;
-import com.runningwith.users.form.Profile;
+import com.runningwith.users.form.*;
 import com.runningwith.users.validator.NicknameFormValidator;
 import com.runningwith.users.validator.PasswordFormValidator;
 import com.runningwith.zone.ZoneEntity;
@@ -55,6 +52,8 @@ public class SettingsController {
     public static final String URL_SETTINGS_TAGS_REMOVE = "/settings/tags/remove";
     public static final String URL_SETTINGS_ZONES = "/settings/zones";
     public static final String VIEW_SETTINGS_ZONES = "settings/zones";
+    public static final String URL_SETTINGS_ZONES_ADD = "/settings/zones/add";
+    public static final String URL_SETTINGS_ZONES_REMOVE = "/settings/zones/remove";
     private final ZoneRepository zoneRepository;
     private final TagRepository tagRepository;
     private final UsersService usersService;
@@ -188,7 +187,7 @@ public class SettingsController {
 
     @PostMapping(URL_SETTINGS_TAGS_REMOVE)
     @ResponseBody
-    public ResponseEntity removeTag(@CurrentUser UsersEntity usersEntity, @RequestBody TagForm tagForm) {
+    public ResponseEntity removeTags(@CurrentUser UsersEntity usersEntity, @RequestBody TagForm tagForm) {
         String title = tagForm.getTagTitle();
         Optional<TagEntity> optionalTagEntity = tagRepository.findByTitle(title);
         if (optionalTagEntity.isEmpty()) {
@@ -212,6 +211,35 @@ public class SettingsController {
         model.addAttribute("whitelist", objectMapper.writeValueAsString(whitelist));
 
         return VIEW_SETTINGS_ZONES;
+    }
+
+    @PostMapping(URL_SETTINGS_ZONES_ADD)
+    @ResponseBody
+    public ResponseEntity addZones(@CurrentUser UsersEntity usersEntity, @RequestBody ZoneForm zoneForm) {
+        Optional<ZoneEntity> optionalZone = zoneRepository.findByCityAndProvince(zoneForm.getCityName(), zoneForm.getProvinceName());
+
+        if (optionalZone.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        ZoneEntity zoneEntity = optionalZone.get();
+
+        usersService.addZone(usersEntity, zoneEntity);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(URL_SETTINGS_ZONES_REMOVE)
+    @ResponseBody
+    public ResponseEntity removeZones(@CurrentUser UsersEntity usersEntity, @RequestBody ZoneForm zoneForm) {
+
+        Optional<ZoneEntity> optionalZone = zoneRepository.findByCityAndProvince(zoneForm.getCityName(), zoneForm.getProvinceName());
+
+        if (optionalZone.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        ZoneEntity zoneEntity = optionalZone.get();
+
+        usersService.removeZone(usersEntity, zoneEntity);
+        return ResponseEntity.ok().build();
     }
 
 }

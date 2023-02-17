@@ -170,4 +170,14 @@ public class UsersService implements UserDetailsService {
         Optional<UsersEntity> byId = usersRepository.findById(usersEntity.getId());
         return byId.orElseThrow().getZones();
     }
+
+    public void addZone(UsersEntity usersEntity, ZoneEntity zoneEntity) {
+        Optional<UsersEntity> byId = usersRepository.findById(usersEntity.getId());
+        byId.ifPresent(user -> user.getZones().add(zoneEntity));
+    }
+
+    public void removeZone(UsersEntity usersEntity, ZoneEntity zoneEntity) {
+        Optional<UsersEntity> byId = usersRepository.findById(usersEntity.getId());
+        byId.ifPresent(user -> user.getZones().remove(zoneEntity));
+    }
 }
