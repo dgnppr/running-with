@@ -142,6 +142,15 @@
     });
 </script>
 
+<th:block th:fragment="footer">
+    <footer>
+        <div class="row justify-content-center">
+            <img alt="" class="mb-2" src="/images/logo_kr_horizontal.png" width="100">
+            <small class="d-block mb-3 text-muted">&copy; 2023</small>
+        </div>
+    </footer>
+</th:block>
+
 <div th:fragment="update-tags (baseUrl)">
     <script src="/node_modules/@yaireo/tagify/dist/tagify.js"></script>
     <script th:inline="javascript" type="application/javascript">
@@ -185,19 +194,55 @@
         function onRemoveTag(e) {
             tagRequest("/remove", e.detail.data.value);
         }
-
-
     </script>
 </div>
 
+<div th:fragment="update-zones (baseUrl)">
+    <script src="/node_modules/@yaireo/tagify/dist/tagify.js"></script>
+    <script th:inline="javascript" type="application/javascript">
 
-<th:block th:fragment="footer">
-    <footer>
-        <div class="row justify-content-center">
-            <img alt="" class="mb-2" src="/images/logo_kr_horizontal.png" width="100">
-            <small class="d-block mb-3 text-muted">&copy; 2023</small>
-        </div>
-    </footer>
-</th:block>
+        function zoneRequest(url, zoneName) {
+            $.ajax({
+                dataType: "json",
+                autocomplete: {
+                    enabled: true,
+                    rightKey: true,
+                },
+                contentType: "application/json; charset=utf-8",
+                method: "POST",
+                url: "[(${baseUrl})]" + url,
+                data: JSON.stringify({'zoneName': zoneName})
+            }).done(function (data, status) {
+                console.log("${data} and status is ${status}");
+            });
+        }
+
+        var input = document.querySelector('input[name=zones-outside]');
+
+        // initialize Tagify on the above input node reference
+        var tagify = new Tagify(input, {
+            enforceWhitelist: true,
+            whitelist: JSON.parse(document.querySelector("#whitelist").textContent),
+            dropdown: {
+                position: "input",
+                enabled: 0 // always opens dropdown when input gets focus
+            }
+        })
+
+        // Chainable event listeners
+        tagify.on('add', onAddZone)
+            .on('remove', onRemoveZone)
+
+        // tag add
+        function onAddZone(e) {
+            zoneRequest("/add", e.detail.data.value);
+        }
+
+        // tag remove
+        function onRemoveZone(e) {
+            zoneRequest("/remove", e.detail.data.value);
+        }
+    </script>
+</div>
 
 </html>

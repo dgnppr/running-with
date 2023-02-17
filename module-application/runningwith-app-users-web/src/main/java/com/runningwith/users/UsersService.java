@@ -10,6 +10,7 @@ import com.runningwith.users.form.Notifications;
 import com.runningwith.users.form.PasswordForm;
 import com.runningwith.users.form.Profile;
 import com.runningwith.users.form.SignUpForm;
+import com.runningwith.zone.ZoneEntity;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -153,6 +154,7 @@ public class UsersService implements UserDetailsService {
         byId.ifPresent(user -> user.getTags().add(tagEntity));
     }
 
+    @Transactional(readOnly = true)
     public Set<TagEntity> getTags(UsersEntity usersEntity) {
         Optional<UsersEntity> byId = usersRepository.findById(usersEntity.getId());
         return byId.orElseThrow().getTags();
@@ -161,5 +163,11 @@ public class UsersService implements UserDetailsService {
     public void removeTag(UsersEntity usersEntity, TagEntity tagEntity) {
         Optional<UsersEntity> byId = usersRepository.findById(usersEntity.getId());
         byId.filter(user -> user.getTags().remove(tagEntity));
+    }
+
+    @Transactional(readOnly = true)
+    public Set<ZoneEntity> getZones(UsersEntity usersEntity) {
+        Optional<UsersEntity> byId = usersRepository.findById(usersEntity.getId());
+        return byId.orElseThrow().getZones();
     }
 }

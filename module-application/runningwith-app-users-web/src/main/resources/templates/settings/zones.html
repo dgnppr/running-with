@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments.html :: head}"></head>
+
+<body class="bg-light">
+<div th:replace="~{fragments.html :: main-nav}"></div>
+
+<div class="container">
+    <div class="row mt-5 justify-content-center">
+        <div class="col-2">
+            <div th:replace="~{fragments.html :: settings-menu(currentMenu='zones')}"></div>
+        </div>
+        <div class="col-8">
+            <div class="row">
+                <h2 class="col-12">주요 활동 지역</h2>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div hidden id="whitelist" th:text="${whitelist}"></div>
+                    <input aria-describedby="tagHelp" class="tagify-outside" id="zones" name='zones-outside'
+                           placeholder="참여하고 싶은 스터디 지역을 입력해주세요." th:value="${#strings.listJoin(zones, ',')}"
+                           type="text"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:replace="~{fragments.html :: ajax-csrf-header}"></script>
+<script th:replace="~{fragments.html :: update-zones(baseUrl='/settings/zones')}"></script>
+</body>
+</html>

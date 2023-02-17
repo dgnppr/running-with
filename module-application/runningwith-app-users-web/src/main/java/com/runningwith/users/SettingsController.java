@@ -11,6 +11,8 @@ import com.runningwith.users.form.PasswordForm;
 import com.runningwith.users.form.Profile;
 import com.runningwith.users.validator.NicknameFormValidator;
 import com.runningwith.users.validator.PasswordFormValidator;
+import com.runningwith.zone.ZoneEntity;
+import com.runningwith.zone.ZoneRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +53,9 @@ public class SettingsController {
     public static final String VIEW_SETTINGS_TAGS = "settings/tags";
     public static final String URL_SETTINGS_TAGS_ADD = "/settings/tags/add";
     public static final String URL_SETTINGS_TAGS_REMOVE = "/settings/tags/remove";
-
+    public static final String URL_SETTINGS_ZONES = "/settings/zones";
+    public static final String VIEW_SETTINGS_ZONES = "settings/zones";
+    private final ZoneRepository zoneRepository;
     private final TagRepository tagRepository;
     private final UsersService usersService;
     private final NicknameFormValidator nicknameFormValidator;
@@ -195,6 +199,19 @@ public class SettingsController {
 
         usersService.removeTag(usersEntity, tagEntity);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(URL_SETTINGS_ZONES)
+    public String updateZonesView(@CurrentUser UsersEntity usersEntity, Model model) throws JsonProcessingException {
+        model.addAttribute("user", usersEntity);
+
+        Set<ZoneEntity> zones = usersService.getZones(usersEntity);
+        model.addAttribute("zones", zones.stream().map(ZoneEntity::toString).collect(Collectors.toList()));
+
+        List<String> whitelist = zoneRepository.findAll().stream().map(ZoneEntity::toString).collect(Collectors.toList());
+        model.addAttribute("whitelist", objectMapper.writeValueAsString(whitelist));
+
+        return VIEW_SETTINGS_ZONES;
     }
 
 }
