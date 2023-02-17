@@ -2,6 +2,7 @@ package com.runningwith.users;
 
 import com.runningwith.account.AccountEntity;
 import com.runningwith.tag.TagEntity;
+import com.runningwith.zone.ZoneEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,6 +33,10 @@ public class UsersEntity {
     @ManyToMany
     @JoinTable(name = "users_tags", joinColumns = @JoinColumn(name = "id_users"), inverseJoinColumns = @JoinColumn(name = "id_tag"))
     private Set<TagEntity> tags = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "users_zones", joinColumns = @JoinColumn(name = "id_users"), inverseJoinColumns = @JoinColumn(name = "id_zone"))
+    private Set<ZoneEntity> zones = new HashSet<>();
 
     private String email;
 

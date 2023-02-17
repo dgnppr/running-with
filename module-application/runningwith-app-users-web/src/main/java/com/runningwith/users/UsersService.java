@@ -65,6 +65,7 @@ public class UsersService implements UserDetailsService {
                 .nickname(signUpForm.getNickname())
                 .email(signUpForm.getEmail())
                 .tags(new HashSet<>())
+                .zones(new HashSet<>())
                 .password(passwordEncoder.encode(signUpForm.getPassword()))
                 .emailCheckToken(UUID.randomUUID().toString())
                 .emailCheckTokenGeneratedAt(LocalDateTime.now())
