@@ -149,15 +149,14 @@ public class UsersService implements UserDetailsService {
         emailService.sendEmail(message);
     }
 
-    public void addTag(UsersEntity usersEntity, TagEntity tagEntity) {
-        Optional<UsersEntity> byId = usersRepository.findById(usersEntity.getId());
-        byId.ifPresent(user -> user.getTags().add(tagEntity));
-    }
-
-    @Transactional(readOnly = true)
     public Set<TagEntity> getTags(UsersEntity usersEntity) {
         Optional<UsersEntity> byId = usersRepository.findById(usersEntity.getId());
         return byId.orElseThrow().getTags();
+    }
+
+    public void addTag(UsersEntity usersEntity, TagEntity tagEntity) {
+        Optional<UsersEntity> byId = usersRepository.findById(usersEntity.getId());
+        byId.ifPresent(user -> user.getTags().add(tagEntity));
     }
 
     public void removeTag(UsersEntity usersEntity, TagEntity tagEntity) {
@@ -165,7 +164,6 @@ public class UsersService implements UserDetailsService {
         byId.filter(user -> user.getTags().remove(tagEntity));
     }
 
-    @Transactional(readOnly = true)
     public Set<ZoneEntity> getZones(UsersEntity usersEntity) {
         Optional<UsersEntity> byId = usersRepository.findById(usersEntity.getId());
         return byId.orElseThrow().getZones();

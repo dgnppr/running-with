@@ -6,10 +6,11 @@ import com.runningwith.WithUser;
 import com.runningwith.tag.TagEntity;
 import com.runningwith.tag.TagForm;
 import com.runningwith.tag.TagRepository;
-import com.runningwith.users.form.NicknameForm;
-import com.runningwith.users.form.Notifications;
-import com.runningwith.users.form.PasswordForm;
-import com.runningwith.users.form.Profile;
+import com.runningwith.users.form.*;
+import com.runningwith.zone.ZoneEntity;
+import com.runningwith.zone.ZoneRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,21 @@ class SettingsControllerTest {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @Autowired
+    ZoneRepository zoneRepository;
+
+    private ZoneEntity testZone = ZoneEntity.builder().city("test").localNameOfCity("testcity").province("testprov").build();
+
+    @BeforeEach
+    void setUp() {
+        zoneRepository.save(testZone);
+    }
+
+    @AfterEach
+    void tearDown() {
+        zoneRepository.deleteAll();
+    }
 
     @WithUser
     @DisplayName("프로필 수정 뷰 테스트")
@@ -317,6 +333,60 @@ class SettingsControllerTest {
                 .andExpect(status().isOk());
 
         assertThat(usersEntity.getTags().contains(tagEntity)).isFalse();
+    }
+
+    @WithUser
+    @DisplayName("존 업데이트 뷰")
+    @Test
+    void view_update_zone() throws Exception {
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+
+        List<String> zones = usersService.getZones(usersEntity).stream().map(ZoneEntity::toString).collect(Collectors.toList());
+        List<String> whitelist = zoneRepository.findAll().stream().map(ZoneEntity::toString).collect(Collectors.toList());
+
+        mockMvc.perform(get(URL_SETTINGS_ZONES))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("user", usersEntity))
+                .andExpect(model().attribute("zones", zones))
+                .andExpect(model().attribute("whitelist", objectMapper.writeValueAsString(whitelist)))
+                .andExpect(authenticated())
+                .andExpect(view().name(VIEW_SETTINGS_ZONES));
+    }
+
+    @WithUser
+    @DisplayName("존 업데이트 - 추가")
+    @Test
+    void update_zone_add() throws Exception {
+        ZoneForm zoneForm = new ZoneForm();
+        zoneForm.setZoneName(testZone.toString());
+
+        mockMvc.perform(post(URL_SETTINGS_ZONES_ADD)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(zoneForm))
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        ZoneEntity zoneEntity = zoneRepository.findByCityAndProvince(testZone.getCity(), testZone.getProvince()).get();
+        assertThat(usersEntity.getZones().contains(zoneEntity)).isTrue();
+    }
+
+    @WithUser
+    @DisplayName("존 업데이트 - 삭제")
+    @Test
+    void update_zone_remove() throws Exception {
+        ZoneForm zoneForm = new ZoneForm();
+        zoneForm.setZoneName(testZone.toString());
+
+        mockMvc.perform(post(URL_SETTINGS_ZONES_REMOVE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(zoneForm))
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        ZoneEntity zoneEntity = zoneRepository.findByCityAndProvince(testZone.getCity(), testZone.getProvince()).get();
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        assertThat(usersEntity.getZones().contains(zoneEntity)).isFalse();
     }
 
 
