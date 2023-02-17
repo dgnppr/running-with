@@ -92,7 +92,7 @@ class UsersControllerTest {
     @Test
     void signUp_submit_with_correct_input() throws Exception {
         mockMvc.perform(post(URL_SIGN_UP)
-                        .param("nickname", "test")
+                        .param("nickname", "tttttt")
                         .param("email", "email@email.com")
                         .param("password", "goodpassword")
                         .with(csrf()))

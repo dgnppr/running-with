@@ -152,8 +152,6 @@ public class SettingsController {
         return REDIRECT + URL_SETTINGS_USERS;
     }
 
-
-    // TODO whitelist view https://yaireo.github.io/tagify/
     @GetMapping(URL_SETTINGS_TAGS)
     public String updateTagsView(@CurrentUser UsersEntity usersEntity, Model model) throws JsonProcessingException {
         model.addAttribute("user", usersEntity);

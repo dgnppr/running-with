@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -63,6 +64,7 @@ public class UsersService implements UserDetailsService {
         UsersEntity usersEntity = UsersEntity.builder()
                 .nickname(signUpForm.getNickname())
                 .email(signUpForm.getEmail())
+                .tags(new HashSet<>())
                 .password(passwordEncoder.encode(signUpForm.getPassword()))
                 .emailCheckToken(UUID.randomUUID().toString())
                 .emailCheckTokenGeneratedAt(LocalDateTime.now())

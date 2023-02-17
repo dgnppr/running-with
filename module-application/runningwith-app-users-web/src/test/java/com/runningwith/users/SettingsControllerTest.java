@@ -1,7 +1,11 @@
 package com.runningwith.users;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.runningwith.MockMvcTest;
 import com.runningwith.WithUser;
+import com.runningwith.tag.TagEntity;
+import com.runningwith.tag.TagForm;
+import com.runningwith.tag.TagRepository;
 import com.runningwith.users.form.NicknameForm;
 import com.runningwith.users.form.Notifications;
 import com.runningwith.users.form.PasswordForm;
@@ -9,8 +13,13 @@ import com.runningwith.users.form.Profile;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.runningwith.users.SettingsController.*;
 import static com.runningwith.users.form.Profile.toProfile;
@@ -35,6 +44,15 @@ class SettingsControllerTest {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    UsersService usersService;
+
+    @Autowired
+    TagRepository tagRepository;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @WithUser
     @DisplayName("프로필 수정 뷰 테스트")
@@ -237,9 +255,69 @@ class SettingsControllerTest {
         assertThat(changedNickname).isEqualTo(change);
     }
 
-    // TODO tag setting view test
-    // TODO tag add test
-    // TODO tag remove test
+    @WithUser
+    @DisplayName("태그 업데이트 뷰")
+    @Test
+    void view_update_tag() throws Exception {
+
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        List<String> userTags = usersService.getTags(usersEntity).stream().map(TagEntity::getTitle).collect(Collectors.toList());
+        List<String> whitelist = tagRepository.findAll().stream().map(TagEntity::getTitle).collect(Collectors.toList());
+
+        mockMvc.perform(get(URL_SETTINGS_TAGS))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("user", usersEntity))
+                .andExpect(model().attribute("tags", userTags))
+                .andExpect(model().attribute("whitelist", objectMapper.writeValueAsString(whitelist)))
+                .andExpect(authenticated())
+                .andExpect(view().name(VIEW_SETTINGS_TAGS));
+    }
+
+
+    @WithUser
+    @DisplayName("태그 업데이트 - 추가")
+    @Test
+    void update_tag_add() throws Exception {
+        TagForm tagForm = new TagForm();
+        tagForm.setTagTitle("newTag");
+
+        mockMvc.perform(post(URL_SETTINGS_TAGS_ADD)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(tagForm))
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        Optional<TagEntity> optionalTag = tagRepository.findByTitle("newTag");
+
+        assertThat(optionalTag).isPresent();
+
+        TagEntity tagEntity = optionalTag.get();
+
+        assertThat(usersEntity.getTags().contains(tagEntity)).isTrue();
+    }
+
+    @WithUser
+    @DisplayName("태그 업데이트 - 삭제")
+    @Test
+    void update_tag_remove() throws Exception {
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        TagEntity tagEntity = tagRepository.save(TagEntity.builder().title("newTag").build());
+        usersService.addTag(usersEntity, tagEntity);
+
+        assertThat(usersEntity.getTags().contains(tagEntity)).isTrue();
+
+        TagForm tagForm = new TagForm();
+        tagForm.setTagTitle("newTag");
+
+        mockMvc.perform(post(URL_SETTINGS_TAGS_REMOVE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(tagForm))
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        assertThat(usersEntity.getTags().contains(tagEntity)).isFalse();
+    }
 
 
 }
