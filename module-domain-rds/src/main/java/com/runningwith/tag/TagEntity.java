@@ -6,7 +6,7 @@ import lombok.*;
 @EqualsAndHashCode(of = "id")
 @AllArgsConstructor
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "tag")
 @Getter
