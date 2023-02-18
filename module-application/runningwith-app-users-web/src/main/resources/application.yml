@@ -14,6 +14,8 @@ spring:
 logging:
   level:
     org.hibernate.sql: debug
+
+app.host: http://localhost:8080
 ---
 spring:
   config:
@@ -36,3 +38,5 @@ spring:
 logging:
   level:
     org.hibernate.sql: debug
+
+app.host: http://localhost:8080

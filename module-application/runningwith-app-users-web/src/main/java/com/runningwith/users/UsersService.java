@@ -3,6 +3,8 @@ package com.runningwith.users;
 import com.runningwith.account.AccountEntity;
 import com.runningwith.account.AccountRepository;
 import com.runningwith.account.AccountType;
+import com.runningwith.config.AppMessages;
+import com.runningwith.config.AppProperties;
 import com.runningwith.mail.EmailMessage;
 import com.runningwith.mail.EmailService;
 import com.runningwith.tag.TagEntity;
@@ -25,6 +27,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -43,6 +47,9 @@ public class UsersService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final SecurityContextRepository securityContextRepository;
     private final EmailService emailService;
+    private final AppProperties appProperties;
+    private final AppMessages appMessages;
+    private final TemplateEngine templateEngine;
 
     public UsersEntity processNewUsers(SignUpForm signUpForm) {
         UsersEntity newUsersEntity = saveNewUsers(signUpForm);
@@ -52,12 +59,20 @@ public class UsersService implements UserDetailsService {
     }
 
     public void sendSignUpConfirmEmail(UsersEntity newUsersEntity) {
+        Context context = new Context();
+        context.setVariable("link", "/check-email-token?token=" + newUsersEntity.getEmailCheckToken() + "&email=" + newUsersEntity.getEmail());
+        context.setVariable("nickname", newUsersEntity.getNickname());
+        context.setVariable("linkName", "이메일 인증하기");
+        context.setVariable("message", appMessages.getDomainName() + " 회원가입을 완료하려면 링크를 클릭하세요.");
+        context.setVariable("host", appProperties.getHost());
+        String message = templateEngine.process("mail/simple-link", context);
+
         EmailMessage emailMessage = EmailMessage.builder()
                 .to(newUsersEntity.getEmail())
-                .subject("회원 가입 인증")
-                .message("/check-email-token?token=" + newUsersEntity.getEmailCheckToken() +
-                        "&email=" + newUsersEntity.getEmail())
+                .subject(appMessages.getDomainName() + " 회원 가입 인증")
+                .message(message)
                 .build();
+
         emailService.sendEmail(emailMessage);
     }
 
