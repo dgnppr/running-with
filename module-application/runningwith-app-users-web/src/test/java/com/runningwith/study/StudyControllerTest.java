@@ -101,5 +101,7 @@ class StudyControllerTest {
                 .andExpect(view().name(VIEW_STUDY_FORM));
     }
 
+    // TODO 스터디 경로 조회 뷰
+
 
 }

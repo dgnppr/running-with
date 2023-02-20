@@ -79,4 +79,19 @@ public class StudyEntity {
     public void addManager(UsersEntity usersEntity) {
         this.managers.add(usersEntity);
     }
+
+    public boolean isJoinable(UsersEntity usersEntity) {
+        return this.isPublished() && this.isRecruiting()
+                && !this.members.contains(usersEntity) && !this.managers.contains(usersEntity);
+
+    }
+
+    public boolean isMember(UsersEntity usersEntity) {
+        return this.members.contains(usersEntity);
+    }
+
+    public boolean isManager(UsersEntity usersEntity) {
+        return this.managers.contains(usersEntity);
+    }
+
 }
