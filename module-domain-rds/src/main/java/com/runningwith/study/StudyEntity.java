@@ -39,17 +39,18 @@ public class StudyEntity {
     @JoinTable(name = "study_zones", joinColumns = @JoinColumn(name = "id_study"), inverseJoinColumns = @JoinColumn(name = "id_zone"))
     private Set<ZoneEntity> zones;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String path;
 
+    @Column(nullable = false)
     private String title;
 
-    @Column(name = "short_description")
+    @Column(name = "short_description", nullable = false)
     private String shortDescription;
 
     @Lob
     @Basic(fetch = FetchType.EAGER)
-    @Column(name = "full_description")
+    @Column(name = "full_description", nullable = false)
     private String fullDescription;
 
     @Lob
@@ -74,4 +75,8 @@ public class StudyEntity {
 
     @Column(name = "use_banner")
     private boolean useBanner = false;
+
+    public void addManager(UsersEntity usersEntity) {
+        this.managers.add(usersEntity);
+    }
 }

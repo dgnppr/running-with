@@ -38,10 +38,13 @@ public class UsersEntity {
     @JoinTable(name = "users_zones", joinColumns = @JoinColumn(name = "id_users"), inverseJoinColumns = @JoinColumn(name = "id_zone"))
     private Set<ZoneEntity> zones = new HashSet<>();
 
+    @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(nullable = false)
     private String password;
 
+    @Column(unique = true, nullable = false)
     private String nickname;
 
     @Column(name = "email_verified")
