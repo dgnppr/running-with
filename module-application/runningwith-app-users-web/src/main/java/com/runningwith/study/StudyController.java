@@ -25,12 +25,13 @@ public class StudyController {
 
     public static final String URL_NEW_STUDY = "/new-study";
     public static final String VIEW_STUDY_FORM = "study/form";
-    public static final String STUDY_FORM = "studyForm";
+    public static final String FORM_STUDY = "studyForm";
+    public static final String URL_STUDY_PATH = "/study/";
 
     private final StudyFormValidator studyFormValidator;
     private final StudyService studyService;
 
-    @InitBinder(STUDY_FORM)
+    @InitBinder(FORM_STUDY)
     public void studyFormInitBinder(WebDataBinder webDataBinder) {
         webDataBinder.addValidators(studyFormValidator);
     }
@@ -50,6 +51,6 @@ public class StudyController {
         }
 
         StudyEntity newStudy = studyService.createNewStudy(usersEntity, studyForm.toEntity());
-        return REDIRECT + "/study/" + URLEncoder.encode(newStudy.getPath(), StandardCharsets.UTF_8);
+        return REDIRECT + URL_STUDY_PATH + URLEncoder.encode(newStudy.getPath(), StandardCharsets.UTF_8);
     }
 }
