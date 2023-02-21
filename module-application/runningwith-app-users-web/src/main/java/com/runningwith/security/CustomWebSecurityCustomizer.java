@@ -1,4 +1,4 @@
-package com.runningwith.config;
+package com.runningwith.security;
 
 import com.runningwith.users.UsersService;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.runningwith.config;
+package com.runningwith.security;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
