@@ -94,6 +94,10 @@
     </ul>
 </nav>
 
+<div class="row" id="study-logo" th:fragment="study-banner" th:if="${study.useBanner}">
+    <img th:src="${study.bannerImage}"/>
+</div>
+
 <div th:fragment="study-info">
     <div class="row pt-4 text-left justify-content-center bg-light">
         <div class="col-6">
@@ -204,6 +208,24 @@
             <i class="fa fa-cog"></i> 설정
         </a>
     </nav>
+</div>
+
+<div class="row px-3 justify-content-center" th:fragment="member-list (members, isManager)">
+    <ul class="list-unstyled col-10">
+        <li class="media mt-3" th:each="member: ${members}">
+            <svg class="rounded border bg-light mr-3" height="64"
+                 th:data-jdenticon-value="${member.nickname}" th:if="${#strings.isEmpty(member?.profileImage)}"
+                 width="64"></svg>
+            <img class="rounded border mr-3" height="64" th:if="${!#strings.isEmpty(member?.profileImage)}"
+                 th:src="${member?.profileImage}" width="64"/>
+            <div class="media-body">
+                <h5 class="mt-0 mb-1"><span th:text="${member.nickname}"></span>
+                    <span class="badge badge-primary" th:if="${isManager}">관리자</span>
+                </h5>
+                <span th:text="${member.bio}"></span>
+            </div>
+        </li>
+    </ul>
 </div>
 
 <script th:fragment="form-validation" type="application/javascript">

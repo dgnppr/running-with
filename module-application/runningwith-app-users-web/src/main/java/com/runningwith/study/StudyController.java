@@ -26,6 +26,7 @@ public class StudyController {
 
     public static final String URL_NEW_STUDY = "/new-study";
     public static final String VIEW_STUDY_FORM = "study/form";
+    public static final String VIEW_STUDY_MEMBERS = "study/members";
     public static final String FORM_STUDY = "studyForm";
     public static final String URL_STUDY_PATH = "/study/";
     public static final String VIEW_STUDY = "study/view";
@@ -59,13 +60,18 @@ public class StudyController {
 
     @GetMapping(URL_STUDY_PATH + "{path}")
     public String studyView(@CurrentUser UsersEntity usersEntity, @PathVariable String path, Model model) {
-
         StudyEntity studyEntity = studyRepository.findByPath(path).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
-
         model.addAttribute("user", usersEntity);
         model.addAttribute("study", studyEntity);
-
         return VIEW_STUDY;
+    }
+
+    @GetMapping(URL_STUDY_PATH + "{path}" + "/members")
+    public String studyMembersView(@CurrentUser UsersEntity usersEntity, @PathVariable String path, Model model) {
+        StudyEntity studyEntity = studyRepository.findByPath(path).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
+        model.addAttribute("user", usersEntity);
+        model.addAttribute("study", studyEntity);
+        return VIEW_STUDY_MEMBERS;
     }
 
 }

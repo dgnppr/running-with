@@ -102,6 +102,7 @@ class StudyControllerTest {
     }
 
     // TODO 스터디 경로 조회 뷰
+    // TODO 스터디 멤버 조회 뷰
 
 
 }
