@@ -1,6 +1,7 @@
 package com.runningwith.users;
 
 import com.runningwith.account.AccountEntity;
+import com.runningwith.study.StudyEntity;
 import com.runningwith.tag.TagEntity;
 import com.runningwith.zone.ZoneEntity;
 import jakarta.persistence.*;
@@ -131,5 +132,9 @@ public class UsersEntity {
 
     public void updateNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public boolean isManagerOf(StudyEntity studyEntity) {
+        return studyEntity.isManager(this);
     }
 }

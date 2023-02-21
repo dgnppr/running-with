@@ -105,24 +105,24 @@
                 <span class="h2" th:text="${study.title}">스터디 이름</span>
             </a>
         </div>
-        <div class="col-4 text-right justify-content-end">
-                <span class="d-inline-block"
-                      data-placement="bottom" data-toggle="tooltip" tabindex="0" th:if="${!study.published}"
-                      title="스터디 공개 준비중">
+        <div class="col-4 text-right justify-content-between">
+            <span class="d-inline-block"
+                  data-placement="bottom" data-toggle="tooltip" tabindex="0" th:if="${!study.published}"
+                  title="스터디 공개 준비중">
                     <button class="btn btn-primary btn-sm" disabled style="pointer-events: none;"
                             type="button">DRAFT</button>
-                </span>
+            </span>
             <span class="d-inline-block"
                   data-placement="bottom" data-toggle="tooltip" tabindex="0" th:if="${study.closed}" title="스터디 종료함">
                     <button class="btn btn-primary btn-sm" disabled style="pointer-events: none;"
                             type="button">CLOSED</button>
-                </span>
+            </span>
             <span class="d-inline-block ml-1"
                   data-placement="bottom" data-toggle="tooltip" tabindex="0" th:if="${!study.recruiting}"
                   title="팀원 모집중 아님">
                     <button class="btn btn-primary btn-sm" disabled style="pointer-events: none;"
                             type="button">OFF</button>
-                </span>
+            </span>
             <span aria-label="Basic example" class="btn-group" role="group" sec:authorize="isAuthenticated()"
                   th:if="${study.isJoinable(#authentication.principal.usersEntity)}">
                                 <a class="btn btn-primary" th:href="@{'/study/' + ${study.path} + '/join'}">
@@ -130,7 +130,7 @@
                                 </a>
                                 <a class="btn btn-outline-primary" th:href="@{'/study/' + ${study.path} + '/members'}"
                                    th:text="${study.members.size()}">1</a>
-                            </span>
+            </span>
             <span class="btn-group" role="group" sec:authorize="isAuthenticated()"
                   th:if="${!study.closed && study.isMember(#authentication.principal.usersEntity)}">
                                 <a class="btn btn-outline-warning" th:href="@{'/study/' + ${study.path} + '/leave'}">
@@ -138,14 +138,14 @@
                                 </a>
                                 <a class="btn btn-outline-primary" th:href="@{'/study/' + ${study.path} + '/members'}"
                                    th:text="${study.members.size()}">1</a>
-                            </span>
+            </span>
             <span sec:authorize="isAuthenticated()"
                   th:if="${study.published && !study.closed && study.isManager(#authentication.principal.usersEntity)}">
                                 <a class="btn btn-outline-primary"
                                    th:href="@{'/study/' + ${study.path} + '/new-event'}">
                                     <i class="fa fa-plus"></i> 모임 만들기
                                 </a>
-                            </span>
+            </span>
         </div>
     </div>
     <div class="row justify-content-center bg-light">
@@ -195,7 +195,7 @@
         </a>
         <a class="nav-item nav-link" href="#" th:classappend="${studyMenu == 'members'}? active"
            th:href="@{'/study/' + ${study.path} + '/members'}">
-            <i class="fa fa-user"></i> 구성원
+            <i class="fa fa-user"></i> 스터디원
         </a>
         <a class="nav-item nav-link" href="#" th:classappend="${studyMenu == 'events'}? active"
            th:href="@{'/study/' + ${study.path} + '/events'}">
@@ -213,19 +213,56 @@
 <div class="row px-3 justify-content-center" th:fragment="member-list (members, isManager)">
     <ul class="list-unstyled col-10">
         <li class="media mt-3" th:each="member: ${members}">
-            <svg class="rounded border bg-light mr-3" height="64"
-                 th:data-jdenticon-value="${member.nickname}" th:if="${#strings.isEmpty(member?.profileImage)}"
-                 width="64"></svg>
+            <svg class="rounded border bg-light mr-3" height="64" th:data-jdenticon-value="${member.nickname}"
+                 th:if="${#strings.isEmpty(member?.profileImage)}" width="64"></svg>
             <img class="rounded border mr-3" height="64" th:if="${!#strings.isEmpty(member?.profileImage)}"
                  th:src="${member?.profileImage}" width="64"/>
             <div class="media-body">
-                <h5 class="mt-0 mb-1"><span th:text="${member.nickname}"></span>
-                    <span class="badge badge-primary" th:if="${isManager}">관리자</span>
+                <h5 class="mt-0 mb-1">
+                    <span th:text="${member.nickname}"></span>
+                    <span class="badge bg-primary" th:if="${isManager}">관리자</span>
                 </h5>
                 <span th:text="${member.bio}"></span>
             </div>
         </li>
     </ul>
+</div>
+
+<div class="alert alert-info alert-dismissible fade show mt-3" role="alert" th:fragment="message" th:if="${message}">
+    <span th:text="${message}">완료</span>
+</div>
+
+<div th:fragment="editor-script">
+    <script src="/node_modules/summernote/dist/summernote-bs4.js"></script>
+    <script type="application/javascript">
+        $(function () {
+            $('#fullDescription').summernote({
+                fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Noto Sans KR', 'Merriweather'],
+                placeholder: '스터디의 목표, 일정, 진행 방식, 사용할 교재 또는 인터넷 강좌 그리고 모집중인 스터디원 등 스터디에 대해 자세히 적어 주세요.',
+                tabsize: 2,
+                height: 300
+            });
+        });
+    </script>
+</div>
+
+<div class="list-group" th:fragment="study-settings-menu (currentMenu)">
+    <a class="list-group-item list-group-item-action" href="#"
+       th:classappend="${currentMenu == 'description'}? active"
+       th:href="@{'/study/' + ${study.path} + '/settings/description'}">소개</a>
+    <a class="list-group-item list-group-item-action" href="#"
+       th:classappend="${currentMenu == 'image'}? active" th:href="@{'/study/' + ${study.path} + '/settings/image'}">배너
+        이미지</a>
+    <a class="list-group-item list-group-item-action" href="#"
+       th:classappend="${currentMenu == 'tags'}? active" th:href="@{'/study/' + ${study.path} + '/settings/tags'}">스터디
+        주제</a>
+    <a class="list-group-item list-group-item-action" href="#"
+       th:classappend="${currentMenu == 'zones'}? active" th:href="@{'/study/' + ${study.path} + '/settings/zones'}">스터디
+        장소</a>
+    <a class="list-group-item list-group-item-action list-group-item-danger"
+       href="#"
+       th:classappend="${currentMenu == 'study'}? active"
+       th:href="@{'/study/' + ${study.path} + '/settings/study'}">스터디</a>
 </div>
 
 <script th:fragment="form-validation" type="application/javascript">
