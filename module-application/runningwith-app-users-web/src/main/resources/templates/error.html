@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments.html :: head}"></head>
+
+<body class="bg-light">
+<div th:replace="~{fragments.html :: main-nav}"></div>
+
+<section class="jumbotron text-center">
+    <div class="container">
+        <h1><span th:text="${error}">오류</span></h1>
+    </div>
+</section>
+
+</body>
+</html>

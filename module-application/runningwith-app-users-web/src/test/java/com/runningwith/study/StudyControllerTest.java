@@ -5,6 +5,8 @@ import com.runningwith.WithUser;
 import com.runningwith.study.form.StudyForm;
 import com.runningwith.users.UsersEntity;
 import com.runningwith.users.UsersRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import java.util.Optional;
 
 import static com.runningwith.study.StudyController.*;
 import static com.runningwith.utils.CustomStringUtils.WITH_USER_NICKNAME;
+import static com.runningwith.utils.CustomStringUtils.getEncodedUrl;
 import static com.runningwith.utils.WebUtils.REDIRECT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -38,6 +41,19 @@ class StudyControllerTest {
 
     @Autowired
     StudyService studyService;
+
+    @BeforeEach
+    void setUp() {
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyForm studyForm = new StudyForm("testpath", "testpath", "testpath", "testpath");
+        StudyEntity studyEntity = studyForm.toEntity();
+        studyService.createNewStudy(usersEntity, studyEntity);
+    }
+
+    @AfterEach
+    void tearDown() {
+        studyRepository.deleteAll();
+    }
 
     @WithUser
     @DisplayName("스터디 폼 뷰")
@@ -101,8 +117,46 @@ class StudyControllerTest {
                 .andExpect(view().name(VIEW_STUDY_FORM));
     }
 
-    // TODO 스터디 경로 조회 뷰
-    // TODO 스터디 멤버 조회 뷰
+    @WithUser
+    @DisplayName("스터디 조회 뷰 - 경로 정상")
+    @Test
+    void view_study_path_with_correct_path() throws Exception {
+        String testpath = getEncodedUrl("testpath");
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyEntity studyEntity = studyRepository.findByPath(testpath).get();
+
+        mockMvc.perform(get(URL_STUDY_PATH + getEncodedUrl(testpath)))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("user", usersEntity))
+                .andExpect(model().attribute("study", studyEntity))
+                .andExpect(view().name(VIEW_STUDY));
+    }
+
+    @WithUser
+    @DisplayName("스터디 조회 뷰 - 경로 오류")
+    @Test
+    void view_study_path_with_wrong_path() throws Exception {
+        String testpath = getEncodedUrl("wrongtestpath");
+        mockMvc.perform(get(URL_STUDY_PATH + getEncodedUrl(testpath)))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("error"))
+                .andExpect(view().name("error"));
+    }
+
+    @WithUser
+    @DisplayName("스터디 멤버 조회")
+    @Test
+    void view_study_members_by_managers() throws Exception {
+        String testpath = getEncodedUrl("testpath");
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyEntity studyEntity = studyRepository.findByPath(testpath).get();
+
+        mockMvc.perform(get(URL_STUDY_PATH + getEncodedUrl(testpath) + URL_STUDY_MEMBERS))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("user", usersEntity))
+                .andExpect(model().attribute("study", studyEntity))
+                .andExpect(view().name(VIEW_STUDY_MEMBERS));
+    }
 
 
 }

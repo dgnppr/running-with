@@ -1,5 +1,6 @@
 package com.runningwith.study;
 
+import com.runningwith.study.form.StudyDescriptionForm;
 import com.runningwith.users.UsersEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,5 +34,9 @@ public class StudyService {
 
     private StudyEntity getStudy(String path) {
         return studyRepository.findByPath(path).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
+    }
+
+    public void updateStudyDescription(StudyEntity studyEntity, StudyDescriptionForm form) {
+        studyEntity.updateDescription(form.getShortDescription(), form.getFullDescription());
     }
 }

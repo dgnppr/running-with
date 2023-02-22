@@ -67,6 +67,7 @@ public class CustomWebSecurityCustomizer implements WebSecurityCustomizer {
     private Customizer<FormLoginConfigurer<HttpSecurity>> getFormLoginConfigurerCustomizer() {
         return (formLogin) -> formLogin
                 .loginPage("/login")
+                .defaultSuccessUrl("/")
                 .permitAll();
     }
 

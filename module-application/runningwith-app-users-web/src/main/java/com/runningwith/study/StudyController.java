@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+import static com.runningwith.utils.CustomStringUtils.getEncodedUrl;
 import static com.runningwith.utils.WebUtils.REDIRECT;
 
 @Controller
@@ -30,6 +31,7 @@ public class StudyController {
     public static final String FORM_STUDY = "studyForm";
     public static final String URL_STUDY_PATH = "/study/";
     public static final String VIEW_STUDY = "study/view";
+    public static final String URL_STUDY_MEMBERS = "/members";
 
     private final StudyFormValidator studyFormValidator;
     private final StudyService studyService;
@@ -55,7 +57,7 @@ public class StudyController {
         }
 
         StudyEntity newStudy = studyService.createNewStudy(usersEntity, studyForm.toEntity());
-        return REDIRECT + URL_STUDY_PATH + URLEncoder.encode(newStudy.getPath(), StandardCharsets.UTF_8);
+        return REDIRECT + URL_STUDY_PATH + URLEncoder.encode(getEncodedUrl(newStudy.getPath()), StandardCharsets.UTF_8);
     }
 
     @GetMapping(URL_STUDY_PATH + "{path}")
@@ -66,7 +68,7 @@ public class StudyController {
         return VIEW_STUDY;
     }
 
-    @GetMapping(URL_STUDY_PATH + "{path}" + "/members")
+    @GetMapping(URL_STUDY_PATH + "{path}" + URL_STUDY_MEMBERS)
     public String studyMembersView(@CurrentUser UsersEntity usersEntity, @PathVariable String path, Model model) {
         StudyEntity studyEntity = studyRepository.findByPath(path).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
         model.addAttribute("user", usersEntity);

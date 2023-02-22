@@ -1,5 +1,7 @@
 package com.runningwith.utils;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public abstract class CustomStringUtils {
@@ -8,5 +10,9 @@ public abstract class CustomStringUtils {
 
     public static String getRandomUUID() {
         return UUID.randomUUID().toString();
+    }
+
+    public static String getEncodedUrl(String path) {
+        return URLEncoder.encode(path, StandardCharsets.UTF_8);
     }
 }

@@ -94,4 +94,9 @@ public class StudyEntity {
         return this.managers.contains(usersEntity);
     }
 
+    public void updateDescription(String shortDescription, String fullDescription) {
+        this.shortDescription = shortDescription;
+        this.fullDescription = fullDescription;
+    }
+
 }
