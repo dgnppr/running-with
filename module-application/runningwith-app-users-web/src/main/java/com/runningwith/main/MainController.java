@@ -6,8 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import static com.runningwith.utils.WebUtils.PAGE_INDEX;
 import static com.runningwith.utils.WebUtils.URL_ROOT;
+import static com.runningwith.utils.WebUtils.VIEW_INDEX;
 
 @Controller
 public class MainController {
@@ -20,11 +20,14 @@ public class MainController {
         if (usersEntity != null) {
             model.addAttribute("user", usersEntity);
         }
-        return PAGE_INDEX;
+        return VIEW_INDEX;
     }
 
     @GetMapping(URL_LOGIN)
-    public String login() {
+    public String login(@CurrentUser UsersEntity usersEntity) {
+        if (usersEntity != null) {
+            return VIEW_INDEX;
+        }
         return PAGE_LOGIN;
     }
 }

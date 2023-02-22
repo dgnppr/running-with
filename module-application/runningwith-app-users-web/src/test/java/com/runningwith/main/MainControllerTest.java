@@ -20,8 +20,8 @@ import static com.runningwith.WithUserSecurityContextFactory.EMAIL;
 import static com.runningwith.WithUserSecurityContextFactory.PASSWORD;
 import static com.runningwith.main.MainController.URL_LOGIN;
 import static com.runningwith.utils.CustomStringUtils.WITH_USER_NICKNAME;
-import static com.runningwith.utils.WebUtils.PAGE_INDEX;
 import static com.runningwith.utils.WebUtils.URL_ROOT;
+import static com.runningwith.utils.WebUtils.VIEW_INDEX;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
@@ -64,7 +64,7 @@ class MainControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("user", usersEntity))
                 .andExpect(authenticated())
-                .andExpect(view().name(PAGE_INDEX));
+                .andExpect(view().name(VIEW_INDEX));
     }
 
     @DisplayName("인덱스 뷰 - 익명 유저")
@@ -74,7 +74,7 @@ class MainControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(model().attributeDoesNotExist("usersEntity"))
                 .andExpect(unauthenticated())
-                .andExpect(view().name(PAGE_INDEX));
+                .andExpect(view().name(VIEW_INDEX));
     }
 
     @DisplayName("로그인 성공 - 이메일")
