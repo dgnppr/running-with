@@ -16,10 +16,13 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
+import static com.runningwith.AppExceptionHandler.VIEW_ERROR;
 import static com.runningwith.study.StudyController.*;
 import static com.runningwith.utils.CustomStringUtils.WITH_USER_NICKNAME;
 import static com.runningwith.utils.CustomStringUtils.getEncodedUrl;
 import static com.runningwith.utils.WebUtils.REDIRECT;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
@@ -127,6 +130,7 @@ class StudyControllerTest {
 
         mockMvc.perform(get(URL_STUDY_PATH + getEncodedUrl(testpath)))
                 .andExpect(status().isOk())
+                .andExpect(authenticated())
                 .andExpect(model().attribute("user", usersEntity))
                 .andExpect(model().attribute("study", studyEntity))
                 .andExpect(view().name(VIEW_STUDY));
@@ -139,8 +143,14 @@ class StudyControllerTest {
         String testpath = getEncodedUrl("wrongtestpath");
         mockMvc.perform(get(URL_STUDY_PATH + getEncodedUrl(testpath)))
                 .andExpect(status().isOk())
+                .andExpect(authenticated())
                 .andExpect(model().attributeExists("error"))
-                .andExpect(view().name("error"));
+                .andExpect(result -> {
+                    Throwable ex = result.getResolvedException();
+                    assertNotNull(ex);
+                    assertEquals(IllegalArgumentException.class, ex.getClass());
+                })
+                .andExpect(view().name(VIEW_ERROR));
     }
 
     @WithUser
@@ -153,6 +163,7 @@ class StudyControllerTest {
 
         mockMvc.perform(get(URL_STUDY_PATH + getEncodedUrl(testpath) + URL_STUDY_MEMBERS))
                 .andExpect(status().isOk())
+                .andExpect(authenticated())
                 .andExpect(model().attribute("user", usersEntity))
                 .andExpect(model().attribute("study", studyEntity))
                 .andExpect(view().name(VIEW_STUDY_MEMBERS));

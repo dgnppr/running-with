@@ -27,6 +27,7 @@ public class StudySettingsController {
 
     public static final String VIEW_STUDY_SETTINGS_DESCRIPTION = "study/settings/description";
     public static final String URL_STUDY_SETTINGS_DESCRIPTION = "/settings/description";
+    public static final String STUDY_DESCRIPTION_FORM = "studyDescriptionForm";
     private final StudyService studyService;
 
     // TODO 뷰 수정(DRAFT OFF)

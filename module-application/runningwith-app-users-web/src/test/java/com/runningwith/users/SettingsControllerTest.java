@@ -301,6 +301,7 @@ class SettingsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(tagForm))
                         .with(csrf()))
+                .andExpect(authenticated())
                 .andExpect(status().isOk());
 
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
@@ -330,6 +331,7 @@ class SettingsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(tagForm))
                         .with(csrf()))
+                .andExpect(authenticated())
                 .andExpect(status().isOk());
 
         assertThat(usersEntity.getTags().contains(tagEntity)).isFalse();
@@ -364,6 +366,7 @@ class SettingsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(zoneForm))
                         .with(csrf()))
+                .andExpect(authenticated())
                 .andExpect(status().isOk());
 
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
@@ -382,6 +385,7 @@ class SettingsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(zoneForm))
                         .with(csrf()))
+                .andExpect(authenticated())
                 .andExpect(status().isOk());
 
         ZoneEntity zoneEntity = zoneRepository.findByCityAndProvince(testZone.getCity(), testZone.getProvince()).get();

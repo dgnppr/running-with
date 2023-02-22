@@ -27,6 +27,8 @@ import static com.runningwith.utils.CustomStringUtils.RANDOM_STRING;
 import static com.runningwith.utils.CustomStringUtils.WITH_USER_NICKNAME;
 import static com.runningwith.utils.WebUtils.REDIRECT;
 import static com.runningwith.utils.WebUtils.URL_REDIRECT_ROOT;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
@@ -204,6 +206,11 @@ class UsersControllerTest {
         mockMvc.perform(get(URL_USERS_PROFILE + "/" + UUID.randomUUID()))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("error"))
+                .andExpect(result -> {
+                    Throwable ex = result.getResolvedException();
+                    assertNotNull(ex);
+                    assertEquals(IllegalArgumentException.class, ex.getClass());
+                })
                 .andExpect(view().name(VIEW_ERROR));
     }
 
