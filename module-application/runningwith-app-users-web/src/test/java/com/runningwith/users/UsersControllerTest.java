@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.runningwith.AppExceptionHandler.VIEW_ERROR;
 import static com.runningwith.WithUserSecurityContextFactory.EMAIL;
 import static com.runningwith.WithUserSecurityContextFactory.PASSWORD;
 import static com.runningwith.users.UsersController.*;
@@ -196,11 +197,14 @@ class UsersControllerTest {
                 .andExpect(view().name(PAGE_USERS_PROFILE));
     }
 
-    // TODO 프로필 뷰 실패 테스트 코드 작성
+
     @DisplayName("프로필 뷰 실패 - 에러 경로")
     @Test
     void view_profile_failure_wrong_path() throws Exception {
-        // mockMvc.perform(get(URL_USERS_PROFILE + "/" + UUID.randomUUID()))
+        mockMvc.perform(get(URL_USERS_PROFILE + "/" + UUID.randomUUID()))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("error"))
+                .andExpect(view().name(VIEW_ERROR));
     }
 
     @DisplayName("이메일 로그인 링크 뷰")
