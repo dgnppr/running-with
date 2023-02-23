@@ -149,7 +149,7 @@ class StudySettingsControllerTest {
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
 
-        mockMvc.perform(get(URL_STUDY_PATH + "TESTPATH" + URL_STUDY_SETTINGS_BANNER))
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTINGS_BANNER))
                 .andExpect(status().isOk())
                 .andExpect(authenticated())
                 .andExpect(model().attribute("user", usersEntity))
@@ -175,6 +175,36 @@ class StudySettingsControllerTest {
         String changed = studyRepository.findByPath(TESTPATH).get().getBannerImage();
 
         assertThat(changed).isNotEqualTo(origin);
+    }
+
+    @WithUser
+    @DisplayName("배너 이미지 사용 업데이트")
+    @Test
+    void enable_study_banner_image() throws Exception {
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_SETTINGS_BANNER_ENABLE)
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(authenticated())
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_STUDY_SETTINGS_BANNER));
+
+        assertThat(studyEntity.isUseBanner()).isEqualTo(true);
+    }
+
+    @WithUser
+    @DisplayName("배너 이미지 미사용 업데이트")
+    @Test
+    void disable_study_banner_image() throws Exception {
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_SETTINGS_BANNER_DISABLE)
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(authenticated())
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_STUDY_SETTINGS_BANNER));
+
+        assertThat(studyEntity.isUseBanner()).isEqualTo(false);
     }
 
 
