@@ -3,10 +3,7 @@
 <head th:replace="~{fragments.html :: head}"></head>
 <body class="bg-light">
 <div th:replace="~{fragments.html :: main-nav}"></div>
-
-<div class="row" id="study-logo" th:if="${study.useBanner}">
-    <img th:src="${study.bannerImage}"/>
-</div>
+<div th:replace="~{fragments.html :: study-banner}"></div>
 
 <div class="container">
     <div th:replace="~{fragments.html :: study-info}"></div>
@@ -17,10 +14,6 @@
     </div>
 </div>
 <th:block th:replace="~{fragments.html :: footer}"></th:block>
-<script type="application/javascript">
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    })
-</script>
+<script th:replace="~{fragments.html :: tooltip}"></script>
 </body>
 </html>

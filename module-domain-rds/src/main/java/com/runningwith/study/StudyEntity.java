@@ -99,4 +99,15 @@ public class StudyEntity {
         this.fullDescription = fullDescription;
     }
 
+    public void updateUseBanner(boolean useBanner) {
+        this.useBanner = useBanner;
+    }
+
+    public String getBannerImage() {
+        return bannerImage != null ? bannerImage : "/images/default_banner.png";
+    }
+
+    public void updateStudyBannerImage(String bannerImage) {
+        this.bannerImage = bannerImage;
+    }
 }

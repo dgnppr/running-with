@@ -7,18 +7,14 @@
 <div th:replace="~{fragments.html :: study-banner}"></div>
 
 <div class="container">
-  <div th:replace="~{fragments.html :: study-info}"></div>
-  <div th:replace="~{fragments.html :: study-menu(studyMenu='members')}"></div>
+    <div th:replace="~{fragments.html :: study-info}"></div>
+    <div th:replace="~{fragments.html :: study-menu(studyMenu='members')}"></div>
 
-  <div th:replace="~{fragments.html :: member-list(members=${study.managers},isManager=${true})}"></div>
-  <div th:replace="~{fragments.html :: member-list(members=${study.members},isManager=${false})}"></div>
+    <div th:replace="~{fragments.html :: member-list(members=${study.managers},isManager=${true})}"></div>
+    <div th:replace="~{fragments.html :: member-list(members=${study.members},isManager=${false})}"></div>
 
 </div>
 <th:block th:replace="~{fragments.html :: footer}"></th:block>
-<script type="application/javascript">
-  $(function () {
-    $('[data-toggle="tooltip"]').tooltip()
-  })
-</script>
+<script th:replace="~{fragments.html :: tooltip}"></script>
 </body>
 </html>

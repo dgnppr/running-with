@@ -28,11 +28,15 @@ public class StudySettingsController {
     public static final String VIEW_STUDY_SETTINGS_DESCRIPTION = "study/settings/description";
     public static final String URL_STUDY_SETTINGS_DESCRIPTION = "/settings/description";
     public static final String STUDY_DESCRIPTION_FORM = "studyDescriptionForm";
+    public static final String URL_STUDY_SETTINGS_BANNER = "/settings/banner";
+    public static final String VIEW_STUDY_SETTINGS_BANNER = "study/settings/banner";
+    public static final String URL_SETTINGS_BANNER_ENABLE = "/settings/banner/enable";
+    public static final String URL_SETTINGS_BANNER_DISABLE = "/settings/banner/disable";
     private final StudyService studyService;
 
     // TODO 뷰 수정(DRAFT OFF)
     @GetMapping(URL_STUDY_SETTINGS_DESCRIPTION)
-    public String studySettingDescriptionView(@CurrentUser UsersEntity usersEntity, @PathVariable String path, Model model) {
+    public String studyDescriptionSettingView(@CurrentUser UsersEntity usersEntity, @PathVariable String path, Model model) {
         StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
         model.addAttribute("user", usersEntity);
         model.addAttribute("study", studyEntity);
@@ -55,6 +59,37 @@ public class StudySettingsController {
         studyService.updateStudyDescription(studyEntity, studyDescriptionForm);
         attributes.addFlashAttribute("message", "스터디 소개 수정 완료");
         return REDIRECT + URL_STUDY_PATH + getEncodedUrl(studyEntity.getPath()) + URL_STUDY_SETTINGS_DESCRIPTION;
+    }
+
+    @GetMapping(URL_STUDY_SETTINGS_BANNER)
+    public String studyBannerSettingView(@CurrentUser UsersEntity usersEntity, @PathVariable String path, Model model) {
+        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+        model.addAttribute("user", usersEntity);
+        model.addAttribute("study", studyEntity);
+        return VIEW_STUDY_SETTINGS_BANNER;
+    }
+
+    @PostMapping(URL_STUDY_SETTINGS_BANNER)
+    public String updateStudyBannerImage(@CurrentUser UsersEntity usersEntity, @PathVariable String path,
+                                         String image, RedirectAttributes attributes) {
+        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+        studyService.updateStudyBannerImage(studyEntity, image);
+        attributes.addFlashAttribute("message", "배너 이미지 수정 완료");
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_STUDY_SETTINGS_BANNER;
+    }
+
+    @PostMapping(URL_SETTINGS_BANNER_ENABLE)
+    public String enableStudyBannerImage(@CurrentUser UsersEntity usersEntity, @PathVariable String path) {
+        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+        studyService.enableStudyBanner(studyEntity);
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_STUDY_SETTINGS_BANNER;
+    }
+
+    @PostMapping(URL_SETTINGS_BANNER_DISABLE)
+    public String unableStudyBannerImage(@CurrentUser UsersEntity usersEntity, @PathVariable String path) {
+        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+        studyService.disableStudyBanner(studyEntity);
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_STUDY_SETTINGS_BANNER;
     }
 
 }

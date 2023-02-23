@@ -232,6 +232,10 @@
     <span th:text="${message}">완료</span>
 </div>
 
+<div class="row" id="study-logo" th:fragment="study-banner" th:if="${study.useBanner}">
+    <img th:src="${study.bannerImage}"/>
+</div>
+
 <div th:fragment="editor-script">
     <script src="/node_modules/summernote/dist/summernote-bs4.js"></script>
     <script type="application/javascript">
@@ -251,19 +255,25 @@
        th:classappend="${currentMenu == 'description'}? active"
        th:href="@{'/study/' + ${study.path} + '/settings/description'}">소개</a>
     <a class="list-group-item list-group-item-action" href="#"
-       th:classappend="${currentMenu == 'image'}? active" th:href="@{'/study/' + ${study.path} + '/settings/image'}">배너
+       th:classappend="${currentMenu == 'image'}? active" th:href="@{'/study/' + ${study.path} + '/settings/banner'}">배너
         이미지</a>
     <a class="list-group-item list-group-item-action" href="#"
        th:classappend="${currentMenu == 'tags'}? active" th:href="@{'/study/' + ${study.path} + '/settings/tags'}">스터디
         주제</a>
     <a class="list-group-item list-group-item-action" href="#"
-       th:classappend="${currentMenu == 'zones'}? active" th:href="@{'/study/' + ${study.path} + '/settings/zones'}">스터디
-        장소</a>
+       th:classappend="${currentMenu == 'zones'}? active" th:href="@{'/study/' + ${study.path} + '/settings/zones'}">활동
+        지역</a>
     <a class="list-group-item list-group-item-action list-group-item-danger"
        href="#"
        th:classappend="${currentMenu == 'study'}? active"
        th:href="@{'/study/' + ${study.path} + '/settings/study'}">스터디</a>
 </div>
+
+<script th:fragment="tooltip" type="application/javascript">
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
 
 <script th:fragment="form-validation" type="application/javascript">
     (function () {

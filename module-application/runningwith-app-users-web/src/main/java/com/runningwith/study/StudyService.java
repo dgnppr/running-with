@@ -39,4 +39,17 @@ public class StudyService {
     public void updateStudyDescription(StudyEntity studyEntity, StudyDescriptionForm form) {
         studyEntity.updateDescription(form.getShortDescription(), form.getFullDescription());
     }
+
+    public void enableStudyBanner(StudyEntity studyEntity) {
+        studyEntity.updateUseBanner(true);
+    }
+
+    public void disableStudyBanner(StudyEntity studyEntity) {
+        studyEntity.updateUseBanner(false);
+    }
+
+    public void updateStudyBannerImage(StudyEntity studyEntity, String bannerImage) {
+        studyEntity.updateStudyBannerImage(bannerImage);
+
+    }
 }
