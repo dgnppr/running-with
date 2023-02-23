@@ -25,8 +25,7 @@ import static com.runningwith.WithUserSecurityContextFactory.EMAIL;
 import static com.runningwith.WithUserSecurityContextFactory.PASSWORD;
 import static com.runningwith.study.StudyController.URL_STUDY_PATH;
 import static com.runningwith.study.StudySettingsController.*;
-import static com.runningwith.utils.CustomStringUtils.WITH_USER_NICKNAME;
-import static com.runningwith.utils.CustomStringUtils.getEncodedUrl;
+import static com.runningwith.utils.CustomStringUtils.*;
 import static com.runningwith.utils.WebUtils.REDIRECT;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
@@ -141,6 +140,41 @@ class StudySettingsControllerTest {
                 .andExpect(model().attribute("study", studyEntity))
                 .andExpect(authenticated())
                 .andExpect(view().name(VIEW_STUDY_SETTINGS_DESCRIPTION));
+    }
+
+    @WithUser
+    @DisplayName("스터디 배너 이미지 뷰")
+    @Test
+    void view_study_banner_image() throws Exception {
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+
+        mockMvc.perform(get(URL_STUDY_PATH + "TESTPATH" + URL_STUDY_SETTINGS_BANNER))
+                .andExpect(status().isOk())
+                .andExpect(authenticated())
+                .andExpect(model().attribute("user", usersEntity))
+                .andExpect(model().attribute("study", studyEntity))
+                .andExpect(view().name(VIEW_STUDY_SETTINGS_BANNER));
+    }
+
+    @WithUser
+    @DisplayName("스터디 배너 이미지 업데이트")
+    @Test
+    void update_study_banner_image() throws Exception {
+
+        String origin = studyRepository.findByPath(TESTPATH).get().getBannerImage();
+
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTINGS_BANNER)
+                        .param("image", RANDOM_STRING)
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(authenticated())
+                .andExpect(flash().attribute("message", "배너 이미지 수정 완료"))
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_STUDY_SETTINGS_BANNER));
+
+        String changed = studyRepository.findByPath(TESTPATH).get().getBannerImage();
+
+        assertThat(changed).isNotEqualTo(origin);
     }
 
 
