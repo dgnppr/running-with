@@ -207,7 +207,9 @@ class StudySettingsControllerTest {
         assertThat(studyEntity.isUseBanner()).isEqualTo(false);
     }
 
-
+    // TODO 스터디 주제 View
+    // TODO 스터디 태그 업데이트 ( 추가,삭제)
+    
     private UsersEntity saveOtherUser() {
         UsersEntity newUsersEntity = UsersEntity.builder()
                 .nickname("nickname")

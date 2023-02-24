@@ -337,6 +337,8 @@
 
         var input = document.querySelector('input[name=tags-outside]');
 
+        console.log(input);
+
         // initialize Tagify on the above input node reference
         var tagify = new Tagify(input, {
             whitelist: JSON.parse(document.querySelector("#whitelist").textContent),
@@ -346,17 +348,21 @@
             }
         })
 
+        console.log(tagify);
+
         // Chainable event listeners
         tagify.on('add', onAddTag)
             .on('remove', onRemoveTag)
 
         // tag add
         function onAddTag(e) {
+            console.log(e)
             tagRequest("/add", e.detail.data.value);
         }
 
         // tag remove
         function onRemoveTag(e) {
+            console.log(e)
             tagRequest("/remove", e.detail.data.value);
         }
     </script>

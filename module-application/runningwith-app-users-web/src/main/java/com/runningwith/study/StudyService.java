@@ -1,12 +1,15 @@
 package com.runningwith.study;
 
 import com.runningwith.study.form.StudyDescriptionForm;
+import com.runningwith.tag.TagEntity;
 import com.runningwith.users.UsersEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -32,6 +35,10 @@ public class StudyService {
         return studyEntity;
     }
 
+    public Set<TagEntity> getStudyTags(StudyEntity studyEntity) {
+        return studyEntity.getTags();
+    }
+
     private StudyEntity getStudy(String path) {
         return studyRepository.findByPath(path).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
     }
@@ -51,5 +58,13 @@ public class StudyService {
     public void updateStudyBannerImage(StudyEntity studyEntity, String bannerImage) {
         studyEntity.updateStudyBannerImage(bannerImage);
 
+    }
+
+    public void addTag(StudyEntity studyEntity, TagEntity tagEntity) {
+        studyEntity.getTags().add(tagEntity);
+    }
+
+    public void removeTag(StudyEntity studyEntity, TagEntity tagEntity) {
+        studyEntity.getTags().remove(tagEntity);
     }
 }
