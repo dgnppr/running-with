@@ -9,6 +9,9 @@ import com.runningwith.tag.TagRepository;
 import com.runningwith.tag.TagService;
 import com.runningwith.users.CurrentUser;
 import com.runningwith.users.UsersEntity;
+import com.runningwith.users.form.ZoneForm;
+import com.runningwith.zone.ZoneEntity;
+import com.runningwith.zone.ZoneRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +47,12 @@ public class StudySettingsController {
     public static final String URL_STUDY_TAGS = "/settings/tags";
     public static final String URL_STUDY_TAGS_ADD = "/settings/tags/add";
     public static final String URL_STUDY_TAGS_REMOVE = "/settings/tags/remove";
+    public static final String URL_STUDY_ZONES = "/settings/zones";
+    public static final String VIEW_STUDY_SETTINGS_ZONES = "study/settings/zones";
+    public static final String URL_STUDY_ZONES_REMOVE = "/settings/zones/remove";
+    public static final String URL_STUDY_ZONES_ADD = "/settings/zones/add";
     private final TagRepository tagRepository;
+    private final ZoneRepository zoneRepository;
     private final StudyService studyService;
     private final TagService tagService;
     private final ObjectMapper objectMapper;
@@ -144,6 +152,54 @@ public class StudySettingsController {
         }
         TagEntity tagEntity = optionalTagEntity.get();
         studyService.removeTag(studyEntity, tagEntity);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(URL_STUDY_ZONES)
+    public String studyZonesUpdateView(@CurrentUser UsersEntity usersEntity, @PathVariable String path, Model model) throws JsonProcessingException {
+        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+
+        model.addAttribute("user", usersEntity);
+        model.addAttribute("study", studyEntity);
+
+        List<String> zones = studyService.getStudyZones(studyEntity).stream().map(ZoneEntity::toString).collect(Collectors.toList());
+        List<String> allZones = zoneRepository.findAll().stream().map(ZoneEntity::toString).collect(Collectors.toList());
+
+        model.addAttribute("zones", zones);
+        model.addAttribute("whitelist", objectMapper.writeValueAsString(allZones));
+
+        return VIEW_STUDY_SETTINGS_ZONES;
+    }
+
+    @PostMapping(URL_STUDY_ZONES_ADD)
+    @ResponseBody
+    public ResponseEntity addStudyZone(@CurrentUser UsersEntity usersEntity, @PathVariable String path, @RequestBody ZoneForm zoneForm) throws JsonProcessingException {
+        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+
+        Optional<ZoneEntity> optionalZone = zoneRepository.findByCityAndProvince(zoneForm.getCityName(), zoneForm.getProvinceName());
+        if (optionalZone.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        ZoneEntity zoneEntity = optionalZone.get();
+        studyService.addZone(studyEntity, zoneEntity);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(URL_STUDY_ZONES_REMOVE)
+    @ResponseBody
+    public ResponseEntity removeStudyZone(@CurrentUser UsersEntity usersEntity, @PathVariable String path, @RequestBody ZoneForm zoneForm) throws JsonProcessingException {
+        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+
+        Optional<ZoneEntity> optionalZone = zoneRepository.findByCityAndProvince(zoneForm.getCityName(), zoneForm.getProvinceName());
+        if (optionalZone.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        ZoneEntity zoneEntity = optionalZone.get();
+        studyService.removeZone(studyEntity, zoneEntity);
+
         return ResponseEntity.ok().build();
     }
 

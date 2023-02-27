@@ -3,6 +3,7 @@ package com.runningwith.study;
 import com.runningwith.study.form.StudyDescriptionForm;
 import com.runningwith.tag.TagEntity;
 import com.runningwith.users.UsersEntity;
+import com.runningwith.zone.ZoneEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
@@ -25,6 +26,7 @@ public class StudyService {
         return newStudy;
     }
 
+    // TODO Query Optimize -> getStudyToUpdate 분리
     public StudyEntity getStudyToUpdate(UsersEntity usersEntity, String path) {
         StudyEntity studyEntity = this.getStudy(path);
 
@@ -38,6 +40,11 @@ public class StudyService {
     public Set<TagEntity> getStudyTags(StudyEntity studyEntity) {
         return studyEntity.getTags();
     }
+
+    public Set<ZoneEntity> getStudyZones(StudyEntity studyEntity) {
+        return studyEntity.getZones();
+    }
+
 
     private StudyEntity getStudy(String path) {
         return studyRepository.findByPath(path).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
@@ -66,5 +73,14 @@ public class StudyService {
 
     public void removeTag(StudyEntity studyEntity, TagEntity tagEntity) {
         studyEntity.getTags().remove(tagEntity);
+    }
+
+
+    public void addZone(StudyEntity studyEntity, ZoneEntity zoneEntity) {
+        studyEntity.getZones().add(zoneEntity);
+    }
+
+    public void removeZone(StudyEntity studyEntity, ZoneEntity zoneEntity) {
+        studyEntity.getZones().remove(zoneEntity);
     }
 }
