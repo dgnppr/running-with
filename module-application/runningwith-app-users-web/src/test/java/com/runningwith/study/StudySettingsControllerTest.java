@@ -1,5 +1,6 @@
 package com.runningwith.study;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.runningwith.MockMvcTest;
 import com.runningwith.WithUser;
 import com.runningwith.account.AccountEntity;
@@ -7,8 +8,12 @@ import com.runningwith.account.AccountRepository;
 import com.runningwith.account.AccountType;
 import com.runningwith.study.form.StudyDescriptionForm;
 import com.runningwith.study.form.StudyForm;
+import com.runningwith.tag.TagEntity;
+import com.runningwith.tag.TagRepository;
 import com.runningwith.users.UsersEntity;
 import com.runningwith.users.UsersRepository;
+import com.runningwith.zone.ZoneEntity;
+import com.runningwith.zone.ZoneRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +23,9 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.runningwith.AppExceptionHandler.VIEW_ERROR;
 import static com.runningwith.WithUserSecurityContextFactory.EMAIL;
@@ -50,6 +57,12 @@ class StudySettingsControllerTest {
     StudyService studyService;
     @Autowired
     AccountRepository accountRepository;
+    @Autowired
+    TagRepository tagRepository;
+    @Autowired
+    ObjectMapper objectMapper;
+    @Autowired
+    ZoneRepository zoneRepository;
 
     @BeforeEach
     void setUp() {
@@ -207,9 +220,52 @@ class StudySettingsControllerTest {
         assertThat(studyEntity.isUseBanner()).isEqualTo(false);
     }
 
-    // TODO 스터디 주제 View
+    @WithUser
+    @DisplayName("스터디 주제 업데이트 뷰")
+    @Test
+    void view_study_tags_update() throws Exception {
+
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        List<String> tags = studyService.getStudyTags(studyEntity).stream().map(TagEntity::getTitle).collect(Collectors.toList());
+        List<String> whitelist = tagRepository.findAll().stream().map(TagEntity::getTitle).collect(Collectors.toList());
+
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_STUDY_TAGS))
+                .andExpect(model().attribute("user", usersEntity))
+                .andExpect(model().attribute("study", studyEntity))
+                .andExpect(model().attribute("tags", tags))
+                .andExpect(model().attribute("whitelist", objectMapper.writeValueAsString(whitelist)))
+                .andExpect(status().isOk())
+                .andExpect(authenticated())
+                .andExpect(view().name(VIEW_STUDY_SETTINGS_TAGS));
+    }
+
+
     // TODO 스터디 태그 업데이트 ( 추가,삭제)
-    
+
+    @WithUser
+    @DisplayName("스터디 장소 업데이트 뷰")
+    @Test
+    void view_study_zones_update() throws Exception {
+
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        List<String> zones = studyService.getStudyTags(studyEntity).stream().map(TagEntity::getTitle).collect(Collectors.toList());
+        List<String> allZones = zoneRepository.findAll().stream().map(ZoneEntity::toString).collect(Collectors.toList());
+
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_STUDY_ZONES))
+                .andExpect(model().attribute("user", usersEntity))
+                .andExpect(model().attribute("study", studyEntity))
+                .andExpect(model().attribute("zones", zones))
+                .andExpect(model().attribute("whitelist", objectMapper.writeValueAsString(allZones)))
+                .andExpect(status().isOk())
+                .andExpect(authenticated())
+                .andExpect(view().name(VIEW_STUDY_SETTINGS_ZONES));
+    }
+
+
+    // TODO 스터디 장소 업데이트 ( 추가,삭제)
+
     private UsersEntity saveOtherUser() {
         UsersEntity newUsersEntity = UsersEntity.builder()
                 .nickname("nickname")
