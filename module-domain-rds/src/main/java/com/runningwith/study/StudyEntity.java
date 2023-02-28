@@ -130,7 +130,7 @@ public class StudyEntity {
     }
 
     public boolean isRecruitUpdatable() {
-        return this.published && this.recruitingUpdatedDateTime == null || this.recruitingUpdatedDateTime.isBefore(LocalDateTime.now().minusHours(1));
+        return (this.published) && (this.recruitingUpdatedDateTime == null || this.recruitingUpdatedDateTime.isBefore(LocalDateTime.now().minusHours(1)));
     }
 
     public void startRecruit() {

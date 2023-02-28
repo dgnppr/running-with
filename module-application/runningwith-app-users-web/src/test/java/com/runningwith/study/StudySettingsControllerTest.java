@@ -16,6 +16,7 @@ import com.runningwith.users.UsersRepository;
 import com.runningwith.users.form.ZoneForm;
 import com.runningwith.zone.ZoneEntity;
 import com.runningwith.zone.ZoneRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -397,7 +398,7 @@ class StudySettingsControllerTest {
     @WithUser
     @DisplayName("스터디 상태 공개로 업데이트 - 정상")
     @Test
-    void update_study_settings_status_publish() throws Exception {
+    void publish_study() throws Exception {
         StudyEntity beforeStudyEntity = studyRepository.findByPath(TEST_PATH).get();
         boolean prevStatus = beforeStudyEntity.isPublished();
 
@@ -418,7 +419,7 @@ class StudySettingsControllerTest {
     @WithUser
     @DisplayName("스터디 상태 공개로 업데이트 - 오류(종료 or 이미 공개인 상태)")
     @Test
-    void update_study_settings_status_publish_with_wrong_status() throws Exception {
+    void plush_study_with_wrong_status() throws Exception {
         StudyEntity beforeStudyEntity = studyRepository.findByPath(TEST_PATH).get();
         beforeStudyEntity.publish();
 
@@ -436,9 +437,9 @@ class StudySettingsControllerTest {
     }
 
     @WithUser
-    @DisplayName("스터디 상태 종료로 업데이트")
+    @DisplayName("스터디 상태 종료로 업데이트 - 정상")
     @Test
-    void update_study_settings_status_close() throws Exception {
+    void close_study() throws Exception {
         StudyEntity beforeStudyEntity = studyRepository.findByPath(TEST_PATH).get();
         beforeStudyEntity.publish();
 
@@ -453,9 +454,7 @@ class StudySettingsControllerTest {
     @WithUser
     @DisplayName("스터디 상태 종료로 업데이트 - 오류(공개X or 이미 종료인 상태)")
     @Test
-    void update_study_settings_status_published_with_wrong_status() throws Exception {
-        StudyEntity beforeStudyEntity = studyRepository.findByPath(TEST_PATH).get();
-        
+    void close_study_with_wrong_status() throws Exception {
         mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTINGS_CLOSE)
                         .with(csrf()))
                 .andExpect(status().isOk())
@@ -467,6 +466,43 @@ class StudySettingsControllerTest {
                     assertEquals(ex.getMessage(), "스터디를 종료할 수 없습니다. 스터디를 공개하지 않았거나 이미 종료한 스터디입니다.");
                 })
                 .andExpect(view().name(VIEW_ERROR));
+    }
+
+    @WithUser
+    @DisplayName("스터디 멤버 모집 시작 - 정상")
+    @Test
+    void start_study_recruit() throws Exception {
+        StudyEntity beforeStudy = studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).get();
+        beforeStudy.publish();
+
+        Assertions.assertThat(beforeStudy.isRecruiting()).isFalse();
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_RECRUIT_START)
+                        .with(csrf()))
+                .andExpect(flash().attributeExists("message"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(authenticated())
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TEST_PATH) + URL_STUDY_SETTING));
+
+        StudyEntity afterStudy = studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).get();
+        Assertions.assertThat(afterStudy.isRecruiting()).isTrue();
+    }
+
+    @WithUser
+    @DisplayName("스터디 멤버 모집 종료 - 정상")
+    @Test
+    void stop_study_recruit() throws Exception {
+        StudyEntity beforeStudy = studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).get();
+        beforeStudy.publish();
+        
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_RECRUIT_STOP)
+                        .with(csrf()))
+                .andExpect(flash().attributeExists("message"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(authenticated())
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TEST_PATH) + URL_STUDY_SETTING));
+
+        StudyEntity afterStudy = studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).get();
+        Assertions.assertThat(afterStudy.isRecruiting()).isFalse();
     }
 
     private UsersEntity saveOtherUser() {
