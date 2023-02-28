@@ -23,4 +23,10 @@ public class AppExceptionHandler {
         return VIEW_ERROR;
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public String handleIllegalStateException(IllegalStateException ex, Model model) {
+        model.addAttribute("error", ex.getMessage());
+        return VIEW_ERROR;
+    }
+
 }

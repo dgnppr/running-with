@@ -49,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @MockMvcTest
 class StudySettingsControllerTest {
 
-    public static final String TESTPATH = "testpath";
+    public static final String TEST_PATH = "testpath";
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -70,7 +70,7 @@ class StudySettingsControllerTest {
     @BeforeEach
     void setUp() {
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
-        StudyForm studyForm = new StudyForm(TESTPATH, "testpath", "testpath", "testpath");
+        StudyForm studyForm = new StudyForm(TEST_PATH, "testpath", "testpath", "testpath");
         StudyEntity studyEntity = studyForm.toEntity();
         studyService.createNewStudy(usersEntity, studyEntity);
     }
@@ -87,9 +87,9 @@ class StudySettingsControllerTest {
     @Test
     void view_study_setting_description_by_managers() throws Exception {
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
-        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TEST_PATH).get();
 
-        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTINGS_DESCRIPTION))
+        mockMvc.perform(get(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTINGS_DESCRIPTION))
                 .andExpect(status().isOk())
                 .andExpect(authenticated())
                 .andExpect(model().attribute("user", usersEntity))
@@ -122,11 +122,11 @@ class StudySettingsControllerTest {
     @DisplayName("스터디 소개글 업데이트 - 입력값 정상")
     @Test
     void update_study_setting_description_with_correct_inputs() throws Exception {
-        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TEST_PATH).get();
 
         StudyDescriptionForm form = new StudyDescriptionForm("test", "test");
 
-        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTINGS_DESCRIPTION)
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTINGS_DESCRIPTION)
                         .param("shortDescription", form.getShortDescription())
                         .param("fullDescription", form.getFullDescription())
                         .with(csrf()))
@@ -134,7 +134,7 @@ class StudySettingsControllerTest {
                 .andExpect(authenticated())
                 .andExpect(view().name(REDIRECT + URL_STUDY_PATH + getEncodedUrl(studyEntity.getPath()) + URL_STUDY_SETTINGS_DESCRIPTION));
 
-        StudyEntity study = studyRepository.findByPath(TESTPATH).get();
+        StudyEntity study = studyRepository.findByPath(TEST_PATH).get();
         assertThat(study.getShortDescription()).isEqualTo(form.getShortDescription());
         assertThat(study.getFullDescription()).isEqualTo(form.getFullDescription());
     }
@@ -144,10 +144,10 @@ class StudySettingsControllerTest {
     @Test
     void update_study_setting_description_with_wrong_inputs() throws Exception {
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
-        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TEST_PATH).get();
         StudyDescriptionForm form = new StudyDescriptionForm("", "");
 
-        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTINGS_DESCRIPTION)
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTINGS_DESCRIPTION)
                         .param("shortDescription", form.getShortDescription())
                         .param("fullDescription", form.getFullDescription())
                         .with(csrf()))
@@ -163,9 +163,9 @@ class StudySettingsControllerTest {
     @Test
     void view_study_banner_image() throws Exception {
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
-        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TEST_PATH).get();
 
-        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTINGS_BANNER))
+        mockMvc.perform(get(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTINGS_BANNER))
                 .andExpect(status().isOk())
                 .andExpect(authenticated())
                 .andExpect(model().attribute("user", usersEntity))
@@ -178,17 +178,17 @@ class StudySettingsControllerTest {
     @Test
     void update_study_banner_image() throws Exception {
 
-        String origin = studyRepository.findByPath(TESTPATH).get().getBannerImage();
+        String origin = studyRepository.findByPath(TEST_PATH).get().getBannerImage();
 
-        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTINGS_BANNER)
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTINGS_BANNER)
                         .param("image", RANDOM_STRING)
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(authenticated())
                 .andExpect(flash().attribute("message", "배너 이미지 수정 완료"))
-                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_STUDY_SETTINGS_BANNER));
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TEST_PATH) + URL_STUDY_SETTINGS_BANNER));
 
-        String changed = studyRepository.findByPath(TESTPATH).get().getBannerImage();
+        String changed = studyRepository.findByPath(TEST_PATH).get().getBannerImage();
 
         assertThat(changed).isNotEqualTo(origin);
     }
@@ -197,13 +197,13 @@ class StudySettingsControllerTest {
     @DisplayName("배너 이미지 사용 업데이트")
     @Test
     void enable_study_banner_image() throws Exception {
-        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TEST_PATH).get();
 
-        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTINGS_BANNER_ENABLE)
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTINGS_BANNER_ENABLE)
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(authenticated())
-                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_STUDY_SETTINGS_BANNER));
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TEST_PATH) + URL_STUDY_SETTINGS_BANNER));
 
         assertThat(studyEntity.isUseBanner()).isEqualTo(true);
     }
@@ -212,13 +212,13 @@ class StudySettingsControllerTest {
     @DisplayName("배너 이미지 미사용 업데이트")
     @Test
     void disable_study_banner_image() throws Exception {
-        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TEST_PATH).get();
 
-        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTINGS_BANNER_DISABLE)
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTINGS_BANNER_DISABLE)
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(authenticated())
-                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_STUDY_SETTINGS_BANNER));
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TEST_PATH) + URL_STUDY_SETTINGS_BANNER));
 
         assertThat(studyEntity.isUseBanner()).isEqualTo(false);
     }
@@ -229,11 +229,11 @@ class StudySettingsControllerTest {
     void view_study_tags_update() throws Exception {
 
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
-        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TEST_PATH).get();
         List<String> tags = studyService.getStudyTags(studyEntity).stream().map(TagEntity::getTitle).collect(Collectors.toList());
         List<String> whitelist = tagRepository.findAll().stream().map(TagEntity::getTitle).collect(Collectors.toList());
 
-        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTING_TAGS))
+        mockMvc.perform(get(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTING_TAGS))
                 .andExpect(model().attribute("user", usersEntity))
                 .andExpect(model().attribute("study", studyEntity))
                 .andExpect(model().attribute("tags", tags))
@@ -250,7 +250,7 @@ class StudySettingsControllerTest {
         TagForm tagForm = new TagForm();
         tagForm.setTagTitle("TEST_TAG_TITLE");
 
-        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTING_TAGS_ADD)
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTING_TAGS_ADD)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(tagForm))
                         .with(csrf()))
@@ -258,7 +258,7 @@ class StudySettingsControllerTest {
                 .andExpect(authenticated());
 
         TagEntity tagEntity = tagRepository.findByTitle(tagForm.getTagTitle()).get();
-        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TEST_PATH).get();
         assertThat(studyEntity.getTags()).containsOnly(tagEntity);
     }
 
@@ -273,14 +273,14 @@ class StudySettingsControllerTest {
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
         usersEntity.getTags().add(tagEntity);
 
-        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTING_TAGS_REMOVE)
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTING_TAGS_REMOVE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(tagForm))
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(authenticated());
 
-        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TEST_PATH).get();
         assertThat(studyEntity.getTags()).doesNotContain(tagEntity);
     }
 
@@ -291,7 +291,7 @@ class StudySettingsControllerTest {
         TagForm tagForm = new TagForm();
         tagForm.setTagTitle("TEST_TAG_TITLE");
 
-        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTING_TAGS_REMOVE)
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTING_TAGS_REMOVE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(tagForm))
                         .with(csrf()))
@@ -305,11 +305,11 @@ class StudySettingsControllerTest {
     void view_study_zones_update() throws Exception {
 
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
-        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TEST_PATH).get();
         List<String> zones = studyService.getStudyTags(studyEntity).stream().map(TagEntity::getTitle).collect(Collectors.toList());
         List<String> allZones = zoneRepository.findAll().stream().map(ZoneEntity::toString).collect(Collectors.toList());
 
-        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTING_ZONES))
+        mockMvc.perform(get(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTING_ZONES))
                 .andExpect(model().attribute("user", usersEntity))
                 .andExpect(model().attribute("study", studyEntity))
                 .andExpect(model().attribute("zones", zones))
@@ -329,7 +329,7 @@ class StudySettingsControllerTest {
         ZoneForm zoneForm = new ZoneForm();
         zoneForm.setZoneName(entity.toString());
 
-        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTING_ZONES_ADD)
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTING_ZONES_ADD)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(zoneForm))
                         .with(csrf()))
@@ -337,7 +337,7 @@ class StudySettingsControllerTest {
                 .andExpect(authenticated());
 
         ZoneEntity zone = zoneRepository.findByCityAndProvince(zoneForm.getCityName(), zoneForm.getProvinceName()).get();
-        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TEST_PATH).get();
         assertThat(studyEntity.getZones()).containsOnly(zone);
     }
 
@@ -345,14 +345,14 @@ class StudySettingsControllerTest {
     @DisplayName("스터디 장소 삭제 - 입력값 정상")
     @Test
     void remove_study_zones_with_correct_inputs() throws Exception {
-        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TEST_PATH).get();
         ZoneEntity entity = new ZoneEntity("TEST_CITY", "TEST_LOCAL", "TEST_PROVINCE");
         zoneRepository.save(entity);
         ZoneForm zoneForm = new ZoneForm();
         zoneForm.setZoneName(entity.toString());
         studyEntity.getZones().add(entity);
 
-        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTING_ZONES_REMOVE)
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTING_ZONES_REMOVE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(zoneForm))
                         .with(csrf()))
@@ -367,17 +367,71 @@ class StudySettingsControllerTest {
     @DisplayName("스터디 장소 삭제 - 입력값 오류(존재하지 않는 장소)")
     @Test
     void remove_study_zones_with_wrong_inputs() throws Exception {
-        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         ZoneEntity entity = new ZoneEntity("TEST_CITY", "TEST_LOCAL", "TEST_PROVINCE");
         ZoneForm zoneForm = new ZoneForm();
         zoneForm.setZoneName(entity.toString());
 
-        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTING_ZONES_REMOVE)
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTING_ZONES_REMOVE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(zoneForm))
                         .with(csrf()))
                 .andExpect(status().isBadRequest())
                 .andExpect(authenticated());
+    }
+
+    @WithUser
+    @DisplayName("스터디 상태 뷰")
+    @Test
+    void view_study_settings_status() throws Exception {
+        StudyEntity studyEntity = studyRepository.findByPath(TEST_PATH).get();
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+
+        mockMvc.perform(get(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTING))
+                .andExpect(status().isOk())
+                .andExpect(authenticated())
+                .andExpect(model().attribute("study", studyEntity))
+                .andExpect(model().attribute("user", usersEntity))
+                .andExpect(view().name(VIEW_STUDY_SETTINGS_STUDY));
+    }
+
+    @WithUser
+    @DisplayName("스터디 상태 공개로 업데이트 - 정상")
+    @Test
+    void update_study_settings_status_published() throws Exception {
+        StudyEntity beforeStudyEntity = studyRepository.findByPath(TEST_PATH).get();
+        boolean prevStatus = beforeStudyEntity.isPublished();
+
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTINGS_PUBLISH)
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(authenticated())
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TEST_PATH) + URL_STUDY_SETTING));
+
+        StudyEntity afterStudyEntity = studyRepository.findByPath(TEST_PATH).get();
+        boolean afterStatus = afterStudyEntity.isPublished();
+
+        assertThat(prevStatus).isFalse();
+        assertThat(afterStatus).isTrue();
+    }
+
+    @WithUser
+    @DisplayName("스터디 상태 공개로 업데이트 - 오류(종료 or 이미 공개인 상태)")
+    @Test
+    void update_study_settings_status_published_with_wrong_status() throws Exception {
+        StudyEntity beforeStudyEntity = studyRepository.findByPath(TEST_PATH).get();
+        beforeStudyEntity.publish();
+
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTINGS_PUBLISH)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(authenticated())
+                .andExpect(result -> {
+                    Throwable ex = result.getResolvedException();
+                    assertNotNull(ex);
+                    assertEquals(IllegalArgumentException.class, ex.getClass());
+                    assertEquals(ex.getMessage(), "스터디를 공개할 수 없는 상태입니다. 스터디를 이미 공개했거나 종료했습니다.");
+                })
+                .andExpect(view().name(VIEW_ERROR));
     }
 
     private UsersEntity saveOtherUser() {
