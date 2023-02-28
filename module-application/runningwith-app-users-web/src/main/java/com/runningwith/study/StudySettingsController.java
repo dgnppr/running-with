@@ -117,7 +117,7 @@ public class StudySettingsController {
 
     @GetMapping(URL_STUDY_TAGS)
     public String studyTagsUpdateView(@CurrentUser UsersEntity usersEntity, @PathVariable String path, Model model) throws JsonProcessingException {
-        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+        StudyEntity studyEntity = studyService.getStudyToUpdateTag(usersEntity, path);
 
         model.addAttribute("user", usersEntity);
         model.addAttribute("study", studyEntity);
@@ -135,7 +135,7 @@ public class StudySettingsController {
     @ResponseBody
     public ResponseEntity addStudyTags(@CurrentUser UsersEntity usersEntity, @PathVariable String path
             , @RequestBody TagForm tagForm) {
-        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+        StudyEntity studyEntity = studyService.getStudyToUpdateTag(usersEntity, path);
         TagEntity tagEntity = tagService.findOrCreateNew(tagForm.getTagTitle());
         studyService.addTag(studyEntity, tagEntity);
         return ResponseEntity.ok().build();
@@ -145,7 +145,7 @@ public class StudySettingsController {
     @ResponseBody
     public ResponseEntity removeStudyTags(@CurrentUser UsersEntity usersEntity, @PathVariable String path
             , @RequestBody TagForm tagForm) {
-        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+        StudyEntity studyEntity = studyService.getStudyToUpdateTag(usersEntity, path);
         Optional<TagEntity> optionalTagEntity = tagRepository.findByTitle(tagForm.getTagTitle());
         if (optionalTagEntity.isEmpty()) {
             return ResponseEntity.badRequest().build();
@@ -157,7 +157,7 @@ public class StudySettingsController {
 
     @GetMapping(URL_STUDY_ZONES)
     public String studyZonesUpdateView(@CurrentUser UsersEntity usersEntity, @PathVariable String path, Model model) throws JsonProcessingException {
-        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+        StudyEntity studyEntity = studyService.getStudyToUpdateZone(usersEntity, path);
 
         model.addAttribute("user", usersEntity);
         model.addAttribute("study", studyEntity);
@@ -174,7 +174,7 @@ public class StudySettingsController {
     @PostMapping(URL_STUDY_ZONES_ADD)
     @ResponseBody
     public ResponseEntity addStudyZone(@CurrentUser UsersEntity usersEntity, @PathVariable String path, @RequestBody ZoneForm zoneForm) throws JsonProcessingException {
-        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+        StudyEntity studyEntity = studyService.getStudyToUpdateZone(usersEntity, path);
 
         Optional<ZoneEntity> optionalZone = zoneRepository.findByCityAndProvince(zoneForm.getCityName(), zoneForm.getProvinceName());
         if (optionalZone.isEmpty()) {
@@ -190,7 +190,7 @@ public class StudySettingsController {
     @PostMapping(URL_STUDY_ZONES_REMOVE)
     @ResponseBody
     public ResponseEntity removeStudyZone(@CurrentUser UsersEntity usersEntity, @PathVariable String path, @RequestBody ZoneForm zoneForm) throws JsonProcessingException {
-        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+        StudyEntity studyEntity = studyService.getStudyToUpdateZone(usersEntity, path);
 
         Optional<ZoneEntity> optionalZone = zoneRepository.findByCityAndProvince(zoneForm.getCityName(), zoneForm.getProvinceName());
         if (optionalZone.isEmpty()) {

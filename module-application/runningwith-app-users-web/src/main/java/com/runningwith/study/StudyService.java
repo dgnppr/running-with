@@ -10,6 +10,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -20,34 +21,52 @@ public class StudyService {
 
     private final StudyRepository studyRepository;
 
+    private static void checkIfManager(UsersEntity usersEntity, StudyEntity studyEntity) {
+        if (!usersEntity.isManagerOf(studyEntity)) {
+            throw new AccessDeniedException("권한을 가지고 있지 않습니다.");
+        }
+    }
+
     public StudyEntity createNewStudy(UsersEntity usersEntity, StudyEntity studyEntity) {
         StudyEntity newStudy = studyRepository.save(studyEntity);
         newStudy.addManager(usersEntity);
         return newStudy;
     }
 
-    // TODO Query Optimize -> getStudyToUpdate 분리
     public StudyEntity getStudyToUpdate(UsersEntity usersEntity, String path) {
-        StudyEntity studyEntity = this.getStudy(path);
-
-        if (!usersEntity.isManagerOf(studyEntity)) {
-            throw new AccessDeniedException("권한을 가지고 있지 않습니다.");
-        }
-
+        Optional<StudyEntity> optionalStudy = studyRepository.findByPath(path);
+        checkIfExistingStudy(optionalStudy);
+        StudyEntity studyEntity = optionalStudy.get();
+        checkIfManager(usersEntity, studyEntity);
         return studyEntity;
     }
 
+    public StudyEntity getStudyToUpdateTag(UsersEntity usersEntity, String path) {
+        Optional<StudyEntity> optionalStudy = studyRepository.findUsersEntityWithTagsByPath(path);
+        checkIfExistingStudy(optionalStudy);
+        StudyEntity studyEntity = optionalStudy.get();
+        checkIfManager(usersEntity, studyEntity);
+        return studyEntity;
+    }
+
+    public StudyEntity getStudyToUpdateZone(UsersEntity usersEntity, String path) {
+        Optional<StudyEntity> optionalStudy = studyRepository.findUsersEntityWithZonesByPath(path);
+        checkIfExistingStudy(optionalStudy);
+        StudyEntity studyEntity = optionalStudy.get();
+        checkIfManager(usersEntity, studyEntity);
+        return studyEntity;
+    }
+
+    public void checkIfExistingStudy(Optional<StudyEntity> optionalStudy) {
+        optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
+    }
+    
     public Set<TagEntity> getStudyTags(StudyEntity studyEntity) {
         return studyEntity.getTags();
     }
 
     public Set<ZoneEntity> getStudyZones(StudyEntity studyEntity) {
         return studyEntity.getZones();
-    }
-
-
-    private StudyEntity getStudy(String path) {
-        return studyRepository.findByPath(path).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
     }
 
     public void updateStudyDescription(StudyEntity studyEntity, StudyDescriptionForm form) {
@@ -74,7 +93,6 @@ public class StudyService {
     public void removeTag(StudyEntity studyEntity, TagEntity tagEntity) {
         studyEntity.getTags().remove(tagEntity);
     }
-
 
     public void addZone(StudyEntity studyEntity, ZoneEntity zoneEntity) {
         studyEntity.getZones().add(zoneEntity);

@@ -14,9 +14,9 @@ public interface StudyRepository extends JpaRepository<StudyEntity, Long> {
     Optional<StudyEntity> findByPath(String path);
 
     @EntityGraph(attributePaths = {"tags", "managers"})
-    Optional<StudyEntity> findStudyEntityWithTagsByPath(String path);
+    Optional<StudyEntity> findUsersEntityWithTagsByPath(String path);
 
     @EntityGraph(attributePaths = {"zones", "managers"})
-    Optional<StudyEntity> findStudyEntityWithZonesByPath(String path);
+    Optional<StudyEntity> findUsersEntityWithZonesByPath(String path);
 
 }
