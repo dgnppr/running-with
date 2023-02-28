@@ -150,4 +150,12 @@ public class StudyEntity {
             throw new IllegalArgumentException("인원 모집을 멈출 수 없습니다. 스터디를 공개하거나 한 시간 뒤 다시 시도하세요.");
         }
     }
+
+    public void updatePath(String newPath) {
+        this.path = newPath;
+    }
+
+    public void updateTitle(String newTitle) {
+        this.title = newTitle;
+    }
 }

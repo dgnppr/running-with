@@ -57,6 +57,8 @@ public class StudySettingsController {
     public static final String URL_STUDY_SETTINGS_CLOSE = "/settings/study/close";
     public static final String URL_STUDY_RECRUIT_START = "/settings/recruit/start";
     public static final String URL_STUDY_RECRUIT_STOP = "/settings/recruit/stop";
+    public static final String URL_STUDY_SETTINGS_PATH = "/settings/study/path";
+    public static final String URL_STUDY_SETTINGS_TITLE = "/settings/study/title";
     private final TagRepository tagRepository;
     private final ZoneRepository zoneRepository;
     private final StudyService studyService;
@@ -258,4 +260,39 @@ public class StudySettingsController {
         attributes.addFlashAttribute("message", "인원 모집 종료");
         return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_STUDY_SETTING;
     }
+
+    @PostMapping(URL_STUDY_SETTINGS_PATH)
+    public String updateStudyPath(@CurrentUser UsersEntity usersEntity, @PathVariable String path, String newPath,
+                                  Model model, RedirectAttributes attributes) {
+        StudyEntity studyEntity = studyService.getStudyToUpdateStatus(usersEntity, path);
+
+        if (!studyService.isValidPath(newPath)) {
+            model.addAttribute("user", usersEntity);
+            model.addAttribute("study", studyEntity);
+            model.addAttribute("studyPathError", "해당 스터디 경로는 사용할 수 없습니다. 다른 값을 입력하세요.");
+            return VIEW_STUDY_SETTINGS_STUDY;
+        }
+
+        studyService.updateStudyPath(studyEntity, newPath);
+        attributes.addFlashAttribute("message", "스터디 URL 수정 완료");
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(newPath) + URL_STUDY_SETTING;
+    }
+
+    @PostMapping(URL_STUDY_SETTINGS_TITLE)
+    public String updateStudyTitle(@CurrentUser UsersEntity usersEntity, @PathVariable String path, String newTitle,
+                                   Model model, RedirectAttributes attributes) {
+        StudyEntity studyEntity = studyService.getStudyToUpdateStatus(usersEntity, path);
+
+        if (!studyService.isValidTitle(newTitle)) {
+            model.addAttribute("user", usersEntity);
+            model.addAttribute("study", studyEntity);
+            model.addAttribute("studyTitleError", "스터디 이름을 다시 입력하세요.");
+            return VIEW_STUDY_SETTINGS_STUDY;
+        }
+
+        studyService.updateStudyTitle(studyEntity, newTitle);
+        attributes.addFlashAttribute("message", "스터디 제목 수정 완료");
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_STUDY_SETTING;
+    }
+
 }

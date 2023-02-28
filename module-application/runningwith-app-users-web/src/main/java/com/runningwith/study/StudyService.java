@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.runningwith.study.form.StudyForm.VALID_PATH_PATTERN;
+
 @Slf4j
 @Service
 @Transactional
@@ -126,5 +128,25 @@ public class StudyService {
 
     public void stopStudyRecruit(StudyEntity studyEntity) {
         studyEntity.stopRecruit();
+    }
+
+    public void updateStudyPath(StudyEntity studyEntity, String newPath) {
+        studyEntity.updatePath(newPath);
+    }
+
+    public boolean isValidPath(String newPath) {
+        if (!newPath.matches(VALID_PATH_PATTERN)) {
+            return false;
+        }
+
+        return !studyRepository.existsByPath(newPath);
+    }
+
+    public boolean isValidTitle(String newTitle) {
+        return newTitle.length() <= 50;
+    }
+
+    public void updateStudyTitle(StudyEntity studyEntity, String newTitle) {
+        studyEntity.updateTitle(newTitle);
     }
 }
