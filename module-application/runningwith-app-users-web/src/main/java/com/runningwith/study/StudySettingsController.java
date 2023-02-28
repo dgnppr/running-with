@@ -54,6 +54,7 @@ public class StudySettingsController {
     public static final String URL_STUDY_SETTING = "/settings/study";
     public static final String VIEW_STUDY_SETTINGS_STUDY = "study/settings/study";
     public static final String URL_STUDY_SETTINGS_PUBLISH = "/settings/study/publish";
+    public static final String URL_STUDY_SETTINGS_CLOSE = "/settings/study/close";
     private final TagRepository tagRepository;
     private final ZoneRepository zoneRepository;
     private final StudyService studyService;
@@ -215,9 +216,16 @@ public class StudySettingsController {
     }
 
     @PostMapping(URL_STUDY_SETTINGS_PUBLISH)
-    public String updateStudyPublish(@CurrentUser UsersEntity usersEntity, @PathVariable String path, RedirectAttributes attributes) {
+    public String publishStudy(@CurrentUser UsersEntity usersEntity, @PathVariable String path, RedirectAttributes attributes) {
         studyService.publishStudy(usersEntity, path);
         attributes.addFlashAttribute("message", "스터디 공개");
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_STUDY_SETTING;
+    }
+
+    @PostMapping(URL_STUDY_SETTINGS_CLOSE)
+    public String closeStudy(@CurrentUser UsersEntity usersEntity, @PathVariable String path, RedirectAttributes attributes) {
+        studyService.closeStudy(usersEntity, path);
+        attributes.addFlashAttribute("message", "스터디 종료");
         return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_STUDY_SETTING;
     }
 }

@@ -110,4 +110,13 @@ public class StudyService {
         studyEntity.publish();
         return studyEntity;
     }
+
+    public StudyEntity closeStudy(UsersEntity usersEntity, String path) {
+        Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityWithManagersByPath(path);
+        checkIfExistingStudy(optionalStudy);
+        StudyEntity studyEntity = optionalStudy.get();
+        checkIfManager(usersEntity, studyEntity);
+        studyEntity.close();
+        return studyEntity;
+    }
 }
