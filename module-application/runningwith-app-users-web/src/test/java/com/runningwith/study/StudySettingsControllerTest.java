@@ -199,7 +199,7 @@ class StudySettingsControllerTest {
     void enable_study_banner_image() throws Exception {
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
 
-        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_SETTINGS_BANNER_ENABLE)
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTINGS_BANNER_ENABLE)
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(authenticated())
@@ -214,7 +214,7 @@ class StudySettingsControllerTest {
     void disable_study_banner_image() throws Exception {
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
 
-        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_SETTINGS_BANNER_DISABLE)
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTINGS_BANNER_DISABLE)
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(authenticated())
@@ -233,7 +233,7 @@ class StudySettingsControllerTest {
         List<String> tags = studyService.getStudyTags(studyEntity).stream().map(TagEntity::getTitle).collect(Collectors.toList());
         List<String> whitelist = tagRepository.findAll().stream().map(TagEntity::getTitle).collect(Collectors.toList());
 
-        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_STUDY_TAGS))
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTING_TAGS))
                 .andExpect(model().attribute("user", usersEntity))
                 .andExpect(model().attribute("study", studyEntity))
                 .andExpect(model().attribute("tags", tags))
@@ -250,7 +250,7 @@ class StudySettingsControllerTest {
         TagForm tagForm = new TagForm();
         tagForm.setTagTitle("TEST_TAG_TITLE");
 
-        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_TAGS_ADD)
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTING_TAGS_ADD)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(tagForm))
                         .with(csrf()))
@@ -273,7 +273,7 @@ class StudySettingsControllerTest {
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
         usersEntity.getTags().add(tagEntity);
 
-        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_TAGS_REMOVE)
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTING_TAGS_REMOVE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(tagForm))
                         .with(csrf()))
@@ -291,7 +291,7 @@ class StudySettingsControllerTest {
         TagForm tagForm = new TagForm();
         tagForm.setTagTitle("TEST_TAG_TITLE");
 
-        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_TAGS_REMOVE)
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTING_TAGS_REMOVE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(tagForm))
                         .with(csrf()))
@@ -309,7 +309,7 @@ class StudySettingsControllerTest {
         List<String> zones = studyService.getStudyTags(studyEntity).stream().map(TagEntity::getTitle).collect(Collectors.toList());
         List<String> allZones = zoneRepository.findAll().stream().map(ZoneEntity::toString).collect(Collectors.toList());
 
-        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_STUDY_ZONES))
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTING_ZONES))
                 .andExpect(model().attribute("user", usersEntity))
                 .andExpect(model().attribute("study", studyEntity))
                 .andExpect(model().attribute("zones", zones))
@@ -329,7 +329,7 @@ class StudySettingsControllerTest {
         ZoneForm zoneForm = new ZoneForm();
         zoneForm.setZoneName(entity.toString());
 
-        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_ZONES_ADD)
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTING_ZONES_ADD)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(zoneForm))
                         .with(csrf()))
@@ -352,7 +352,7 @@ class StudySettingsControllerTest {
         zoneForm.setZoneName(entity.toString());
         studyEntity.getZones().add(entity);
 
-        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_ZONES_REMOVE)
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTING_ZONES_REMOVE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(zoneForm))
                         .with(csrf()))
@@ -372,7 +372,7 @@ class StudySettingsControllerTest {
         ZoneForm zoneForm = new ZoneForm();
         zoneForm.setZoneName(entity.toString());
 
-        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_ZONES_REMOVE)
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_SETTING_ZONES_REMOVE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(zoneForm))
                         .with(csrf()))

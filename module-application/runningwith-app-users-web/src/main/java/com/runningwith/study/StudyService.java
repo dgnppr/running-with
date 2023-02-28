@@ -42,7 +42,7 @@ public class StudyService {
     }
 
     public StudyEntity getStudyToUpdateTag(UsersEntity usersEntity, String path) {
-        Optional<StudyEntity> optionalStudy = studyRepository.findUsersEntityWithTagsByPath(path);
+        Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityWithTagsByPath(path);
         checkIfExistingStudy(optionalStudy);
         StudyEntity studyEntity = optionalStudy.get();
         checkIfManager(usersEntity, studyEntity);
@@ -50,7 +50,7 @@ public class StudyService {
     }
 
     public StudyEntity getStudyToUpdateZone(UsersEntity usersEntity, String path) {
-        Optional<StudyEntity> optionalStudy = studyRepository.findUsersEntityWithZonesByPath(path);
+        Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityWithZonesByPath(path);
         checkIfExistingStudy(optionalStudy);
         StudyEntity studyEntity = optionalStudy.get();
         checkIfManager(usersEntity, studyEntity);
@@ -60,7 +60,7 @@ public class StudyService {
     public void checkIfExistingStudy(Optional<StudyEntity> optionalStudy) {
         optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
     }
-    
+
     public Set<TagEntity> getStudyTags(StudyEntity studyEntity) {
         return studyEntity.getTags();
     }
@@ -100,5 +100,14 @@ public class StudyService {
 
     public void removeZone(StudyEntity studyEntity, ZoneEntity zoneEntity) {
         studyEntity.getZones().remove(zoneEntity);
+    }
+
+    public StudyEntity publishStudy(UsersEntity usersEntity, String path) {
+        Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityWithManagersByPath(path);
+        checkIfExistingStudy(optionalStudy);
+        StudyEntity studyEntity = optionalStudy.get();
+        checkIfManager(usersEntity, studyEntity);
+        studyEntity.publish();
+        return studyEntity;
     }
 }

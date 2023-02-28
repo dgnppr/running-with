@@ -41,16 +41,19 @@ public class StudySettingsController {
     public static final String STUDY_DESCRIPTION_FORM = "studyDescriptionForm";
     public static final String URL_STUDY_SETTINGS_BANNER = "/settings/banner";
     public static final String VIEW_STUDY_SETTINGS_BANNER = "study/settings/banner";
-    public static final String URL_SETTINGS_BANNER_ENABLE = "/settings/banner/enable";
-    public static final String URL_SETTINGS_BANNER_DISABLE = "/settings/banner/disable";
+    public static final String URL_STUDY_SETTINGS_BANNER_ENABLE = "/settings/banner/enable";
+    public static final String URL_STUDY_SETTINGS_BANNER_DISABLE = "/settings/banner/disable";
     public static final String VIEW_STUDY_SETTINGS_TAGS = "study/settings/tags";
-    public static final String URL_STUDY_TAGS = "/settings/tags";
-    public static final String URL_STUDY_TAGS_ADD = "/settings/tags/add";
-    public static final String URL_STUDY_TAGS_REMOVE = "/settings/tags/remove";
-    public static final String URL_STUDY_ZONES = "/settings/zones";
+    public static final String URL_STUDY_SETTING_TAGS = "/settings/tags";
+    public static final String URL_STUDY_SETTING_TAGS_ADD = "/settings/tags/add";
+    public static final String URL_STUDY_SETTING_TAGS_REMOVE = "/settings/tags/remove";
+    public static final String URL_STUDY_SETTING_ZONES = "/settings/zones";
     public static final String VIEW_STUDY_SETTINGS_ZONES = "study/settings/zones";
-    public static final String URL_STUDY_ZONES_REMOVE = "/settings/zones/remove";
-    public static final String URL_STUDY_ZONES_ADD = "/settings/zones/add";
+    public static final String URL_STUDY_SETTING_ZONES_REMOVE = "/settings/zones/remove";
+    public static final String URL_STUDY_SETTING_ZONES_ADD = "/settings/zones/add";
+    public static final String URL_STUDY_SETTING = "/settings/study";
+    public static final String VIEW_STUDY_SETTINGS_STUDY = "study/settings/study";
+    public static final String URL_STUDY_SETTINGS_PUBLISH = "/settings/study/publish";
     private final TagRepository tagRepository;
     private final ZoneRepository zoneRepository;
     private final StudyService studyService;
@@ -101,21 +104,21 @@ public class StudySettingsController {
         return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_STUDY_SETTINGS_BANNER;
     }
 
-    @PostMapping(URL_SETTINGS_BANNER_ENABLE)
+    @PostMapping(URL_STUDY_SETTINGS_BANNER_ENABLE)
     public String enableStudyBannerImage(@CurrentUser UsersEntity usersEntity, @PathVariable String path) {
         StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
         studyService.enableStudyBanner(studyEntity);
         return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_STUDY_SETTINGS_BANNER;
     }
 
-    @PostMapping(URL_SETTINGS_BANNER_DISABLE)
+    @PostMapping(URL_STUDY_SETTINGS_BANNER_DISABLE)
     public String unableStudyBannerImage(@CurrentUser UsersEntity usersEntity, @PathVariable String path) {
         StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
         studyService.disableStudyBanner(studyEntity);
         return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_STUDY_SETTINGS_BANNER;
     }
 
-    @GetMapping(URL_STUDY_TAGS)
+    @GetMapping(URL_STUDY_SETTING_TAGS)
     public String studyTagsUpdateView(@CurrentUser UsersEntity usersEntity, @PathVariable String path, Model model) throws JsonProcessingException {
         StudyEntity studyEntity = studyService.getStudyToUpdateTag(usersEntity, path);
 
@@ -131,7 +134,7 @@ public class StudySettingsController {
         return VIEW_STUDY_SETTINGS_TAGS;
     }
 
-    @PostMapping(URL_STUDY_TAGS_ADD)
+    @PostMapping(URL_STUDY_SETTING_TAGS_ADD)
     @ResponseBody
     public ResponseEntity addStudyTags(@CurrentUser UsersEntity usersEntity, @PathVariable String path
             , @RequestBody TagForm tagForm) {
@@ -141,7 +144,7 @@ public class StudySettingsController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping(URL_STUDY_TAGS_REMOVE)
+    @PostMapping(URL_STUDY_SETTING_TAGS_REMOVE)
     @ResponseBody
     public ResponseEntity removeStudyTags(@CurrentUser UsersEntity usersEntity, @PathVariable String path
             , @RequestBody TagForm tagForm) {
@@ -155,7 +158,7 @@ public class StudySettingsController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping(URL_STUDY_ZONES)
+    @GetMapping(URL_STUDY_SETTING_ZONES)
     public String studyZonesUpdateView(@CurrentUser UsersEntity usersEntity, @PathVariable String path, Model model) throws JsonProcessingException {
         StudyEntity studyEntity = studyService.getStudyToUpdateZone(usersEntity, path);
 
@@ -171,7 +174,7 @@ public class StudySettingsController {
         return VIEW_STUDY_SETTINGS_ZONES;
     }
 
-    @PostMapping(URL_STUDY_ZONES_ADD)
+    @PostMapping(URL_STUDY_SETTING_ZONES_ADD)
     @ResponseBody
     public ResponseEntity addStudyZone(@CurrentUser UsersEntity usersEntity, @PathVariable String path, @RequestBody ZoneForm zoneForm) throws JsonProcessingException {
         StudyEntity studyEntity = studyService.getStudyToUpdateZone(usersEntity, path);
@@ -187,7 +190,7 @@ public class StudySettingsController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping(URL_STUDY_ZONES_REMOVE)
+    @PostMapping(URL_STUDY_SETTING_ZONES_REMOVE)
     @ResponseBody
     public ResponseEntity removeStudyZone(@CurrentUser UsersEntity usersEntity, @PathVariable String path, @RequestBody ZoneForm zoneForm) throws JsonProcessingException {
         StudyEntity studyEntity = studyService.getStudyToUpdateZone(usersEntity, path);
@@ -203,4 +206,18 @@ public class StudySettingsController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping(URL_STUDY_SETTING)
+    public String studySettingView(@CurrentUser UsersEntity usersEntity, @PathVariable String path, Model model) {
+        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+        model.addAttribute("user", usersEntity);
+        model.addAttribute("study", studyEntity);
+        return VIEW_STUDY_SETTINGS_STUDY;
+    }
+
+    @PostMapping(URL_STUDY_SETTINGS_PUBLISH)
+    public String updateStudyPublish(@CurrentUser UsersEntity usersEntity, @PathVariable String path, RedirectAttributes attributes) {
+        studyService.publishStudy(usersEntity, path);
+        attributes.addFlashAttribute("message", "스터디 공개");
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_STUDY_SETTING;
+    }
 }

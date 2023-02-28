@@ -110,4 +110,13 @@ public class StudyEntity {
     public void updateStudyBannerImage(String bannerImage) {
         this.bannerImage = bannerImage;
     }
+
+    public void publish() {
+        if (!this.closed && !this.published) {
+            this.published = true;
+            this.publishedDatetime = LocalDateTime.now();
+        } else {
+            throw new IllegalStateException("스터디를 공개할 수 없는 상태입니다. 스터디를 이미 공개했거나 종료했습니다.");
+        }
+    }
 }
