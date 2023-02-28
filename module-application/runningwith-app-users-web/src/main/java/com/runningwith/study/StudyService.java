@@ -158,4 +158,18 @@ public class StudyService {
             throw new IllegalArgumentException("스터디를 삭제할 수 없습니다.");
         }
     }
+
+    public void removeMember(String path, UsersEntity usersEntity) {
+        Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityWithMembersByPath(path);
+        checkIfExistingStudy(optionalStudy);
+        StudyEntity studyEntity = optionalStudy.get();
+        studyEntity.getMembers().remove(usersEntity);
+    }
+
+    public void addMember(String path, UsersEntity usersEntity) {
+        Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityWithMembersByPath(path);
+        checkIfExistingStudy(optionalStudy);
+        StudyEntity studyEntity = optionalStudy.get();
+        studyEntity.getMembers().add(usersEntity);
+    }
 }

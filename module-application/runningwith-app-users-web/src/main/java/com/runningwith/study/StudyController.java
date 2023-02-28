@@ -15,9 +15,6 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-
 import static com.runningwith.utils.CustomStringUtils.getEncodedUrl;
 import static com.runningwith.utils.WebUtils.REDIRECT;
 
@@ -32,6 +29,8 @@ public class StudyController {
     public static final String URL_STUDY_PATH = "/study/";
     public static final String VIEW_STUDY = "study/view";
     public static final String URL_STUDY_MEMBERS = "/members";
+    public static final String URL_STUDY_JOIN = "/join";
+    public static final String URL_STUDY_LEAVE = "/leave";
 
     private final StudyFormValidator studyFormValidator;
     private final StudyService studyService;
@@ -57,7 +56,7 @@ public class StudyController {
         }
 
         StudyEntity newStudy = studyService.createNewStudy(usersEntity, studyForm.toEntity());
-        return REDIRECT + URL_STUDY_PATH + URLEncoder.encode(getEncodedUrl(newStudy.getPath()), StandardCharsets.UTF_8);
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(studyForm.getPath());
     }
 
     @GetMapping(URL_STUDY_PATH + "{path}")
@@ -74,6 +73,18 @@ public class StudyController {
         model.addAttribute("user", usersEntity);
         model.addAttribute("study", studyEntity);
         return VIEW_STUDY_MEMBERS;
+    }
+
+    @GetMapping(URL_STUDY_PATH + "{path}" + URL_STUDY_JOIN)
+    public String joinStudy(@CurrentUser UsersEntity usersEntity, @PathVariable String path) {
+        studyService.addMember(path, usersEntity);
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_STUDY_MEMBERS;
+    }
+
+    @GetMapping(URL_STUDY_PATH + "{path}" + URL_STUDY_LEAVE)
+    public String leaveStudy(@CurrentUser UsersEntity usersEntity, @PathVariable String path) {
+        studyService.removeMember(path, usersEntity);
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_STUDY_MEMBERS;
     }
 
 }

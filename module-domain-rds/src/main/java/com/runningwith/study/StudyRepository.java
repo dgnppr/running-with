@@ -22,4 +22,6 @@ public interface StudyRepository extends JpaRepository<StudyEntity, Long> {
     @EntityGraph(attributePaths = {"managers"})
     Optional<StudyEntity> findStudyEntityWithManagersByPath(String path);
 
+    @EntityGraph(attributePaths = {"members"})
+    Optional<StudyEntity> findStudyEntityWithMembersByPath(String path);
 }

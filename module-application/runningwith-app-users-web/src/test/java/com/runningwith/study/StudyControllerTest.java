@@ -2,9 +2,13 @@ package com.runningwith.study;
 
 import com.runningwith.MockMvcTest;
 import com.runningwith.WithUser;
+import com.runningwith.account.AccountEntity;
+import com.runningwith.account.AccountRepository;
+import com.runningwith.account.AccountType;
 import com.runningwith.study.form.StudyForm;
 import com.runningwith.users.UsersEntity;
 import com.runningwith.users.UsersRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,9 +18,13 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.runningwith.AppExceptionHandler.VIEW_ERROR;
+import static com.runningwith.WithUserSecurityContextFactory.EMAIL;
+import static com.runningwith.WithUserSecurityContextFactory.PASSWORD;
 import static com.runningwith.study.StudyController.*;
 import static com.runningwith.utils.CustomStringUtils.WITH_USER_NICKNAME;
 import static com.runningwith.utils.CustomStringUtils.getEncodedUrl;
@@ -33,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @MockMvcTest
 class StudyControllerTest {
 
+    public static final String TESTPATH = "testpath";
     @Autowired
     MockMvc mockMvc;
 
@@ -45,10 +54,14 @@ class StudyControllerTest {
     @Autowired
     StudyService studyService;
 
+    @Autowired
+    AccountRepository accountRepository;
+
     @BeforeEach
     void setUp() {
-        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
-        StudyForm studyForm = new StudyForm("testpath", "testpath", "testpath", "testpath");
+        //UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        UsersEntity usersEntity = saveOtherUser();
+        StudyForm studyForm = new StudyForm(TESTPATH, "testpath", "testpath", "testpath");
         StudyEntity studyEntity = studyForm.toEntity();
         studyService.createNewStudy(usersEntity, studyEntity);
     }
@@ -56,6 +69,7 @@ class StudyControllerTest {
     @AfterEach
     void tearDown() {
         studyRepository.deleteAll();
+        usersRepository.deleteAll();
     }
 
     @WithUser
@@ -124,11 +138,10 @@ class StudyControllerTest {
     @DisplayName("스터디 조회 뷰 - 경로 정상")
     @Test
     void view_study_path_with_correct_path() throws Exception {
-        String testpath = getEncodedUrl("testpath");
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
-        StudyEntity studyEntity = studyRepository.findByPath(testpath).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
 
-        mockMvc.perform(get(URL_STUDY_PATH + getEncodedUrl(testpath)))
+        mockMvc.perform(get(URL_STUDY_PATH + getEncodedUrl(TESTPATH)))
                 .andExpect(status().isOk())
                 .andExpect(authenticated())
                 .andExpect(model().attribute("user", usersEntity))
@@ -157,11 +170,11 @@ class StudyControllerTest {
     @DisplayName("스터디 멤버 조회")
     @Test
     void view_study_members_by_managers() throws Exception {
-        String testpath = getEncodedUrl("testpath");
-        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
-        StudyEntity studyEntity = studyRepository.findByPath(testpath).get();
 
-        mockMvc.perform(get(URL_STUDY_PATH + getEncodedUrl(testpath) + URL_STUDY_MEMBERS))
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_STUDY_MEMBERS))
                 .andExpect(status().isOk())
                 .andExpect(authenticated())
                 .andExpect(model().attribute("user", usersEntity))
@@ -169,5 +182,56 @@ class StudyControllerTest {
                 .andExpect(view().name(VIEW_STUDY_MEMBERS));
     }
 
+    @WithUser
+    @DisplayName("스터디 참여")
+    @Test
+    void join_study() throws Exception {
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_STUDY_JOIN))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(authenticated())
+                .andExpect(redirectedUrl(URL_STUDY_PATH + TESTPATH + URL_STUDY_MEMBERS));
 
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        Assertions.assertThat(studyEntity.getMembers()).contains(usersEntity);
+    }
+
+    @WithUser
+    @DisplayName("스터디 탈퇴")
+    @Test
+    void leave_study() throws Exception {
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        studyService.addMember(TESTPATH, usersEntity);
+
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_STUDY_LEAVE))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(authenticated())
+                .andExpect(redirectedUrl(URL_STUDY_PATH + TESTPATH + URL_STUDY_MEMBERS));
+
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        Assertions.assertThat(studyEntity.getMembers()).doesNotContain(usersEntity);
+    }
+
+
+    private UsersEntity saveOtherUser() {
+        UsersEntity newUsersEntity = UsersEntity.builder()
+                .nickname("nickname")
+                .email("nickname" + EMAIL)
+                .password(PASSWORD)
+                .emailCheckToken(UUID.randomUUID().toString())
+                .emailCheckTokenGeneratedAt(LocalDateTime.now())
+                .studyCreatedByWeb(true)
+                .studyEnrollmentResultByWeb(true)
+                .studyUpdatedByWeb(true)
+                .studyCreatedByEmail(false)
+                .studyEnrollmentResultByEmail(false)
+                .studyUpdatedByEmail(false)
+                .emailCheckTokenGeneratedAt(LocalDateTime.now().minusHours(2))
+                .accountEntity(new AccountEntity(AccountType.USERS))
+                .build();
+        accountRepository.save(newUsersEntity.getAccountEntity());
+        usersRepository.save(newUsersEntity);
+
+        return newUsersEntity;
+    }
 }
