@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import static com.runningwith.study.StudyController.URL_STUDY_PATH;
 import static com.runningwith.utils.CustomStringUtils.getEncodedUrl;
 import static com.runningwith.utils.WebUtils.REDIRECT;
+import static com.runningwith.utils.WebUtils.URL_REDIRECT_ROOT;
 
 @Slf4j
 @Controller
@@ -59,6 +60,7 @@ public class StudySettingsController {
     public static final String URL_STUDY_RECRUIT_STOP = "/settings/recruit/stop";
     public static final String URL_STUDY_SETTINGS_PATH = "/settings/study/path";
     public static final String URL_STUDY_SETTINGS_TITLE = "/settings/study/title";
+    public static final String URL_STUDY_SETTINGS_REMOVE = "/settings/study/remove";
     private final TagRepository tagRepository;
     private final ZoneRepository zoneRepository;
     private final StudyService studyService;
@@ -293,6 +295,13 @@ public class StudySettingsController {
         studyService.updateStudyTitle(studyEntity, newTitle);
         attributes.addFlashAttribute("message", "스터디 제목 수정 완료");
         return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_STUDY_SETTING;
+    }
+
+    @PostMapping(URL_STUDY_SETTINGS_REMOVE)
+    public String removeStudy(@CurrentUser UsersEntity usersEntity, @PathVariable String path) {
+        StudyEntity studyEntity = studyService.getStudyToUpdateStatus(usersEntity, path);
+        studyService.removeStudy(studyEntity);
+        return URL_REDIRECT_ROOT;
     }
 
 }

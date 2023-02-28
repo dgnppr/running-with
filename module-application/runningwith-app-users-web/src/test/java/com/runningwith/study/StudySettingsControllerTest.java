@@ -37,6 +37,7 @@ import static com.runningwith.study.StudyController.URL_STUDY_PATH;
 import static com.runningwith.study.StudySettingsController.*;
 import static com.runningwith.utils.CustomStringUtils.*;
 import static com.runningwith.utils.WebUtils.REDIRECT;
+import static com.runningwith.utils.WebUtils.URL_ROOT;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -570,7 +571,7 @@ class StudySettingsControllerTest {
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
         StudyEntity studyEntity = studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).get();
 
-        String wrongTitle = "new title";
+        String wrongTitle = "wrong title";
         for (int i = 0; i < 10; i++) {
             wrongTitle += wrongTitle;
         }
@@ -586,6 +587,43 @@ class StudySettingsControllerTest {
                 .andExpect(view().name(VIEW_STUDY_SETTINGS_STUDY));
     }
 
+    @WithUser
+    @DisplayName("스터디 삭제 완료")
+    @Test
+    void remove_study() throws Exception {
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTINGS_REMOVE)
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(authenticated())
+                .andExpect(redirectedUrl(URL_ROOT));
+
+        assertThat(studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).isEmpty()).isTrue();
+    }
+
+
+    @WithUser
+    @DisplayName("스터디 삭제 실패 - 공개된 스터디")
+    @Test
+    void remove_study_published() throws Exception {
+        StudyEntity studyEntity = studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).get();
+        studyEntity.publish();
+
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTINGS_REMOVE)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(authenticated())
+                .andExpect(result -> {
+                    Throwable ex = result.getResolvedException();
+                    assertNotNull(ex);
+                    assertEquals(IllegalArgumentException.class, ex.getClass());
+                    assertEquals(ex.getMessage(), "스터디를 삭제할 수 없습니다.");
+                })
+                .andExpect(view().name(VIEW_ERROR));
+
+        assertThat(studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).isPresent()).isTrue();
+    }
+
+    // TODO 스터디 삭제 로직 추가
 
     private UsersEntity saveOtherUser() {
         UsersEntity newUsersEntity = UsersEntity.builder()

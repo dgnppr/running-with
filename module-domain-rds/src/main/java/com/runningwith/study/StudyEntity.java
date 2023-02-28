@@ -158,4 +158,8 @@ public class StudyEntity {
     public void updateTitle(String newTitle) {
         this.title = newTitle;
     }
+
+    public boolean isRemovable() {
+        return !this.published;
+    }
 }
