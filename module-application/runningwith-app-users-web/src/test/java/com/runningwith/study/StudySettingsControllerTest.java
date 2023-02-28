@@ -16,7 +16,6 @@ import com.runningwith.users.UsersRepository;
 import com.runningwith.users.form.ZoneForm;
 import com.runningwith.zone.ZoneEntity;
 import com.runningwith.zone.ZoneRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -475,7 +474,7 @@ class StudySettingsControllerTest {
         StudyEntity beforeStudy = studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).get();
         beforeStudy.publish();
 
-        Assertions.assertThat(beforeStudy.isRecruiting()).isFalse();
+        assertThat(beforeStudy.isRecruiting()).isFalse();
         mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_RECRUIT_START)
                         .with(csrf()))
                 .andExpect(flash().attributeExists("message"))
@@ -484,7 +483,7 @@ class StudySettingsControllerTest {
                 .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TEST_PATH) + URL_STUDY_SETTING));
 
         StudyEntity afterStudy = studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).get();
-        Assertions.assertThat(afterStudy.isRecruiting()).isTrue();
+        assertThat(afterStudy.isRecruiting()).isTrue();
     }
 
     @WithUser
@@ -493,7 +492,7 @@ class StudySettingsControllerTest {
     void stop_study_recruit() throws Exception {
         StudyEntity beforeStudy = studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).get();
         beforeStudy.publish();
-        
+
         mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_RECRUIT_STOP)
                         .with(csrf()))
                 .andExpect(flash().attributeExists("message"))
@@ -502,8 +501,91 @@ class StudySettingsControllerTest {
                 .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TEST_PATH) + URL_STUDY_SETTING));
 
         StudyEntity afterStudy = studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).get();
-        Assertions.assertThat(afterStudy.isRecruiting()).isFalse();
+        assertThat(afterStudy.isRecruiting()).isFalse();
     }
+
+
+    @WithUser
+    @DisplayName("스터디 경로 수정 - 입력값 정상")
+    @Test
+    void update_study_path_with_correct_input() throws Exception {
+
+        String newPath = "newpath";
+
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTINGS_PATH)
+                        .param("newPath", newPath)
+                        .with(csrf()))
+                .andExpect(flash().attribute("message", "스터디 URL 수정 완료"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(authenticated())
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(newPath) + URL_STUDY_SETTING));
+
+        assertThat(studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).isEmpty()).isTrue();
+        assertThat(studyRepository.findStudyEntityWithManagersByPath(newPath).isPresent()).isTrue();
+    }
+
+    @WithUser
+    @DisplayName("스터디 경로 수정 - 입력값 오류")
+    @Test
+    void update_study_path_with_wrong_input() throws Exception {
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyEntity studyEntity = studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).get();
+
+        String wrongPath = "NEWPATH";
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTINGS_PATH)
+                        .param("newPath", wrongPath)
+                        .with(csrf()))
+                .andExpect(model().attribute("user", usersEntity))
+                .andExpect(model().attribute("study", studyEntity))
+                .andExpect(model().attributeExists("studyPathError"))
+                .andExpect(status().isOk())
+                .andExpect(authenticated())
+                .andExpect(view().name(VIEW_STUDY_SETTINGS_STUDY));
+
+        assertThat(studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).isPresent()).isTrue();
+        assertThat(studyRepository.findStudyEntityWithManagersByPath(wrongPath).isEmpty()).isTrue();
+    }
+
+    @WithUser
+    @DisplayName("스터디 제목 수정 - 입력값 정상")
+    @Test
+    void update_study_title_with_correct_input() throws Exception {
+
+        String newTitle = "new title";
+
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTINGS_TITLE)
+                        .param("newTitle", newTitle)
+                        .with(csrf()))
+                .andExpect(flash().attribute("message", "스터디 제목 수정 완료"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(authenticated())
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TEST_PATH) + URL_STUDY_SETTING));
+    }
+
+    @WithUser
+    @DisplayName("스터디 제목 수정 - 입력값 오류")
+    @Test
+    void update_study_title_with_wrong_input() throws Exception {
+
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyEntity studyEntity = studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).get();
+
+        String wrongTitle = "new title";
+        for (int i = 0; i < 10; i++) {
+            wrongTitle += wrongTitle;
+        }
+
+        mockMvc.perform(post(URL_STUDY_PATH + TEST_PATH + URL_STUDY_SETTINGS_TITLE)
+                        .param("newTitle", wrongTitle)
+                        .with(csrf()))
+                .andExpect(model().attribute("user", usersEntity))
+                .andExpect(model().attribute("study", studyEntity))
+                .andExpect(model().attributeExists("studyTitleError"))
+                .andExpect(status().isOk())
+                .andExpect(authenticated())
+                .andExpect(view().name(VIEW_STUDY_SETTINGS_STUDY));
+    }
+
 
     private UsersEntity saveOtherUser() {
         UsersEntity newUsersEntity = UsersEntity.builder()

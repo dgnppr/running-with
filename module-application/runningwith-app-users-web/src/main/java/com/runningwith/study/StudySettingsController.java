@@ -269,7 +269,7 @@ public class StudySettingsController {
         if (!studyService.isValidPath(newPath)) {
             model.addAttribute("user", usersEntity);
             model.addAttribute("study", studyEntity);
-            model.addAttribute("studyPathError", "해당 스터디 경로는 사용할 수 없습니다. 다른 값을 입력하세요.");
+            model.addAttribute("studyPathError", "해당 스터디 경로는 사용할 수 없습니다.");
             return VIEW_STUDY_SETTINGS_STUDY;
         }
 
