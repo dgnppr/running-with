@@ -102,21 +102,29 @@ public class StudyService {
         studyEntity.getZones().remove(zoneEntity);
     }
 
-    public StudyEntity publishStudy(UsersEntity usersEntity, String path) {
+    public void publishStudy(UsersEntity usersEntity, String path) {
+        StudyEntity studyEntity = getStudyToUpdateStatus(usersEntity, path);
+        studyEntity.publish();
+    }
+
+    public void closeStudy(UsersEntity usersEntity, String path) {
+        StudyEntity studyEntity = getStudyToUpdateStatus(usersEntity, path);
+        studyEntity.close();
+    }
+
+    public StudyEntity getStudyToUpdateStatus(UsersEntity usersEntity, String path) {
         Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityWithManagersByPath(path);
         checkIfExistingStudy(optionalStudy);
         StudyEntity studyEntity = optionalStudy.get();
         checkIfManager(usersEntity, studyEntity);
-        studyEntity.publish();
         return studyEntity;
     }
 
-    public StudyEntity closeStudy(UsersEntity usersEntity, String path) {
-        Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityWithManagersByPath(path);
-        checkIfExistingStudy(optionalStudy);
-        StudyEntity studyEntity = optionalStudy.get();
-        checkIfManager(usersEntity, studyEntity);
-        studyEntity.close();
-        return studyEntity;
+    public void startStudyRecruit(StudyEntity studyEntity) {
+        studyEntity.startRecruit();
+    }
+
+    public void stopStudyRecruit(StudyEntity studyEntity) {
+        studyEntity.stopRecruit();
     }
 }

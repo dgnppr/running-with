@@ -55,6 +55,8 @@ public class StudySettingsController {
     public static final String VIEW_STUDY_SETTINGS_STUDY = "study/settings/study";
     public static final String URL_STUDY_SETTINGS_PUBLISH = "/settings/study/publish";
     public static final String URL_STUDY_SETTINGS_CLOSE = "/settings/study/close";
+    public static final String URL_STUDY_RECRUIT_START = "/settings/recruit/start";
+    public static final String URL_STUDY_RECRUIT_STOP = "/settings/recruit/stop";
     private final TagRepository tagRepository;
     private final ZoneRepository zoneRepository;
     private final StudyService studyService;
@@ -226,6 +228,34 @@ public class StudySettingsController {
     public String closeStudy(@CurrentUser UsersEntity usersEntity, @PathVariable String path, RedirectAttributes attributes) {
         studyService.closeStudy(usersEntity, path);
         attributes.addFlashAttribute("message", "스터디 종료");
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_STUDY_SETTING;
+    }
+
+    @PostMapping(URL_STUDY_RECRUIT_START)
+    public String startRecruit(@CurrentUser UsersEntity usersEntity, @PathVariable String path, RedirectAttributes attributes) {
+        StudyEntity studyEntity = studyService.getStudyToUpdateStatus(usersEntity, path);
+
+        if (!studyEntity.isRecruitUpdatable()) {
+            attributes.addFlashAttribute("message", "1시간 안에 인원 모집 설정을 여러번 변경할 수 없습니다.");
+            return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_STUDY_SETTING;
+        }
+
+        studyService.startStudyRecruit(studyEntity);
+        attributes.addFlashAttribute("message", "인원 모집 시작");
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_STUDY_SETTING;
+    }
+
+    @PostMapping(URL_STUDY_RECRUIT_STOP)
+    public String stopRecruit(@CurrentUser UsersEntity usersEntity, @PathVariable String path, RedirectAttributes attributes) {
+        StudyEntity studyEntity = studyService.getStudyToUpdateStatus(usersEntity, path);
+
+        if (!studyEntity.isRecruitUpdatable()) {
+            attributes.addFlashAttribute("message", "1시간 안에 인원 모집 설정을 여러번 변경할 수 없습니다.");
+            return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_STUDY_SETTING;
+        }
+
+        studyService.stopStudyRecruit(studyEntity);
+        attributes.addFlashAttribute("message", "인원 모집 종료");
         return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_STUDY_SETTING;
     }
 }

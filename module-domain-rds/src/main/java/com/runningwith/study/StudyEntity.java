@@ -128,4 +128,26 @@ public class StudyEntity {
             throw new IllegalArgumentException("스터디를 종료할 수 없습니다. 스터디를 공개하지 않았거나 이미 종료한 스터디입니다.");
         }
     }
+
+    public boolean isRecruitUpdatable() {
+        return this.published && this.recruitingUpdatedDateTime == null || this.recruitingUpdatedDateTime.isBefore(LocalDateTime.now().minusHours(1));
+    }
+
+    public void startRecruit() {
+        if (isRecruitUpdatable()) {
+            this.recruiting = true;
+            this.recruitingUpdatedDateTime = LocalDateTime.now();
+        } else {
+            throw new IllegalArgumentException("인원 모집을 시작할 수 없습니다. 스터디를 공개하거나 한 시간 뒤 다시 시도하세요.");
+        }
+    }
+
+    public void stopRecruit() {
+        if (isRecruitUpdatable()) {
+            this.recruiting = false;
+            this.recruitingUpdatedDateTime = LocalDateTime.now();
+        } else {
+            throw new IllegalArgumentException("인원 모집을 멈출 수 없습니다. 스터디를 공개하거나 한 시간 뒤 다시 시도하세요.");
+        }
+    }
 }
