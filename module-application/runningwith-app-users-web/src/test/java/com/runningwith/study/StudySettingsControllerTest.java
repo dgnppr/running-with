@@ -9,9 +9,11 @@ import com.runningwith.account.AccountType;
 import com.runningwith.study.form.StudyDescriptionForm;
 import com.runningwith.study.form.StudyForm;
 import com.runningwith.tag.TagEntity;
+import com.runningwith.tag.TagForm;
 import com.runningwith.tag.TagRepository;
 import com.runningwith.users.UsersEntity;
 import com.runningwith.users.UsersRepository;
+import com.runningwith.users.form.ZoneForm;
 import com.runningwith.zone.ZoneEntity;
 import com.runningwith.zone.ZoneRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -19,6 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -240,8 +243,61 @@ class StudySettingsControllerTest {
                 .andExpect(view().name(VIEW_STUDY_SETTINGS_TAGS));
     }
 
+    @WithUser
+    @DisplayName("스터디 주제 추가")
+    @Test
+    void add_study_tags() throws Exception {
+        TagForm tagForm = new TagForm();
+        tagForm.setTagTitle("TEST_TAG_TITLE");
 
-    // TODO 스터디 태그 업데이트 ( 추가,삭제)
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_TAGS_ADD)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(tagForm))
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(authenticated());
+
+        TagEntity tagEntity = tagRepository.findByTitle(tagForm.getTagTitle()).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        assertThat(studyEntity.getTags()).containsOnly(tagEntity);
+    }
+
+    @WithUser
+    @DisplayName("스터디 주제 삭제 - 입력값 정상")
+    @Test
+    void remove_study_tags_with_correct_inputs() throws Exception {
+        TagForm tagForm = new TagForm();
+        tagForm.setTagTitle("TEST_TAG_TITLE");
+        TagEntity tagEntity = TagEntity.builder().title(tagForm.getTagTitle()).build();
+        tagRepository.save(tagEntity);
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        usersEntity.getTags().add(tagEntity);
+
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_TAGS_REMOVE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(tagForm))
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(authenticated());
+
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        assertThat(studyEntity.getTags()).doesNotContain(tagEntity);
+    }
+
+    @WithUser
+    @DisplayName("스터디 주제 삭제 - 입력값 오류(존재하지 않는 주제)")
+    @Test
+    void remove_study_tags_with_wrong_inputs() throws Exception {
+        TagForm tagForm = new TagForm();
+        tagForm.setTagTitle("TEST_TAG_TITLE");
+
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_TAGS_REMOVE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(tagForm))
+                        .with(csrf()))
+                .andExpect(status().isBadRequest())
+                .andExpect(authenticated());
+    }
 
     @WithUser
     @DisplayName("스터디 장소 업데이트 뷰")
@@ -264,7 +320,65 @@ class StudySettingsControllerTest {
     }
 
 
-    // TODO 스터디 장소 업데이트 ( 추가,삭제)
+    @WithUser
+    @DisplayName("스터디 장소 추가")
+    @Test
+    void add_study_zones() throws Exception {
+        ZoneEntity entity = new ZoneEntity("TEST_CITY", "TEST_LOCAL", "TEST_PROVINCE");
+        zoneRepository.save(entity);
+        ZoneForm zoneForm = new ZoneForm();
+        zoneForm.setZoneName(entity.toString());
+
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_ZONES_ADD)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(zoneForm))
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(authenticated());
+
+        ZoneEntity zone = zoneRepository.findByCityAndProvince(zoneForm.getCityName(), zoneForm.getProvinceName()).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        assertThat(studyEntity.getZones()).containsOnly(zone);
+    }
+
+    @WithUser
+    @DisplayName("스터디 장소 삭제 - 입력값 정상")
+    @Test
+    void remove_study_zones_with_correct_inputs() throws Exception {
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        ZoneEntity entity = new ZoneEntity("TEST_CITY", "TEST_LOCAL", "TEST_PROVINCE");
+        zoneRepository.save(entity);
+        ZoneForm zoneForm = new ZoneForm();
+        zoneForm.setZoneName(entity.toString());
+        studyEntity.getZones().add(entity);
+
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_ZONES_REMOVE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(zoneForm))
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(authenticated());
+
+        ZoneEntity zone = zoneRepository.findByCityAndProvince(zoneForm.getCityName(), zoneForm.getProvinceName()).get();
+        assertThat(studyEntity.getZones()).doesNotContain(zone);
+    }
+
+    @WithUser
+    @DisplayName("스터디 장소 삭제 - 입력값 오류(존재하지 않는 장소)")
+    @Test
+    void remove_study_zones_with_wrong_inputs() throws Exception {
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        ZoneEntity entity = new ZoneEntity("TEST_CITY", "TEST_LOCAL", "TEST_PROVINCE");
+        ZoneForm zoneForm = new ZoneForm();
+        zoneForm.setZoneName(entity.toString());
+
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_STUDY_ZONES_REMOVE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(zoneForm))
+                        .with(csrf()))
+                .andExpect(status().isBadRequest())
+                .andExpect(authenticated());
+    }
 
     private UsersEntity saveOtherUser() {
         UsersEntity newUsersEntity = UsersEntity.builder()
