@@ -3,7 +3,7 @@ package com.runningwith.users;
 import com.runningwith.MockMvcTest;
 import com.runningwith.account.AccountEntity;
 import com.runningwith.account.AccountRepository;
-import com.runningwith.account.AccountType;
+import com.runningwith.account.enumeration.AccountType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

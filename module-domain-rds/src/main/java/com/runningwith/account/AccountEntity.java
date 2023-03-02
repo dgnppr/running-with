@@ -1,6 +1,7 @@
 package com.runningwith.account;
 
 
+import com.runningwith.account.enumeration.AccountType;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;

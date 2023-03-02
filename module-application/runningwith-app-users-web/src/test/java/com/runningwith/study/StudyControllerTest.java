@@ -4,7 +4,7 @@ import com.runningwith.MockMvcTest;
 import com.runningwith.WithUser;
 import com.runningwith.account.AccountEntity;
 import com.runningwith.account.AccountRepository;
-import com.runningwith.account.AccountType;
+import com.runningwith.account.enumeration.AccountType;
 import com.runningwith.study.form.StudyForm;
 import com.runningwith.users.UsersEntity;
 import com.runningwith.users.UsersRepository;

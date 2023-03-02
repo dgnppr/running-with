@@ -1,6 +1,6 @@
 package com.runningwith.users;
 
-import com.runningwith.account.AccountType;
+import com.runningwith.account.enumeration.AccountType;
 import lombok.Getter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;

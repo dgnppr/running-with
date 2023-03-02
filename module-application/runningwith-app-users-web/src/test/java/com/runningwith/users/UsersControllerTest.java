@@ -4,7 +4,7 @@ import com.runningwith.MockMvcTest;
 import com.runningwith.WithUser;
 import com.runningwith.account.AccountEntity;
 import com.runningwith.account.AccountRepository;
-import com.runningwith.account.AccountType;
+import com.runningwith.account.enumeration.AccountType;
 import com.runningwith.mail.EmailMessage;
 import com.runningwith.mail.EmailService;
 import org.junit.jupiter.api.AfterEach;

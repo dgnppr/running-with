@@ -1,7 +1,7 @@
 package com.runningwith.event.form;
 
 import com.runningwith.event.EventEntity;
-import com.runningwith.event.EventType;
+import com.runningwith.event.enumeration.EventType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

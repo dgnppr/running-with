@@ -1,4 +1,4 @@
-package com.runningwith.account;
+package com.runningwith.account.enumeration;
 
 import lombok.Getter;
 
