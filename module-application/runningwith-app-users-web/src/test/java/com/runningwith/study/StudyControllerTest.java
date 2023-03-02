@@ -59,7 +59,6 @@ class StudyControllerTest {
 
     @BeforeEach
     void setUp() {
-        //UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
         UsersEntity usersEntity = saveOtherUser();
         StudyForm studyForm = new StudyForm(TESTPATH, "testpath", "testpath", "testpath");
         StudyEntity studyEntity = studyForm.toEntity();
