@@ -1,5 +1,6 @@
 package com.runningwith.event;
 
+import com.runningwith.event.enumeration.EventType;
 import com.runningwith.study.StudyEntity;
 import com.runningwith.users.UsersEntity;
 import jakarta.persistence.*;
@@ -29,7 +30,7 @@ public class EventEntity {
     private StudyEntity studyEntity;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_account")
+    @JoinColumn(name = "id_users")
     private UsersEntity createdBy;
 
     @OneToMany(mappedBy = "eventEntity")
