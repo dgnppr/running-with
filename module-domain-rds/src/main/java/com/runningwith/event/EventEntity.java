@@ -63,4 +63,20 @@ public class EventEntity {
     @Enumerated(EnumType.STRING)
     private EventType eventType;
 
+    public EventEntity(String title, String description, LocalDateTime endEnrollmentDateTime, LocalDateTime startDateTime, LocalDateTime endDateTime, Integer limitOfEnrollments, EventType eventType) {
+        this.title = title;
+        this.description = description;
+        this.endEnrollmentDateTime = endEnrollmentDateTime;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.limitOfEnrollments = limitOfEnrollments;
+        this.eventType = eventType;
+    }
+
+    public EventEntity create(StudyEntity studyEntity, UsersEntity createdBy) {
+        this.studyEntity = studyEntity;
+        this.createdBy = createdBy;
+        this.createdDateTime = LocalDateTime.now();
+        return this;
+    }
 }
