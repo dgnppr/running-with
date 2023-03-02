@@ -74,6 +74,37 @@ public class EventEntity {
         this.eventType = eventType;
     }
 
+    public boolean isEnrollableFor(UsersEntity usersEntity) {
+        return isNotClosed() && !isAlreadyEnrolled(usersEntity);
+    }
+
+    public boolean isDisenrollableFor(UsersEntity usersEntity) {
+        return isNotClosed() && isAlreadyEnrolled(usersEntity);
+    }
+
+    private boolean isNotClosed() {
+        return this.endEnrollmentDateTime.isAfter(LocalDateTime.now());
+    }
+
+    public boolean isAttended(UsersEntity usersEntity) {
+        for (EnrollmentEntity e : this.enrollments) {
+            if (e.getUsersEntity().equals(usersEntity) && e.isAttended()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isAlreadyEnrolled(UsersEntity usersEntity) {
+        for (EnrollmentEntity e : this.enrollments) {
+            if (e.getUsersEntity().equals(usersEntity)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public EventEntity create(StudyEntity studyEntity, UsersEntity createdBy) {
         this.studyEntity = studyEntity;
         this.createdBy = createdBy;

@@ -16,6 +16,81 @@
         .container {
             max-width: 100%;
         }
+
+
+        #study-logo {
+            height: 200px;
+            width: 100%;
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+        }
+
+        #study-logo img {
+            height: auto;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+
+        body,
+        input,
+        button,
+        select,
+        optgroup,
+        textarea,
+        .tooltip,
+        .popover {
+            font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+
+        table th {
+            font-weight: lighter;
+        }
+
+        mark {
+            padding: 0;
+            background: transparent;
+            background: linear-gradient(to right, #f0ad4e 50%, transparent 50%);
+            background-position: right bottom;
+            background-size: 200% 100%;
+            transition: all .5s ease;
+            color: #fff;
+        }
+
+        mark.animate {
+            background-position: left bottom;
+            color: #000;
+        }
+
+        .jumbotron {
+            padding-top: 3rem;
+            padding-bottom: 3rem;
+            margin-bottom: 0;
+            background-color: #fff;
+        }
+
+        @media (min-width: 768px) {
+            .jumbotron {
+                padding-top: 6rem;
+                padding-bottom: 6rem;
+            }
+        }
+
+        .jumbotron p:last-child {
+            margin-bottom: 0;
+        }
+
+        .jumbotron h1 {
+            font-weight: 300;
+        }
+
+        .jumbotron .container {
+            max-width: 40rem;
+        }
     </style>
 </head>
 
@@ -269,6 +344,36 @@
        th:href="@{'/study/' + ${study.path} + '/settings/study'}">스터디</a>
 </div>
 
+<div th:fragment="date-time">
+    <script src="/node_modules/moment/min/moment-with-locales.min.js"></script>
+    <script type="application/javascript">
+        $(function () {
+            moment.locale('ko');
+            $(".date-time").text(function (index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LLL');
+            });
+            $(".date").text(function (index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LL');
+            });
+            $(".weekday").text(function (index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('dddd');
+            });
+            $(".time").text(function (index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LT');
+            });
+            $(".calendar").text(function (index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").calendar();
+            });
+            $(".fromNow").text(function (index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").fromNow();
+            });
+            $(".date-weekday-time").text(function (index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LLLL');
+            });
+        })
+    </script>
+</div>
+
 <script th:fragment="tooltip" type="application/javascript">
     $(function () {
         $('[data-toggle="tooltip"]').tooltip()
@@ -311,9 +416,8 @@
     <footer class="justify-content-center">
         <!--        <img alt="" class="mb-2" src="/images/logo_kr_horizontal.png">-->
         <!--        <small class="d-block mb-3 text-muted">&copy; 2023</small>-->
-        <!--        <div class="row justify-content-center">-->
-
-        <!--        </div>-->
+        <div class="row justify-content-center">
+        </div>
     </footer>
 </th:block>
 

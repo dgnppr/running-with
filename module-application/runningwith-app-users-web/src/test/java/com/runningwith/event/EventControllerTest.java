@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 
+import static com.runningwith.AppExceptionHandler.VIEW_ERROR;
 import static com.runningwith.event.EventController.*;
 import static com.runningwith.study.StudyController.URL_STUDY_PATH;
 import static com.runningwith.utils.CustomStringUtils.WITH_USER_NICKNAME;
@@ -46,6 +47,12 @@ class EventControllerTest {
     @Autowired
     StudyRepository studyRepository;
 
+    @Autowired
+    EventRepository eventRepository;
+
+    @Autowired
+    EventService eventService;
+
     private EventForm getEventForm(String eventFrom_description, String eventFrom_title, int limitOfEnrollments) {
         EventForm eventForm = new EventForm();
         eventForm.setEventType(EventType.FCFS);
@@ -69,6 +76,7 @@ class EventControllerTest {
     @AfterEach
     void tearDown() {
         studyRepository.deleteAll();
+        eventRepository.deleteAll();
     }
 
     @WithUser
@@ -131,6 +139,36 @@ class EventControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name(VIEW_EVENT_FORM));
 
+    }
+
+    @WithUser
+    @DisplayName("스터디 모임 상세 뷰 - 경로 정상")
+    @Test
+    void view_study_event_with_correct_path() throws Exception {
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        EventForm eventForm = getEventForm("eventFrom description", "eventFrom title", 2);
+        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
+
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS + eventEntity.getId())
+                        .with(csrf()))
+                .andExpect(authenticated())
+                .andExpect(model().attribute("user", usersEntity))
+                .andExpect(model().attribute("study", studyEntity))
+                .andExpect(model().attribute("event", eventEntity))
+                .andExpect(status().isOk())
+                .andExpect(view().name(VIEW_EVENT_VIEW));
+    }
+
+    @WithUser
+    @DisplayName("스터디 모임 상세 뷰 - 경로 오류")
+    @Test
+    void view_study_event_with_wrong_path() throws Exception {
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS + "-1")
+                        .with(csrf()))
+                .andExpect(authenticated())
+                .andExpect(status().isOk())
+                .andExpect(view().name(VIEW_ERROR));
     }
 
 

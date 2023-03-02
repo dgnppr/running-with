@@ -29,6 +29,12 @@ public class StudyService {
         }
     }
 
+    public StudyEntity getStudy(String path) {
+        Optional<StudyEntity> optionalStudy = studyRepository.findByPath(path);
+        checkIfExistingStudy(optionalStudy);
+        return optionalStudy.get();
+    }
+
     public StudyEntity createNewStudy(UsersEntity usersEntity, StudyEntity studyEntity) {
         StudyEntity newStudy = studyRepository.save(studyEntity);
         newStudy.addManager(usersEntity);
