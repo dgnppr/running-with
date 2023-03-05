@@ -188,5 +188,24 @@ class EventControllerTest {
                 .andExpect(view().name(VIEW_STUDY_EVENTS));
     }
 
+    @WithUser
+    @DisplayName("스터디 모임 수정 뷰")
+    @Test
+    void view_study_event_edit() throws Exception {
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        EventForm eventForm = getEventForm("eventFrom description", "eventFrom title", 2);
+        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
+
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS + URL_SLASH + eventEntity.getId() + URL_EVENT_EDIT))
+                .andExpect(model().attribute("user", usersEntity))
+                .andExpect(model().attribute("study", studyEntity))
+                .andExpect(model().attribute("event", eventEntity))
+                .andExpect(model().attributeExists(EVENT_FORM))
+                .andExpect(authenticated())
+                .andExpect(status().isOk())
+                .andExpect(view().name(VIEW_EVENT_EDIT));
+    }
+
 
 }
