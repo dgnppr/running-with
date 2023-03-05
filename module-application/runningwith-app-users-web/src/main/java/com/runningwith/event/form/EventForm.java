@@ -4,12 +4,18 @@ import com.runningwith.event.EventEntity;
 import com.runningwith.event.enumeration.EventType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class EventForm {
 
@@ -33,6 +39,18 @@ public class EventForm {
 
     @Min(2)
     private Integer limitOfEnrollments = 2;
+
+    public static EventForm toForm(EventEntity eventEntity) {
+        return EventForm.builder()
+                .title(eventEntity.getTitle())
+                .description(eventEntity.getDescription())
+                .eventType(eventEntity.getEventType())
+                .endEnrollmentDateTime(eventEntity.getEndEnrollmentDateTime())
+                .startDateTime(eventEntity.getStartDateTime())
+                .endDateTime(eventEntity.getEndDateTime())
+                .limitOfEnrollments(eventEntity.getLimitOfEnrollments())
+                .build();
+    }
 
     public EventEntity toEntity() {
         return new EventEntity(this.title, this.description, this.endEnrollmentDateTime, this.startDateTime, this.endDateTime, this.limitOfEnrollments, this.eventType);

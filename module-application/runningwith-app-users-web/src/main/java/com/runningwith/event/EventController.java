@@ -36,6 +36,8 @@ public class EventController {
     public static final String URL_EVENTS = "/events";
     public static final String VIEW_EVENT_VIEW = "event/view";
     public static final String VIEW_STUDY_EVENTS = "study/events";
+    public static final String URL_EVENT_EDIT = "/edit";
+    public static final String VIEW_EVENT_EDIT = "event/edit";
     private final StudyService studyService;
     private final EventService eventService;
     private final EventValidator eventValidator;
@@ -76,7 +78,7 @@ public class EventController {
     public String viewEvent(@CurrentUser UsersEntity usersEntity, @PathVariable String path, @PathVariable Long id, Model model) {
 
         StudyEntity studyEntity = studyService.getStudy(path);
-        EventEntity eventEntity = eventRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 모임입니다."));
+        EventEntity eventEntity = getOrElseThrow(id);
 
         model.addAttribute("user", usersEntity);
         model.addAttribute("event", eventEntity);
@@ -106,6 +108,33 @@ public class EventController {
         model.addAttribute("oldEvents", oldEvents);
 
         return VIEW_STUDY_EVENTS;
+    }
+
+    @GetMapping(URL_EVENTS + URL_SLASH + "{id}" + URL_EVENT_EDIT)
+    public String viewEventUpdate(@CurrentUser UsersEntity usersEntity, @PathVariable String path,
+                                  @PathVariable Long id, Model model) {
+
+        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+        EventEntity eventEntity = getOrElseThrow(id);
+
+        model.addAttribute("user", usersEntity);
+        model.addAttribute("study", studyEntity);
+        model.addAttribute("event", eventEntity);
+        model.addAttribute(EVENT_FORM, EventForm.toForm(eventEntity));
+
+        return VIEW_EVENT_EDIT;
+    }
+
+    @PostMapping(URL_EVENTS + URL_SLASH + "{id}" + URL_EVENT_EDIT)
+    public String updateEvent(@CurrentUser UsersEntity usersEntity, @PathVariable String path, Model model) {
+
+        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+
+        return VIEW_EVENT_EDIT;
+    }
+
+    private EventEntity getOrElseThrow(Long id) {
+        return eventRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 모임입니다."));
     }
 
 }
