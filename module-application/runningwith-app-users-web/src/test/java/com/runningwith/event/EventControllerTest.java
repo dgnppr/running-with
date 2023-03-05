@@ -165,11 +165,27 @@ class EventControllerTest {
     @DisplayName("스터디 모임 상세 뷰 - 경로 오류")
     @Test
     void view_study_event_with_wrong_path() throws Exception {
-        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS + URL_SLASH + "-1")
-                        .with(csrf()))
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS + URL_SLASH + "-1"))
                 .andExpect(authenticated())
                 .andExpect(status().isOk())
                 .andExpect(view().name(VIEW_ERROR));
+    }
+
+    @WithUser
+    @DisplayName("스터디 모임 리스트 뷰")
+    @Test
+    void view_study_event_list() throws Exception {
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS))
+                .andExpect(model().attribute("user", usersEntity))
+                .andExpect(model().attribute("study", studyEntity))
+                .andExpect(model().attributeExists("newEvents"))
+                .andExpect(model().attributeExists("oldEvents"))
+                .andExpect(authenticated())
+                .andExpect(status().isOk())
+                .andExpect(view().name(VIEW_STUDY_EVENTS));
     }
 
 
