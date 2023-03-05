@@ -5,7 +5,8 @@
 <nav th:replace="~{fragments.html :: main-nav}"></nav>
 <div th:replace="~{fragments.html :: study-banner}"></div>
 <div class="container">
-    
+    <div th:replace="~{fragments.html :: event-form (mode='edit', action='/study/' + ${study.path}
+        + '/events/' + ${event.id} + '/edit')}"></div>
 </div>
 <th:block th:replace="~{fragments.html :: footer}"></th:block>
 <script th:replace="~{fragments.html :: form-validation}"></script>
