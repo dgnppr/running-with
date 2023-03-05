@@ -24,6 +24,7 @@ import static com.runningwith.event.EventController.*;
 import static com.runningwith.study.StudyController.URL_STUDY_PATH;
 import static com.runningwith.utils.CustomStringUtils.WITH_USER_NICKNAME;
 import static com.runningwith.utils.CustomStringUtils.getEncodedUrl;
+import static com.runningwith.utils.WebUtils.URL_SLASH;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -112,7 +113,7 @@ class EventControllerTest {
                         .with(csrf()))
                 .andExpect(authenticated())
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrlPattern(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_EVENTS + "{id}"));
+                .andExpect(redirectedUrlPattern(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_EVENTS + URL_SLASH + "{id}"));
     }
 
     @WithUser
@@ -150,7 +151,7 @@ class EventControllerTest {
         EventForm eventForm = getEventForm("eventFrom description", "eventFrom title", 2);
         EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
 
-        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS + eventEntity.getId())
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS + URL_SLASH + eventEntity.getId())
                         .with(csrf()))
                 .andExpect(authenticated())
                 .andExpect(model().attribute("user", usersEntity))
@@ -164,7 +165,7 @@ class EventControllerTest {
     @DisplayName("스터디 모임 상세 뷰 - 경로 오류")
     @Test
     void view_study_event_with_wrong_path() throws Exception {
-        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS + "-1")
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS + URL_SLASH + "-1")
                         .with(csrf()))
                 .andExpect(authenticated())
                 .andExpect(status().isOk())

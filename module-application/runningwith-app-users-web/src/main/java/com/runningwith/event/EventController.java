@@ -15,9 +15,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.runningwith.study.StudyController.URL_STUDY_PATH;
 import static com.runningwith.utils.CustomStringUtils.getEncodedUrl;
 import static com.runningwith.utils.WebUtils.REDIRECT;
+import static com.runningwith.utils.WebUtils.URL_SLASH;
 
 @Slf4j
 @Controller
@@ -28,8 +33,9 @@ public class EventController {
     public static final String EVENT_FORM = "eventForm";
     public static final String VIEW_EVENT_FORM = "event/form";
     public static final String URL_NEW_EVENT = "/new-event";
-    public static final String URL_EVENTS = "/events/";
+    public static final String URL_EVENTS = "/events";
     public static final String VIEW_EVENT_VIEW = "event/view";
+    public static final String VIEW_STUDY_EVENTS = "study/events";
     private final StudyService studyService;
     private final EventService eventService;
     private final EventValidator eventValidator;
@@ -62,12 +68,12 @@ public class EventController {
         }
 
         EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
-        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_EVENTS + eventEntity.getId();
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_EVENTS + URL_SLASH + eventEntity.getId();
     }
 
-    // TODO event view design
-    @GetMapping(URL_EVENTS + "{id}")
-    public String getEvent(@CurrentUser UsersEntity usersEntity, @PathVariable String path, @PathVariable Long id, Model model) {
+    // TODO event view redesign
+    @GetMapping(URL_EVENTS + URL_SLASH + "{id}")
+    public String viewEvent(@CurrentUser UsersEntity usersEntity, @PathVariable String path, @PathVariable Long id, Model model) {
 
         StudyEntity studyEntity = studyService.getStudy(path);
         EventEntity eventEntity = eventRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 모임입니다."));
@@ -77,6 +83,29 @@ public class EventController {
         model.addAttribute("study", studyEntity);
 
         return VIEW_EVENT_VIEW;
+    }
+
+    @GetMapping(URL_EVENTS)
+    public String viewEvents(@CurrentUser UsersEntity usersEntity, @PathVariable String path, Model model) {
+        StudyEntity studyEntity = studyService.getStudy(path);
+
+        List<EventEntity> newEvents = new ArrayList<>();
+        List<EventEntity> oldEvents = new ArrayList<>();
+
+        eventRepository.findByStudyEntityOrderByStartDateTime(studyEntity).forEach(eventEntity -> {
+            if (eventEntity.getEndDateTime().isBefore(LocalDateTime.now())) {
+                oldEvents.add(eventEntity);
+            } else {
+                newEvents.add(eventEntity);
+            }
+        });
+
+        model.addAttribute("user", usersEntity);
+        model.addAttribute("study", studyEntity);
+        model.addAttribute("newEvents", newEvents);
+        model.addAttribute("oldEvents", oldEvents);
+
+        return VIEW_STUDY_EVENTS;
     }
 
 }

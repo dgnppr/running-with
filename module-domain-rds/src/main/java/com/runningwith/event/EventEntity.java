@@ -96,6 +96,10 @@ public class EventEntity {
         return false;
     }
 
+    public int numberOfRemainSpots() {
+        return this.limitOfEnrollments - (int) this.enrollments.stream().filter(EnrollmentEntity::isAccepted).count();
+    }
+
     private boolean isAlreadyEnrolled(UsersEntity usersEntity) {
         for (EnrollmentEntity e : this.enrollments) {
             if (e.getUsersEntity().equals(usersEntity)) {
