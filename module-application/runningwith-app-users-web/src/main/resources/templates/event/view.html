@@ -15,14 +15,15 @@
         </div>
         <div class="col-4 text-right justify-content-end">
                 <span sec:authorize="isAuthenticated()">
-                    <button class="btn btn-outline-primary"
-                            data-target="#enroll" data-toggle="modal"
-                            th:if="${event.isEnrollableFor(#authentication.principal.usersEntity)}">
+                    <button class="btn btn-outline-primary" data-bs-target="#enroll"
+                            data-bs-toggle="modal"
+                            th:if="${event.isEnrollableFor(#authentication.principal.usersEntity)}"
+                            type="button">
                         <i class="fa fa-plus-circle"></i> 참가 신청
                     </button>
-                    <button class="btn btn-outline-primary"
-                            data-target="#disenroll" data-toggle="modal"
-                            th:if="${event.isDisenrollableFor(#authentication.principal.usersEntity)}">
+                    <button class="btn btn-outline-primary" data-bs-target="#disenroll"
+                            data-bs-toggle="modal"
+                            th:if="${event.isDisenrollableFor(#authentication.principal.usersEntity)}" type="button">
                         <i class="fa fa-minus-circle"></i> 참가 신청 취소
                     </button>
                     <span class="text-success" disabled
@@ -109,17 +110,17 @@
                         <th scope="row" th:text="${enrollStat.count}"></th>
                         <td>
                             <a class="text-decoration-none"
-                               th:href="@{'/profile/' + ${enroll.user.nickname}}">
+                               th:href="@{'/profile/' + ${enroll.usersEntity.nickname}}">
                                 <svg class="rounded border bg-light"
                                      data-jdenticon-value="nickname"
-                                     height="24" th:data-jdenticon-value="${enroll.user.nickname}"
-                                     th:if="${#strings.isEmpty(enroll.user?.profileImage)}"
+                                     height="24" th:data-jdenticon-value="${enroll.usersEntity.nickname}"
+                                     th:if="${#strings.isEmpty(enroll.usersEntity?.profileImage)}"
                                      width="24"></svg>
                                 <img class="rounded border"
-                                     height="24" th:if="${!#strings.isEmpty(enroll.user?.profileImage)}"
-                                     th:src="${enroll.user?.profileImage}"
+                                     height="24" th:if="${!#strings.isEmpty(enroll.usersEntity?.profileImage)}"
+                                     th:src="${enroll.usersEntity?.profileImage}"
                                      width="24"/>
-                                <span th:text="${enroll.user.nickname}"></span>
+                                <span th:text="${enroll.usersEntity.nickname}"></span>
                             </a>
                         </td>
                         <td>
@@ -132,11 +133,11 @@
                         <td th:if="${study.isManager(#authentication.principal.usersEntity)}">
                             <a class="text-decoration-none" href="#"
                                th:href="@{'/study/' + ${study.path} + '/events/' + ${event.id} + '/enrollments/' + ${enroll.id} + '/accept'}"
-                               th:if="${event.isAcceptable(enroll)}">신청
+                               th:if="${event.canAccept(enroll)}">신청
                                 수락</a>
                             <a class="text-decoration-none" href="#"
                                th:href="@{'/study/' + ${study.path} + '/events/' + ${event.id} + '/enrollments/' + ${enroll.id} + '/reject'}"
-                               th:if="${event.isRejectable(enroll)}">취소</a>
+                               th:if="${event.canReject(enroll)}">취소</a>
                         </td>
                         <td th:if="${study.isManager(#authentication.principal.usersEntity)}">
                             <a class="text-decoration-none" href="#"

@@ -162,4 +162,20 @@ public class EventEntity {
 
         return null;
     }
+
+    public boolean canAccept(EnrollmentEntity enrollmentEntity) {
+        return this.eventType == EventType.CONFIRMATIVE
+                && this.enrollments.contains(enrollmentEntity)
+                && this.limitOfEnrollments > this.getNumberOfAcceptedEnrollments()
+                && !enrollmentEntity.isAttended()
+                && !enrollmentEntity.isAccepted();
+    }
+
+    public boolean canReject(EnrollmentEntity enrollmentEntity) {
+        return this.eventType == EventType.CONFIRMATIVE
+                && this.enrollments.contains(enrollmentEntity)
+                && !enrollmentEntity.isAttended()
+                && enrollmentEntity.isAccepted();
+    }
+
 }

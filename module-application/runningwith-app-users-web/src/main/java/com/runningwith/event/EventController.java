@@ -40,7 +40,7 @@ public class EventController {
     public static final String URL_EVENT_EDIT = "/edit";
     public static final String VIEW_EVENT_EDIT = "event/edit";
     public static final String URL_EVENT_DELETE = "/delete";
-    public static final String URL_EVENT_ENROLL = "enroll";
+    public static final String URL_EVENT_ENROLL = "/enroll";
     public static final String URL_EVENT_DISENROLL = "/disenroll";
     private final StudyService studyService;
     private final EventService eventService;
@@ -153,7 +153,7 @@ public class EventController {
     public String cancelEvent(@CurrentUser UsersEntity usersEntity, @PathVariable String path, @PathVariable Long id) {
         StudyEntity studyEntity = studyService.getStudyToUpdateStatus(usersEntity, path);
         EventEntity eventEntity = getEventEntityOrElseThrow(id);
-        
+
         eventService.deleteEvent(eventEntity);
         return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_EVENTS;
     }
