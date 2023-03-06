@@ -270,6 +270,7 @@ class EventControllerTest {
                 .andExpect(view().name(VIEW_EVENT_EDIT));
     }
 
+    // TODO 등록된 enrollment도 같이 삭제 확인
     @WithUser
     @DisplayName("스터디 모임 삭제")
     @Test
