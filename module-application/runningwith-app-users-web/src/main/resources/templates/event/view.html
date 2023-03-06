@@ -199,35 +199,12 @@
                    th:href="@{'/study/' + ${study.path} + '/events/' + ${event.id} + '/edit'}">
                     모임 수정
                 </a> <br/>
-                <button class="btn btn-outline-danger btn-sm" data-target="#cancel" data-toggle="modal">
+                <a class="btn btn-outline-danger btn-sm my-1"
+                   th:href="@{'/study/' + ${study.path} + '/events/' + ${event.id} + '/delete'}">
                     모임 취소
-                </button>
+                </a>
             </dd>
         </dl>
-        <div aria-hidden="true" aria-labelledby="cancelTitle" class="modal fade" id="cancel" role="dialog"
-             tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="cancelTitle" th:text="${event.title}"></h5>
-                        <button aria-label="Close" class="close" data-dismiss="modal" type="button">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p>모임을 취소 하시겠습니까?</p>
-                        <p><strong>확인</strong>하시면 본 모임 및 참가 신청 관련 데이터를 삭제합니다.</p>
-                        <p>감사합니다.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-dismiss="modal" type="button">닫기</button>
-                        <form th:action="@{'/study/' + ${study.path} + '/events/' + ${event.id}}" th:method="delete">
-                            <button aria-describedby="submitHelp" class="btn btn-primary" type="submit">확인</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 <th:block th:replace="~{fragments.html :: footer}"></th:block>

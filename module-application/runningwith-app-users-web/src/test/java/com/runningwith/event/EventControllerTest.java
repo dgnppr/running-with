@@ -252,7 +252,7 @@ class EventControllerTest {
                 2, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(3), EventType.FCFS);
         EventEntity beforeEvent = eventService.createEvent(beforeForm.toEntity(), studyEntity, usersEntity);
         EventForm afterForm = getEventForm("event From description", "event From title",
-                3, LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(3), LocalDateTime.now().plusDays(4), EventType.FCFS);
+                3, LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(3), LocalDateTime.now().plusDays(4), EventType.CONFIRMATIVE);
 
         mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + beforeEvent.getId() + URL_EVENT_EDIT)
                         .param("eventType", afterForm.getEventType().toString())
@@ -268,7 +268,25 @@ class EventControllerTest {
                 .andExpect(model().attributeHasErrors(EVENT_FORM))
                 .andExpect(model().attributeHasFieldErrors("eventForm", "endEnrollmentDateTime"))
                 .andExpect(view().name(VIEW_EVENT_EDIT));
+    }
 
+    @WithUser
+    @DisplayName("스터디 모임 삭제")
+    @Test
+    void delete_study_event() throws Exception {
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        EventForm eventForm = getEventForm("eventFrom description", "eventFrom title",
+                2, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(3), EventType.FCFS);
+        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
+
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + eventEntity.getId() + URL_EVENT_DELETE)
+                        .with(csrf()))
+                .andExpect(authenticated())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_EVENTS));
+
+        assertThat(eventRepository.findById(eventEntity.getId())).isEmpty();
     }
 
 }

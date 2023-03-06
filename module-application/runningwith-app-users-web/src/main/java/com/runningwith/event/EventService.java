@@ -26,4 +26,8 @@ public class EventService {
         eventEntity.update(eventForm.getTitle(), eventForm.getDescription(), eventForm.getEventType(),
                 eventForm.getEndEnrollmentDateTime(), eventForm.getStartDateTime(), eventForm.getEndDateTime(), eventForm.getLimitOfEnrollments());
     }
+
+    public void deleteEvent(EventEntity eventEntity) {
+        eventRepository.delete(eventEntity);
+    }
 }
