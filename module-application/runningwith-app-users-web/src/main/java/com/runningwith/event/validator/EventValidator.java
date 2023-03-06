@@ -51,6 +51,6 @@ public class EventValidator implements Validator {
         if (eventForm.getLimitOfEnrollments() < eventEntity.getNumberOfAcceptedEnrollments()) {
             bindingResult.rejectValue("limitOfEnrollments", "wrong.value", "확인된 참기 신청보다 모집 인원 수가 커야 합니다.");
         }
-
     }
+    
 }

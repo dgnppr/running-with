@@ -24,7 +24,7 @@ import static com.runningwith.event.EventController.*;
 import static com.runningwith.study.StudyController.URL_STUDY_PATH;
 import static com.runningwith.utils.CustomStringUtils.WITH_USER_NICKNAME;
 import static com.runningwith.utils.CustomStringUtils.getEncodedUrl;
-import static com.runningwith.utils.WebUtils.URL_SLASH;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -54,15 +54,15 @@ class EventControllerTest {
     @Autowired
     EventService eventService;
 
-    private EventForm getEventForm(String eventFrom_description, String eventFrom_title, int limitOfEnrollments) {
+    private EventForm getEventForm(String eventFrom_description, String eventFrom_title, int limitOfEnrollments, LocalDateTime endEnrollmentDateTime, LocalDateTime startDateTime, LocalDateTime endDateTime, EventType eventType) {
         EventForm eventForm = new EventForm();
-        eventForm.setEventType(EventType.FCFS);
+        eventForm.setEventType(eventType);
         eventForm.setDescription(eventFrom_description);
         eventForm.setTitle(eventFrom_title);
         eventForm.setLimitOfEnrollments(limitOfEnrollments);
-        eventForm.setEndEnrollmentDateTime(LocalDateTime.now().plusDays(1));
-        eventForm.setStartDateTime(LocalDateTime.now().plusDays(2));
-        eventForm.setEndDateTime(LocalDateTime.now().plusDays(3));
+        eventForm.setEndEnrollmentDateTime(endEnrollmentDateTime);
+        eventForm.setStartDateTime(startDateTime);
+        eventForm.setEndDateTime(endDateTime);
         return eventForm;
     }
 
@@ -76,8 +76,8 @@ class EventControllerTest {
 
     @AfterEach
     void tearDown() {
-        studyRepository.deleteAll();
         eventRepository.deleteAll();
+        studyRepository.deleteAll();
     }
 
     @WithUser
@@ -100,7 +100,7 @@ class EventControllerTest {
     @DisplayName("스터디 모임 생성 - 입력값 정상")
     @Test
     void submit_study_event_form_with_correct_inputs() throws Exception {
-        EventForm eventForm = getEventForm("eventFrom description", "eventFrom title", 2);
+        EventForm eventForm = getEventForm("eventFrom description", "eventFrom title", 2, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(3), EventType.FCFS);
 
         mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_NEW_EVENT)
                         .param("eventType", eventForm.getEventType().toString())
@@ -113,7 +113,7 @@ class EventControllerTest {
                         .with(csrf()))
                 .andExpect(authenticated())
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrlPattern(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_EVENTS + URL_SLASH + "{id}"));
+                .andExpect(redirectedUrlPattern(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_EVENTS_PATH + "{id}"));
     }
 
     @WithUser
@@ -123,7 +123,7 @@ class EventControllerTest {
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
 
-        EventForm eventForm = getEventForm("", "", 0);
+        EventForm eventForm = getEventForm("", "", 0, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(3), EventType.FCFS);
 
         mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_NEW_EVENT)
                         .param("eventType", eventForm.getEventType().toString())
@@ -148,10 +148,10 @@ class EventControllerTest {
     void view_study_event_with_correct_path() throws Exception {
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
-        EventForm eventForm = getEventForm("eventFrom description", "eventFrom title", 2);
+        EventForm eventForm = getEventForm("eventFrom description", "eventFrom title", 2, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(3), EventType.FCFS);
         EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
 
-        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS + URL_SLASH + eventEntity.getId())
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + eventEntity.getId())
                         .with(csrf()))
                 .andExpect(authenticated())
                 .andExpect(model().attribute("user", usersEntity))
@@ -165,7 +165,7 @@ class EventControllerTest {
     @DisplayName("스터디 모임 상세 뷰 - 경로 오류")
     @Test
     void view_study_event_with_wrong_path() throws Exception {
-        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS + URL_SLASH + "-1"))
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + "-1"))
                 .andExpect(authenticated())
                 .andExpect(status().isOk())
                 .andExpect(view().name(VIEW_ERROR));
@@ -194,10 +194,10 @@ class EventControllerTest {
     void view_study_event_edit() throws Exception {
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
-        EventForm eventForm = getEventForm("eventFrom description", "eventFrom title", 2);
+        EventForm eventForm = getEventForm("eventFrom description", "eventFrom title", 2, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(3), EventType.FCFS);
         EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
 
-        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS + URL_SLASH + eventEntity.getId() + URL_EVENT_EDIT))
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + eventEntity.getId() + URL_EVENT_EDIT))
                 .andExpect(model().attribute("user", usersEntity))
                 .andExpect(model().attribute("study", studyEntity))
                 .andExpect(model().attribute("event", eventEntity))
@@ -207,24 +207,68 @@ class EventControllerTest {
                 .andExpect(view().name(VIEW_EVENT_EDIT));
     }
 
-//    @WithUser
-//    @DisplayName("스터디 모임 수정 - 입력값 정상")
-//    @Test
-//    void edit_study_event_with_correct_inputs() throws Exception {
-//        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
-//        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
-//        EventForm eventForm = getEventForm("eventFrom description", "eventFrom title", 2);
-//        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
-//
-//        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_EVENTS + URL_SLASH + eventEntity.getId() + URL_EVENT_EDIT))
-//                .andExpect(model().attribute("user", usersEntity))
-//                .andExpect(model().attribute("study", studyEntity))
-//                .andExpect(model().attribute("event", eventEntity))
-//                .andExpect(model().attributeExists(EVENT_FORM))
-//                .andExpect(authenticated())
-//                .andExpect(status().isOk())
-//                .andExpect(view().name(VIEW_EVENT_EDIT));
-//    }
+    @WithUser
+    @DisplayName("스터디 모임 수정 - 입력값 정상")
+    @Test
+    void post_study_event_with_correct_inputs() throws Exception {
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        EventForm beforeForm = getEventForm("eventFrom description", "eventFrom title",
+                2, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(3), EventType.FCFS);
+        EventEntity beforeEvent = eventService.createEvent(beforeForm.toEntity(), studyEntity, usersEntity);
+        EventForm afterForm = getEventForm("event From description", "event From title",
+                3, LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(3), LocalDateTime.now().plusDays(4), EventType.FCFS);
 
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + beforeEvent.getId() + URL_EVENT_EDIT)
+                        .param("eventType", afterForm.getEventType().toString())
+                        .param("description", afterForm.getDescription())
+                        .param("title", afterForm.getTitle())
+                        .param("endEnrollmentDateTime", afterForm.getEndEnrollmentDateTime().toString())
+                        .param("startDateTime", afterForm.getStartDateTime().toString())
+                        .param("endDateTime", afterForm.getEndDateTime().toString())
+                        .param("limitOfEnrollments", afterForm.getLimitOfEnrollments().toString())
+                        .with(csrf()))
+                .andExpect(authenticated())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_EVENTS_PATH + beforeEvent.getId()));
+
+        EventEntity afterEvent = eventRepository.findById(beforeEvent.getId()).get();
+        assertThat(afterEvent.getTitle()).isEqualTo(afterForm.getTitle());
+        assertThat(afterEvent.getEventType()).isEqualTo(afterForm.getEventType());
+        assertThat(afterEvent.getEndEnrollmentDateTime()).isEqualTo(afterForm.getEndEnrollmentDateTime());
+        assertThat(afterEvent.getStartDateTime()).isEqualTo(afterForm.getStartDateTime());
+        assertThat(afterEvent.getEndDateTime()).isEqualTo(afterForm.getEndDateTime());
+        assertThat(afterEvent.getLimitOfEnrollments()).isEqualTo(afterForm.getLimitOfEnrollments());
+    }
+
+    // TODO 필드 검증 로직 추가
+    @WithUser
+    @DisplayName("스터디 모임 수정 - 입력값 오류")
+    @Test
+    void post_study_event_with_wrong_inputs() throws Exception {
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        EventForm beforeForm = getEventForm("eventFrom description", "eventFrom title",
+                2, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(3), EventType.FCFS);
+        EventEntity beforeEvent = eventService.createEvent(beforeForm.toEntity(), studyEntity, usersEntity);
+        EventForm afterForm = getEventForm("event From description", "event From title",
+                3, LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(3), LocalDateTime.now().plusDays(4), EventType.FCFS);
+
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + beforeEvent.getId() + URL_EVENT_EDIT)
+                        .param("eventType", afterForm.getEventType().toString())
+                        .param("description", afterForm.getDescription())
+                        .param("title", afterForm.getTitle())
+                        .param("endEnrollmentDateTime", afterForm.getEndEnrollmentDateTime().toString())
+                        .param("startDateTime", afterForm.getStartDateTime().toString())
+                        .param("endDateTime", afterForm.getEndDateTime().toString())
+                        .param("limitOfEnrollments", afterForm.getLimitOfEnrollments().toString())
+                        .with(csrf()))
+                .andExpect(authenticated())
+                .andExpect(status().isOk())
+                .andExpect(model().attributeHasErrors(EVENT_FORM))
+                .andExpect(model().attributeHasFieldErrors("eventForm", "endEnrollmentDateTime"))
+                .andExpect(view().name(VIEW_EVENT_EDIT));
+
+    }
 
 }

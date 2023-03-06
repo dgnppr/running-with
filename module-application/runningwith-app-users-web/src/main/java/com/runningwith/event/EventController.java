@@ -34,6 +34,7 @@ public class EventController {
     public static final String VIEW_EVENT_FORM = "event/form";
     public static final String URL_NEW_EVENT = "/new-event";
     public static final String URL_EVENTS = "/events";
+    public static final String URL_EVENTS_PATH = "/events/";
     public static final String VIEW_EVENT_VIEW = "event/view";
     public static final String VIEW_STUDY_EVENTS = "study/events";
     public static final String URL_EVENT_EDIT = "/edit";
@@ -74,7 +75,7 @@ public class EventController {
     }
 
     // TODO event view redesign
-    @GetMapping(URL_EVENTS + URL_SLASH + "{id}")
+    @GetMapping(URL_EVENTS_PATH + "{id}")
     public String viewEvent(@CurrentUser UsersEntity usersEntity, @PathVariable String path, @PathVariable Long id, Model model) {
 
         StudyEntity studyEntity = studyService.getStudy(path);
@@ -110,7 +111,7 @@ public class EventController {
         return VIEW_STUDY_EVENTS;
     }
 
-    @GetMapping(URL_EVENTS + URL_SLASH + "{id}" + URL_EVENT_EDIT)
+    @GetMapping(URL_EVENTS_PATH + "{id}" + URL_EVENT_EDIT)
     public String viewEventUpdate(@CurrentUser UsersEntity usersEntity, @PathVariable String path,
                                   @PathVariable Long id, Model model) {
 
@@ -125,7 +126,7 @@ public class EventController {
         return VIEW_EVENT_EDIT;
     }
 
-    @PostMapping(URL_EVENTS + URL_SLASH + "{id}" + URL_EVENT_EDIT)
+    @PostMapping(URL_EVENTS_PATH + "{id}" + URL_EVENT_EDIT)
     public String updateEvent(@CurrentUser UsersEntity usersEntity, @PathVariable String path, @PathVariable Long id,
                               @Validated EventForm eventForm, BindingResult bindingResult, Model model) {
 
@@ -142,7 +143,7 @@ public class EventController {
         }
 
         eventService.updateEvent(eventEntity, eventForm);
-        return VIEW_EVENT_EDIT;
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_EVENTS_PATH + eventEntity.getId();
     }
 
     private EventEntity getEventEntityOrElseThrow(Long id) {
