@@ -78,7 +78,7 @@ public class EventController {
     public String viewEvent(@CurrentUser UsersEntity usersEntity, @PathVariable String path, @PathVariable Long id, Model model) {
 
         StudyEntity studyEntity = studyService.getStudy(path);
-        EventEntity eventEntity = getOrElseThrow(id);
+        EventEntity eventEntity = getEventEntityOrElseThrow(id);
 
         model.addAttribute("user", usersEntity);
         model.addAttribute("event", eventEntity);
@@ -115,7 +115,7 @@ public class EventController {
                                   @PathVariable Long id, Model model) {
 
         StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
-        EventEntity eventEntity = getOrElseThrow(id);
+        EventEntity eventEntity = getEventEntityOrElseThrow(id);
 
         model.addAttribute("user", usersEntity);
         model.addAttribute("study", studyEntity);
@@ -126,14 +126,26 @@ public class EventController {
     }
 
     @PostMapping(URL_EVENTS + URL_SLASH + "{id}" + URL_EVENT_EDIT)
-    public String updateEvent(@CurrentUser UsersEntity usersEntity, @PathVariable String path, Model model) {
+    public String updateEvent(@CurrentUser UsersEntity usersEntity, @PathVariable String path, @PathVariable Long id,
+                              @Validated EventForm eventForm, BindingResult bindingResult, Model model) {
 
         StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+        EventEntity eventEntity = getEventEntityOrElseThrow(id);
+        eventForm.setEventType(eventEntity.getEventType());
+        eventValidator.validateUpdateForm(eventForm, eventEntity, bindingResult);
 
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("user", usersEntity);
+            model.addAttribute("study", studyEntity);
+            model.addAttribute("event", eventEntity);
+            return VIEW_EVENT_EDIT;
+        }
+
+        eventService.updateEvent(eventEntity, eventForm);
         return VIEW_EVENT_EDIT;
     }
 
-    private EventEntity getOrElseThrow(Long id) {
+    private EventEntity getEventEntityOrElseThrow(Long id) {
         return eventRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 모임입니다."));
     }
 

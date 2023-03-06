@@ -207,5 +207,24 @@ class EventControllerTest {
                 .andExpect(view().name(VIEW_EVENT_EDIT));
     }
 
+//    @WithUser
+//    @DisplayName("스터디 모임 수정 - 입력값 정상")
+//    @Test
+//    void edit_study_event_with_correct_inputs() throws Exception {
+//        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+//        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+//        EventForm eventForm = getEventForm("eventFrom description", "eventFrom title", 2);
+//        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
+//
+//        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_EVENTS + URL_SLASH + eventEntity.getId() + URL_EVENT_EDIT))
+//                .andExpect(model().attribute("user", usersEntity))
+//                .andExpect(model().attribute("study", studyEntity))
+//                .andExpect(model().attribute("event", eventEntity))
+//                .andExpect(model().attributeExists(EVENT_FORM))
+//                .andExpect(authenticated())
+//                .andExpect(status().isOk())
+//                .andExpect(view().name(VIEW_EVENT_EDIT));
+//    }
+
 
 }

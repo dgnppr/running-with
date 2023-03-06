@@ -115,4 +115,18 @@ public class EventEntity {
         this.createdDateTime = LocalDateTime.now();
         return this;
     }
+
+    public long getNumberOfAcceptedEnrollments() {
+        return this.enrollments.stream().filter(EnrollmentEntity::isAccepted).count();
+    }
+
+    public void update(String title, String description, EventType eventType, LocalDateTime endEnrollmentDateTime, LocalDateTime startDateTime, LocalDateTime endDateTime, Integer limitOfEnrollments) {
+        this.title = title;
+        this.description = description;
+        this.eventType = eventType;
+        this.endEnrollmentDateTime = endEnrollmentDateTime;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.limitOfEnrollments = limitOfEnrollments;
+    }
 }
