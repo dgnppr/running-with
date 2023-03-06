@@ -41,6 +41,7 @@ public class EventController {
     public static final String VIEW_EVENT_EDIT = "event/edit";
     public static final String URL_EVENT_DELETE = "/delete";
     public static final String URL_EVENT_ENROLL = "enroll";
+    public static final String URL_EVENT_DISENROLL = "/disenroll";
     private final StudyService studyService;
     private final EventService eventService;
     private final EventValidator eventValidator;
@@ -152,6 +153,7 @@ public class EventController {
     public String cancelEvent(@CurrentUser UsersEntity usersEntity, @PathVariable String path, @PathVariable Long id) {
         StudyEntity studyEntity = studyService.getStudyToUpdateStatus(usersEntity, path);
         EventEntity eventEntity = getEventEntityOrElseThrow(id);
+        
         eventService.deleteEvent(eventEntity);
         return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_EVENTS;
     }
@@ -160,7 +162,18 @@ public class EventController {
     public String newEnrollment(@CurrentUser UsersEntity usersEntity, @PathVariable String path, @PathVariable Long id) {
         StudyEntity studyEntity = studyService.getStudyToEnroll(path);
         EventEntity eventEntity = getEventEntityOrElseThrow(id);
+
         eventService.newEnrollment(eventEntity, usersEntity);
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_EVENTS_PATH + id;
+    }
+
+    @PostMapping(URL_EVENTS_PATH + "{id}" + URL_EVENT_DISENROLL)
+    public String cancelEnrollment(@CurrentUser UsersEntity usersEntity,
+                                   @PathVariable String path, @PathVariable Long id) {
+        StudyEntity studyEntity = studyService.getStudyToEnroll(path);
+        EventEntity eventEntity = getEventEntityOrElseThrow(id);
+
+        eventService.cancelEnrollment(eventEntity, usersEntity);
         return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_EVENTS_PATH + id;
     }
 
