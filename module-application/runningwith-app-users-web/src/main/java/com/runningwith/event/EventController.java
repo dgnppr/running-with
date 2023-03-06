@@ -149,11 +149,10 @@ public class EventController {
         return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_EVENTS_PATH + eventEntity.getId();
     }
 
-    @GetMapping(URL_EVENTS_PATH + "{id}" + URL_EVENT_DELETE)
+    @PostMapping(URL_EVENTS_PATH + "{id}" + URL_EVENT_DELETE)
     public String cancelEvent(@CurrentUser UsersEntity usersEntity, @PathVariable String path, @PathVariable Long id) {
         StudyEntity studyEntity = studyService.getStudyToUpdateStatus(usersEntity, path);
         EventEntity eventEntity = getEventEntityOrElseThrow(id);
-
         eventService.deleteEvent(eventEntity);
         return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_EVENTS;
     }

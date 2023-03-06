@@ -44,8 +44,6 @@
                     </div>
                     <div class="modal-body">
                         <p>모임 참가 신청을 취소하시겠습니까?</p>
-                        <p><strong>확인</strong>하시면 본 참가 신청을 취소하고 다른 대기자에게 참석 기회를 줍니다.</p>
-                        <p>감사합니다.</p>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" data-dismiss="modal" type="button">닫기</button>
@@ -68,9 +66,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <p>모임에 참석하시겠습니까? 일정을 캘린더에 등록해 두시면 좋습니다.</p>
-                        <p><strong>확인</strong> 버튼을 클릭하면 모임 참가 신청을 합니다.</p>
-                        <p>감사합니다.</p>
+                        <p>모임 참석 신청을 하시겠습니까?</p>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" data-dismiss="modal" type="button">닫기</button>
@@ -200,12 +196,34 @@
                    th:href="@{'/study/' + ${study.path} + '/events/' + ${event.id} + '/edit'}">
                     모임 수정
                 </a> <br/>
-                <a class="btn btn-outline-danger btn-sm my-1"
-                   th:href="@{'/study/' + ${study.path} + '/events/' + ${event.id} + '/delete'}">
+                <button class="btn btn-outline-danger btn-sm" data-bs-target="#cancel" data-bs-toggle="modal">
                     모임 취소
-                </a>
+                </button>
             </dd>
         </dl>
+        <div aria-hidden="true" aria-labelledby="cancelTitle" class="modal fade" id="cancel" role="dialog"
+             tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cancelTitle" th:text="${event.title}"></h5>
+                        <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>모임을 취소 하시겠습니까?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-dismiss="modal" type="button">닫기</button>
+                        <form th:action="@{'/study/' + ${study.path} + '/events/' + ${event.id}+ '/delete'}"
+                              th:method="post">
+                            <button aria-describedby="submitHelp" class="btn btn-primary" type="submit">확인</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <th:block th:replace="~{fragments.html :: footer}"></th:block>

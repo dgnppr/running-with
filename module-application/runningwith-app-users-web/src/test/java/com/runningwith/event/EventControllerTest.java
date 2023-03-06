@@ -280,7 +280,7 @@ class EventControllerTest {
                 2, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(3), EventType.FCFS);
         EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
 
-        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + eventEntity.getId() + URL_EVENT_DELETE)
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + eventEntity.getId() + URL_EVENT_DELETE)
                         .with(csrf()))
                 .andExpect(authenticated())
                 .andExpect(status().is3xxRedirection())

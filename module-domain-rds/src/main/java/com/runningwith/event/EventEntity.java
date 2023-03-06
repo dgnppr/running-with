@@ -33,7 +33,7 @@ public class EventEntity {
     @JoinColumn(name = "id_users")
     private UsersEntity createdBy;
 
-    @OneToMany(mappedBy = "eventEntity")
+    @OneToMany(mappedBy = "eventEntity", orphanRemoval = true)
     @OrderBy("enrolledAt")
     private List<EnrollmentEntity> enrollments = new ArrayList<>();
 
