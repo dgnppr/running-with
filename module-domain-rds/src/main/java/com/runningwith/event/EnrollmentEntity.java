@@ -35,4 +35,17 @@ public class EnrollmentEntity {
 
     private boolean attended = false;
 
+    public EnrollmentEntity(UsersEntity usersEntity, LocalDateTime enrolledAt, boolean accepted) {
+        this.usersEntity = usersEntity;
+        this.enrolledAt = enrolledAt;
+        this.accepted = accepted;
+    }
+
+    public void setEvent(EventEntity eventEntity) {
+        this.eventEntity = eventEntity;
+    }
+
+    public void updateAccepted(boolean accepted) {
+        this.accepted = accepted;
+    }
 }

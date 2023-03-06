@@ -129,4 +129,37 @@ public class EventEntity {
         this.endDateTime = endDateTime;
         this.limitOfEnrollments = limitOfEnrollments;
     }
+
+    public boolean isAbleToAcceptWaitingEnrollment() {
+        return this.eventType == EventType.FCFS && this.limitOfEnrollments > this.getNumberOfAcceptedEnrollments();
+    }
+
+    public void addNewEnrollment(EnrollmentEntity enrollmentEntity) {
+        this.enrollments.add(enrollmentEntity);
+        enrollmentEntity.setEvent(this);
+    }
+
+    public void removeEnrollment(EnrollmentEntity enrollmentEntity) {
+        this.enrollments.remove(enrollmentEntity);
+        enrollmentEntity.setEvent(null);
+    }
+
+    public void acceptNextWaitingEnrollment() {
+        if (this.isAbleToAcceptWaitingEnrollment()) {
+            EnrollmentEntity enrollmentToAccept = this.getTheFirstWaitingEnrollment();
+            if (enrollmentToAccept != null) {
+                enrollmentToAccept.updateAccepted(true);
+            }
+        }
+    }
+
+    private EnrollmentEntity getTheFirstWaitingEnrollment() {
+        for (EnrollmentEntity e : this.enrollments) {
+            if (!e.isAccepted()) {
+                return e;
+            }
+        }
+
+        return null;
+    }
 }

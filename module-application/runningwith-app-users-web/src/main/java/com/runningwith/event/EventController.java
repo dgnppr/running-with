@@ -40,6 +40,7 @@ public class EventController {
     public static final String URL_EVENT_EDIT = "/edit";
     public static final String VIEW_EVENT_EDIT = "event/edit";
     public static final String URL_EVENT_DELETE = "/delete";
+    public static final String URL_EVENT_ENROLL = "enroll";
     private final StudyService studyService;
     private final EventService eventService;
     private final EventValidator eventValidator;
@@ -155,8 +156,18 @@ public class EventController {
         return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_EVENTS;
     }
 
+    @PostMapping(URL_EVENTS_PATH + "{id}" + URL_EVENT_ENROLL)
+    public String newEnrollment(@CurrentUser UsersEntity usersEntity, @PathVariable String path, @PathVariable Long id) {
+        StudyEntity studyEntity = studyService.getStudyToEnroll(path);
+        EventEntity eventEntity = getEventEntityOrElseThrow(id);
+        eventService.newEnrollment(eventEntity, usersEntity);
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_EVENTS_PATH + id;
+    }
+
+
     private EventEntity getEventEntityOrElseThrow(Long id) {
         return eventRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 모임입니다."));
     }
+
 
 }

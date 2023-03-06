@@ -8,6 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 @Slf4j
 @Service
 @Transactional
@@ -15,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class EventService {
 
     private final EventRepository eventRepository;
+    private final EnrollmentRepository enrollmentRepository;
 
     public EventEntity createEvent(EventEntity eventEntity, StudyEntity studyEntity, UsersEntity usersEntity) {
         eventEntity.create(studyEntity, usersEntity);
@@ -30,4 +34,26 @@ public class EventService {
     public void deleteEvent(EventEntity eventEntity) {
         eventRepository.delete(eventEntity);
     }
+
+    public void newEnrollment(EventEntity eventEntity, UsersEntity usersEntity) {
+        if (!enrollmentRepository.existsByEventEntityAndUsersEntity(eventEntity, usersEntity)) {
+            EnrollmentEntity enrollmentEntity = new EnrollmentEntity(usersEntity, LocalDateTime.now(), eventEntity.isAbleToAcceptWaitingEnrollment());
+            eventEntity.addNewEnrollment(enrollmentEntity);
+            enrollmentRepository.save(enrollmentEntity);
+        }
+    }
+
+    public void cancelEnrollment(EventEntity eventEntity, UsersEntity usersEntity) {
+        Optional<EnrollmentEntity> optionalEnrollment = enrollmentRepository.findByEventEntityAndUsersEntity(eventEntity, usersEntity);
+        EnrollmentEntity enrollmentEntity = checkIfExistingEnrollment(optionalEnrollment);
+        eventEntity.removeEnrollment(enrollmentEntity);
+        enrollmentRepository.delete(enrollmentEntity);
+        eventEntity.acceptNextWaitingEnrollment();
+    }
+
+    private EnrollmentEntity checkIfExistingEnrollment(Optional<EnrollmentEntity> optionalEnrollment) {
+        return optionalEnrollment.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 신청입니다."));
+    }
+
+
 }
