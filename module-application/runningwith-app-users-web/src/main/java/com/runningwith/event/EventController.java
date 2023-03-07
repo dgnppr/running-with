@@ -45,6 +45,8 @@ public class EventController {
     public static final String URL_ENROLLMENTS_PATH = "/enrollments/";
     public static final String URL_ENROLLMENT_ACCEPT = "/accept";
     public static final String URL_ENROLLMENT_REJECT = "/reject";
+    public static final String URL_ENROLLMENT_CHECK_IN = "/check-in";
+    public static final String URL_ENROLLMENT_CANCEL_CHECKIN = "/cancel-checkin";
     private final StudyService studyService;
     private final EventService eventService;
     private final EventValidator eventValidator;
@@ -195,10 +197,25 @@ public class EventController {
         return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_EVENTS_PATH + eventEntity.getId();
     }
 
+    @GetMapping(URL_EVENTS_PATH + "{id}" + URL_ENROLLMENTS_PATH + "{enrollmentId}" + URL_ENROLLMENT_CHECK_IN)
+    public String checkInEnrollment(@CurrentUser UsersEntity usersEntity, @PathVariable String path,
+                                    @PathVariable("id") EventEntity eventEntity, @PathVariable("enrollmentId") EnrollmentEntity enrollmentEntity) {
+        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+        eventService.checkInEnrollment(enrollmentEntity);
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_EVENTS_PATH + eventEntity.getId();
+    }
+
+    @GetMapping(URL_EVENTS_PATH + "{id}" + URL_ENROLLMENTS_PATH + "{enrollmentId}" + URL_ENROLLMENT_CANCEL_CHECKIN)
+    public String cancelCheckInEnrollment(@CurrentUser UsersEntity usersEntity, @PathVariable String path,
+                                          @PathVariable("id") EventEntity eventEntity, @PathVariable("enrollmentId") EnrollmentEntity enrollmentEntity) {
+        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+        eventService.cancelCheckInEnrollment(enrollmentEntity);
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_EVENTS_PATH + eventEntity.getId();
+    }
+
 
     private EventEntity getEventEntityOrElseThrow(Long id) {
         return eventRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 모임입니다."));
     }
-
 
 }

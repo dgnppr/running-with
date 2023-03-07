@@ -63,4 +63,12 @@ public class EventService {
     public void rejectEnrollment(EventEntity eventEntity, EnrollmentEntity enrollmentEntity) {
         eventEntity.reject(enrollmentEntity);
     }
+
+    public void checkInEnrollment(EnrollmentEntity enrollmentEntity) {
+        enrollmentEntity.updateAttended(true);
+    }
+
+    public void cancelCheckInEnrollment(EnrollmentEntity enrollmentEntity) {
+        enrollmentEntity.updateAttended(false);
+    }
 }

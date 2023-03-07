@@ -137,7 +137,7 @@
                         </td>
                         <td th:if="${study.isManager(#authentication.principal.usersEntity)}">
                             <a class="text-decoration-none" href="#"
-                               th:href="@{'/study/' + ${study.path} + '/events/' + ${event.id} + '/enrollments/' + ${enroll.id} + '/checkin'}"
+                               th:href="@{'/study/' + ${study.path} + '/events/' + ${event.id} + '/enrollments/' + ${enroll.id} + '/check-in'}"
                                th:if="${enroll.accepted && !enroll.attended}">체크인</a>
                             <a class="text-decoration-none" href="#"
                                th:href="@{'/study/' + ${study.path} + '/events/' + ${event.id} + '/enrollments/' + ${enroll.id} + '/cancel-checkin'}"

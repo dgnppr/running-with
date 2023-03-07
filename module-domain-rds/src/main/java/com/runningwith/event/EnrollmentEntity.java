@@ -48,4 +48,8 @@ public class EnrollmentEntity {
     public void updateAccepted(boolean accepted) {
         this.accepted = accepted;
     }
+
+    public void updateAttended(boolean attended) {
+        this.attended = attended;
+    }
 }
