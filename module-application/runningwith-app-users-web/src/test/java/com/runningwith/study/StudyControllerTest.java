@@ -59,7 +59,7 @@ class StudyControllerTest {
 
     @BeforeEach
     void setUp() {
-        UsersEntity usersEntity = saveOtherUser();
+        UsersEntity usersEntity = createNewUser();
         StudyForm studyForm = new StudyForm(TESTPATH, "testpath", "testpath", "testpath");
         StudyEntity studyEntity = studyForm.toEntity();
         studyService.createNewStudy(usersEntity, studyEntity);
@@ -212,7 +212,7 @@ class StudyControllerTest {
     }
 
 
-    private UsersEntity saveOtherUser() {
+    private UsersEntity createNewUser() {
         UsersEntity newUsersEntity = UsersEntity.builder()
                 .nickname("nickname")
                 .email("nickname" + EMAIL)

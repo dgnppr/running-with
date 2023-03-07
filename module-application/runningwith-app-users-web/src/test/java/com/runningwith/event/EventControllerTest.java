@@ -2,6 +2,9 @@ package com.runningwith.event;
 
 import com.runningwith.MockMvcTest;
 import com.runningwith.WithUser;
+import com.runningwith.account.AccountEntity;
+import com.runningwith.account.AccountRepository;
+import com.runningwith.account.enumeration.AccountType;
 import com.runningwith.event.enumeration.EventType;
 import com.runningwith.event.form.EventForm;
 import com.runningwith.study.StudyEntity;
@@ -18,8 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
 import static com.runningwith.AppExceptionHandler.VIEW_ERROR;
+import static com.runningwith.WithUserSecurityContextFactory.EMAIL;
+import static com.runningwith.WithUserSecurityContextFactory.PASSWORD;
 import static com.runningwith.event.EventController.*;
 import static com.runningwith.study.StudyController.URL_STUDY_PATH;
 import static com.runningwith.utils.CustomStringUtils.WITH_USER_NICKNAME;
@@ -54,6 +61,12 @@ class EventControllerTest {
     @Autowired
     EventService eventService;
 
+    @Autowired
+    AccountRepository accountRepository;
+
+    @Autowired
+    EnrollmentRepository enrollmentRepository;
+
     private EventForm getEventForm(String eventFrom_description, String eventFrom_title, int limitOfEnrollments, LocalDateTime endEnrollmentDateTime, LocalDateTime startDateTime, LocalDateTime endDateTime, EventType eventType) {
         EventForm eventForm = new EventForm();
         eventForm.setEventType(eventType);
@@ -68,10 +81,10 @@ class EventControllerTest {
 
     @BeforeEach
     void setUp() {
-        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        UsersEntity studyCreator = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
         StudyForm studyForm = new StudyForm(TESTPATH, "testpath", "testpath", "testpath");
         StudyEntity studyEntity = studyForm.toEntity();
-        studyService.createNewStudy(usersEntity, studyEntity);
+        studyService.createNewStudy(studyCreator, studyEntity);
     }
 
     @AfterEach
@@ -290,4 +303,90 @@ class EventControllerTest {
         assertThat(eventRepository.findById(eventEntity.getId())).isEmpty();
     }
 
+    @WithUser
+    @DisplayName("선착순 스터디 모임 참가 신청 - 자동 수락")
+    @Test
+    void submit_new_enrollment_to_FCFS_accepted() throws Exception {
+        UsersEntity usersEntity = createNewUser("nickname");
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        EventForm eventForm = getEventForm("eventFrom description", "eventFrom title",
+                2, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(3), EventType.FCFS);
+        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
+
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + eventEntity.getId() + URL_EVENT_ENROLL)
+                        .with(csrf()))
+                .andExpect(authenticated())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_EVENTS_PATH + eventEntity.getId()));
+
+        UsersEntity applicant = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        assertThatAccepted(eventEntity, applicant);
+    }
+
+    @WithUser
+    @DisplayName("선착순 스터디 모임 참가 신청 - 대기(인원 차 있는 상태)")
+    @Test
+    void submit_new_enrollment_to_FCFS_waiting() throws Exception {
+        UsersEntity usersEntity = createNewUser("nickname");
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        EventForm eventForm = getEventForm("eventFrom description", "eventFrom title",
+                2, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(3), EventType.FCFS);
+
+        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
+
+        UsersEntity test1 = createNewUser("test1");
+        UsersEntity test2 = createNewUser("test2");
+        eventService.newEnrollment(eventEntity, test1);
+        eventService.newEnrollment(eventEntity, test2);
+
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + eventEntity.getId() + URL_EVENT_ENROLL)
+                        .with(csrf()))
+                .andExpect(authenticated())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_EVENTS_PATH + eventEntity.getId()));
+
+        UsersEntity applicant = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        assertThatNotAccepted(eventEntity, applicant);
+    }
+
+    private void assertThatNotAccepted(EventEntity eventEntity, UsersEntity applicant) {
+        Optional<EnrollmentEntity> optionalEnrollmentEntity = enrollmentRepository.findByEventEntityAndUsersEntity(eventEntity, applicant);
+        assertThat(optionalEnrollmentEntity).isPresent();
+        EnrollmentEntity enrollmentEntity = optionalEnrollmentEntity.get();
+        assertThat(enrollmentEntity.isAccepted()).isFalse();
+    }
+
+    // TODO 스터디 모임 신청 - 관리자 확인
+
+    // TODO 스터디 모임 신청 취소
+
+
+    private void assertThatAccepted(EventEntity eventEntity, UsersEntity applicant) {
+        Optional<EnrollmentEntity> optionalEnrollmentEntity = enrollmentRepository.findByEventEntityAndUsersEntity(eventEntity, applicant);
+        assertThat(optionalEnrollmentEntity).isPresent();
+        EnrollmentEntity enrollmentEntity = optionalEnrollmentEntity.get();
+        assertThat(enrollmentEntity.isAccepted()).isTrue();
+    }
+
+    private UsersEntity createNewUser(String nickname) {
+        UsersEntity newUsersEntity = UsersEntity.builder()
+                .nickname(nickname)
+                .email(nickname + EMAIL)
+                .password(PASSWORD)
+                .emailCheckToken(UUID.randomUUID().toString())
+                .emailCheckTokenGeneratedAt(LocalDateTime.now())
+                .studyCreatedByWeb(true)
+                .studyEnrollmentResultByWeb(true)
+                .studyUpdatedByWeb(true)
+                .studyCreatedByEmail(false)
+                .studyEnrollmentResultByEmail(false)
+                .studyUpdatedByEmail(false)
+                .emailCheckTokenGeneratedAt(LocalDateTime.now().minusHours(2))
+                .accountEntity(new AccountEntity(AccountType.USERS))
+                .build();
+        accountRepository.save(newUsersEntity.getAccountEntity());
+        usersRepository.save(newUsersEntity);
+
+        return newUsersEntity;
+    }
 }
