@@ -5,6 +5,7 @@ import com.runningwith.infra.MockMvcTest;
 import com.runningwith.modules.account.AccountEntity;
 import com.runningwith.modules.account.AccountRepository;
 import com.runningwith.modules.account.enumeration.AccountType;
+import com.runningwith.modules.study.factory.StudyEntityFactory;
 import com.runningwith.modules.study.form.StudyDescriptionForm;
 import com.runningwith.modules.study.form.StudyForm;
 import com.runningwith.modules.tag.TagEntity;
@@ -67,13 +68,15 @@ class StudySettingsControllerTest {
     ObjectMapper objectMapper;
     @Autowired
     ZoneRepository zoneRepository;
+    @Autowired
+    StudyEntityFactory studyEntityFactory;
 
     @BeforeEach
     void setUp() {
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
-        StudyForm studyForm = new StudyForm(TEST_PATH, "testpath", "testpath", "testpath");
+        StudyForm studyForm = studyEntityFactory.createStudyForm(TEST_PATH, "testpath", "testpath", "testpath");
         StudyEntity studyEntity = studyForm.toEntity();
-        studyService.createNewStudy(usersEntity, studyEntity);
+        studyEntityFactory.createStudyEntity(usersEntity, studyEntity);
     }
 
     @AfterEach
@@ -104,9 +107,9 @@ class StudySettingsControllerTest {
     @Test
     void view_study_setting_description_by_other() throws Exception {
         UsersEntity otherUser = saveOtherUser();
-        StudyForm studyForm = new StudyForm("ttestpath", "testpath", "testpath", "testpath");
+        StudyForm studyForm = studyEntityFactory.createStudyForm("ttestpath", "testpath", "testpath", "testpath");
         StudyEntity studyEntity = studyForm.toEntity();
-        studyService.createNewStudy(otherUser, studyEntity);
+        studyEntityFactory.createStudyEntity(otherUser, studyEntity);
 
         mockMvc.perform(get(URL_STUDY_PATH + "ttestpath" + URL_STUDY_SETTINGS_DESCRIPTION))
                 .andExpect(status().isOk())
