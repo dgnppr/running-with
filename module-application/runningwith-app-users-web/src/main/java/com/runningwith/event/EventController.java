@@ -46,7 +46,7 @@ public class EventController {
     public static final String URL_ENROLLMENT_ACCEPT = "/accept";
     public static final String URL_ENROLLMENT_REJECT = "/reject";
     public static final String URL_ENROLLMENT_CHECK_IN = "/check-in";
-    public static final String URL_ENROLLMENT_CANCEL_CHECKIN = "/cancel-checkin";
+    public static final String URL_ENROLLMENT_CANCEL_CHECK_IN = "/cancel-checkin";
     private final StudyService studyService;
     private final EventService eventService;
     private final EventValidator eventValidator;
@@ -205,7 +205,7 @@ public class EventController {
         return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_EVENTS_PATH + eventEntity.getId();
     }
 
-    @GetMapping(URL_EVENTS_PATH + "{id}" + URL_ENROLLMENTS_PATH + "{enrollmentId}" + URL_ENROLLMENT_CANCEL_CHECKIN)
+    @GetMapping(URL_EVENTS_PATH + "{id}" + URL_ENROLLMENTS_PATH + "{enrollmentId}" + URL_ENROLLMENT_CANCEL_CHECK_IN)
     public String cancelCheckInEnrollment(@CurrentUser UsersEntity usersEntity, @PathVariable String path,
                                           @PathVariable("id") EventEntity eventEntity, @PathVariable("enrollmentId") EnrollmentEntity enrollmentEntity) {
         StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);

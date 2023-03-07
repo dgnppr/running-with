@@ -403,7 +403,7 @@ class EventControllerTest {
     @WithUser
     @DisplayName("관리자 확인 모임 참가 신청 - 대기 상태")
     @Test
-    void submit_new_enrollment_to_CONFIRMATIVE_waiting() throws Exception {
+    void submit_new_enrollment_to_confirmative_waiting() throws Exception {
         UsersEntity eventCreator = createNewUser("nickname");
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         EventForm eventForm = getEventForm("eventFrom description", "eventFrom title",
@@ -418,6 +418,116 @@ class EventControllerTest {
 
         UsersEntity applicant = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
         assertThatNotAccepted(eventEntity, applicant);
+    }
+
+    @WithUser
+    @DisplayName("관리자 확인 모임 참가 신청 수락 by manager")
+    @Test
+    void accept_new_enrollment_to_confirmative_event() throws Exception {
+        UsersEntity manager = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        EventForm eventForm = getEventForm("eventFrom description", "eventFrom title",
+                2, now().plusDays(1), now().plusDays(2), now().plusDays(3), CONFIRMATIVE);
+        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, manager);
+
+        UsersEntity applicant = createNewUser("applicant");
+        eventService.newEnrollment(eventEntity, applicant);
+        assertThatNotAccepted(eventEntity, applicant);
+
+        EnrollmentEntity enrollmentEntity = enrollmentRepository.findByEventEntityAndUsersEntity(eventEntity, applicant).get();
+
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + eventEntity.getId() + URL_ENROLLMENTS_PATH + enrollmentEntity.getId() + URL_ENROLLMENT_ACCEPT))
+                .andExpect(authenticated())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_EVENTS_PATH + eventEntity.getId()));
+
+        assertThatAccepted(eventEntity, applicant);
+    }
+
+    @WithUser
+    @DisplayName("관리자 확인 모임 참가 신청 거절 by manager")
+    @Test
+    void reject_new_enrollment_to_confirmative_event() throws Exception {
+        UsersEntity manager = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        EventForm eventForm = getEventForm("eventFrom description", "eventFrom title",
+                2, now().plusDays(1), now().plusDays(2), now().plusDays(3), CONFIRMATIVE);
+        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, manager);
+
+        UsersEntity applicant = createNewUser("applicant");
+        eventService.newEnrollment(eventEntity, applicant);
+        assertThatNotAccepted(eventEntity, applicant);
+
+        EnrollmentEntity enrollmentEntity = enrollmentRepository.findByEventEntityAndUsersEntity(eventEntity, applicant).get();
+
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + eventEntity.getId() + URL_ENROLLMENTS_PATH + enrollmentEntity.getId() + URL_ENROLLMENT_REJECT))
+                .andExpect(authenticated())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_EVENTS_PATH + eventEntity.getId()));
+
+        assertThatNotAccepted(eventEntity, applicant);
+    }
+
+    @WithUser
+    @DisplayName("참가 체크인 by manager")
+    @Test
+    void check_in_enrollment() throws Exception {
+        UsersEntity manager = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        EventForm eventForm = getEventForm("eventFrom description", "eventFrom title",
+                2, now().plusDays(1), now().plusDays(2), now().plusDays(3), FCFS);
+        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, manager);
+
+        UsersEntity applicant = createNewUser("applicant");
+        eventService.newEnrollment(eventEntity, applicant);
+        assertThatAccepted(eventEntity, applicant);
+
+        EnrollmentEntity enrollmentEntity = enrollmentRepository.findByEventEntityAndUsersEntity(eventEntity, applicant).get();
+
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + eventEntity.getId() + URL_ENROLLMENTS_PATH + enrollmentEntity.getId() + URL_ENROLLMENT_CHECK_IN))
+                .andExpect(authenticated())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_EVENTS_PATH + eventEntity.getId()));
+
+        assertThatEnrollmentCheckedIn(eventEntity, applicant);
+    }
+
+    @WithUser
+    @DisplayName("참가 체크인 취소 by manager")
+    @Test
+    void cancel_check_in_enrollment() throws Exception {
+        UsersEntity manager = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        EventForm eventForm = getEventForm("eventFrom description", "eventFrom title",
+                2, now().plusDays(1), now().plusDays(2), now().plusDays(3), FCFS);
+        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, manager);
+
+        UsersEntity applicant = createNewUser("applicant");
+        eventService.newEnrollment(eventEntity, applicant);
+        assertThatAccepted(eventEntity, applicant);
+        EnrollmentEntity enrollmentEntity = enrollmentRepository.findByEventEntityAndUsersEntity(eventEntity, applicant).get();
+        eventService.checkInEnrollment(enrollmentEntity);
+
+        mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + eventEntity.getId() + URL_ENROLLMENTS_PATH + enrollmentEntity.getId() + URL_ENROLLMENT_CANCEL_CHECK_IN))
+                .andExpect(authenticated())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_EVENTS_PATH + eventEntity.getId()));
+
+        assertThatEnrollmentNotCheckedIn(eventEntity, applicant);
+    }
+
+    private void assertThatEnrollmentNotCheckedIn(EventEntity eventEntity, UsersEntity applicant) {
+        Optional<EnrollmentEntity> optionalEnrollment = enrollmentRepository.findByEventEntityAndUsersEntity(eventEntity, applicant);
+        assertThat(optionalEnrollment).isPresent();
+        EnrollmentEntity enrollment = optionalEnrollment.get();
+        assertThat(enrollment.isAttended()).isFalse();
+    }
+
+    private void assertThatEnrollmentCheckedIn(EventEntity eventEntity, UsersEntity applicant) {
+        Optional<EnrollmentEntity> optionalEnrollment = enrollmentRepository.findByEventEntityAndUsersEntity(eventEntity, applicant);
+        assertThat(optionalEnrollment).isPresent();
+        EnrollmentEntity enrollment = optionalEnrollment.get();
+        assertThat(enrollment.isAttended()).isTrue();
     }
 
 
@@ -486,6 +596,5 @@ class EventControllerTest {
         eventForm.setEndDateTime(endDateTime);
         return eventForm;
     }
-
 
 }
