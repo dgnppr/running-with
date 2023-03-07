@@ -306,7 +306,7 @@ class EventControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_EVENTS));
 
-        assertThat(eventRepository.findById(eventEntity.getId())).isEmpty();
+        assertThatEventDeleted(eventEntity);
     }
 
     @WithUser
@@ -333,12 +333,12 @@ class EventControllerTest {
     @DisplayName("선착순 스터디 모임 참가 신청 - 대기(인원 차 있는 상태)")
     @Test
     void submit_new_enrollment_to_FCFS_waiting() throws Exception {
-        UsersEntity usersEntity = createNewUser("nickname");
+        UsersEntity eventCreator = createNewUser("nickname");
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         EventForm eventForm = getEventForm("eventFrom description", "eventFrom title",
                 2, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(3), EventType.FCFS);
 
-        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
+        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, eventCreator);
 
         UsersEntity test1 = createNewUser("test1");
         UsersEntity test2 = createNewUser("test2");
@@ -355,14 +355,74 @@ class EventControllerTest {
         assertThatNotAccepted(eventEntity, applicant);
     }
 
+    @WithUser
+    @DisplayName("선착순 모임 참가 신청 취소 by 참가 신청 확정자 when 대기자가 있는 경우")
+    @Test
+    void accept_next_applicant_to_FCFS_event_when_accepted_applicant_cancel() throws Exception {
+        UsersEntity eventCreator = createNewUser("nickname");
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        EventForm eventForm = getEventForm("eventFrom description", "eventFrom title",
+                2, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(3), EventType.FCFS);
 
-    // TODO 스터디 모임 신청 - 관리자 확인
+        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, eventCreator);
 
-    private void assertThatNotAccepted(EventEntity eventEntity, UsersEntity applicant) {
-        Optional<EnrollmentEntity> optionalEnrollmentEntity = enrollmentRepository.findByEventEntityAndUsersEntity(eventEntity, applicant);
-        assertThat(optionalEnrollmentEntity).isPresent();
-        EnrollmentEntity enrollmentEntity = optionalEnrollmentEntity.get();
-        assertThat(enrollmentEntity.isAccepted()).isFalse();
+        UsersEntity canceler = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        UsersEntity applicant1 = createNewUser("applicant1");
+        UsersEntity applicant2 = createNewUser("applicant2");
+        eventService.newEnrollment(eventEntity, canceler);
+        eventService.newEnrollment(eventEntity, applicant1);
+        eventService.newEnrollment(eventEntity, applicant2);
+
+        assertThatAccepted(eventEntity, canceler);
+        assertThatAccepted(eventEntity, applicant1);
+        assertThatNotAccepted(eventEntity, applicant2);
+
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + eventEntity.getId() + URL_EVENT_DISENROLL)
+                        .with(csrf()))
+                .andExpect(authenticated())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_EVENTS_PATH + eventEntity.getId()));
+
+        assertThatAccepted(eventEntity, applicant1);
+        assertThatAccepted(eventEntity, applicant2);
+        assertThatEnrollmentCanceled(eventEntity, canceler);
+    }
+
+    @WithUser
+    @DisplayName("선착순 모임 참가 신청 취소 by 참기 신청 대기자")
+    @Test
+    void not_accepted_user_cancel_enrollment_to_FCFS() throws Exception {
+        UsersEntity eventCreator = createNewUser("nickname");
+        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
+        EventForm eventForm = getEventForm("eventFrom description", "eventFrom title",
+                2, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(3), EventType.FCFS);
+        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, eventCreator);
+
+        UsersEntity applicant1 = createNewUser("applicant1");
+        UsersEntity applicant2 = createNewUser("applicant2");
+        UsersEntity canceler = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        eventService.newEnrollment(eventEntity, applicant1);
+        eventService.newEnrollment(eventEntity, applicant2);
+        eventService.newEnrollment(eventEntity, canceler);
+
+        assertThatAccepted(eventEntity, applicant1);
+        assertThatAccepted(eventEntity, applicant2);
+        assertThatNotAccepted(eventEntity, canceler);
+
+        mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + eventEntity.getId() + URL_EVENT_DISENROLL)
+                        .with(csrf()))
+                .andExpect(authenticated())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_EVENTS_PATH + eventEntity.getId()));
+
+        assertThatAccepted(eventEntity, applicant1);
+        assertThatAccepted(eventEntity, applicant2);
+        assertThatEnrollmentCanceled(eventEntity, canceler);
+    }
+
+    private void assertThatEnrollmentCanceled(EventEntity eventEntity, UsersEntity canceler) {
+        Optional<EnrollmentEntity> optionalEnrollment = enrollmentRepository.findByEventEntityAndUsersEntity(eventEntity, canceler);
+        assertThat(optionalEnrollment).isEmpty();
     }
 
     private void assertThatAccepted(EventEntity eventEntity, UsersEntity applicant) {
@@ -370,6 +430,17 @@ class EventControllerTest {
         assertThat(optionalEnrollmentEntity).isPresent();
         EnrollmentEntity enrollmentEntity = optionalEnrollmentEntity.get();
         assertThat(enrollmentEntity.isAccepted()).isTrue();
+    }
+
+    private void assertThatEventDeleted(EventEntity eventEntity) {
+        assertThat(eventRepository.findById(eventEntity.getId())).isEmpty();
+    }
+
+    private void assertThatNotAccepted(EventEntity eventEntity, UsersEntity applicant) {
+        Optional<EnrollmentEntity> optionalEnrollmentEntity = enrollmentRepository.findByEventEntityAndUsersEntity(eventEntity, applicant);
+        assertThat(optionalEnrollmentEntity).isPresent();
+        EnrollmentEntity enrollmentEntity = optionalEnrollmentEntity.get();
+        assertThat(enrollmentEntity.isAccepted()).isFalse();
     }
 
     private UsersEntity createNewUser(String nickname) {
@@ -393,4 +464,6 @@ class EventControllerTest {
 
         return newUsersEntity;
     }
+
+
 }
