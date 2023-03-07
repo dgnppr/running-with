@@ -3,9 +3,8 @@ package com.runningwith.modules.users;
 import com.runningwith.infra.MockMvcTest;
 import com.runningwith.infra.mail.EmailMessage;
 import com.runningwith.infra.mail.EmailService;
-import com.runningwith.modules.account.AccountEntity;
 import com.runningwith.modules.account.AccountRepository;
-import com.runningwith.modules.account.enumeration.AccountType;
+import com.runningwith.modules.users.factory.UsersEntityFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,7 +23,6 @@ import static com.runningwith.infra.utils.WebUtils.URL_REDIRECT_ROOT;
 import static com.runningwith.modules.AppExceptionHandler.VIEW_ERROR;
 import static com.runningwith.modules.users.UsersController.*;
 import static com.runningwith.modules.users.WithUserSecurityContextFactory.EMAIL;
-import static com.runningwith.modules.users.WithUserSecurityContextFactory.PASSWORD;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,28 +47,14 @@ class UsersControllerTest {
     AccountRepository accountRepository;
     @Autowired
     UsersService usersService;
+    @Autowired
+    UsersEntityFactory usersEntityFactory;
     @MockBean
     EmailService emailService;
 
     @BeforeEach
     void setUp() {
-        UsersEntity usersEntity = UsersEntity.builder()
-                .nickname("nickname")
-                .email("nickname" + EMAIL)
-                .password(PASSWORD)
-                .emailCheckToken(UUID.randomUUID().toString())
-                .emailCheckTokenGeneratedAt(LocalDateTime.now())
-                .studyCreatedByWeb(true)
-                .studyEnrollmentResultByWeb(true)
-                .studyUpdatedByWeb(true)
-                .studyCreatedByEmail(false)
-                .studyEnrollmentResultByEmail(false)
-                .studyUpdatedByEmail(false)
-                .emailCheckTokenGeneratedAt(LocalDateTime.now().minusHours(2))
-                .accountEntity(new AccountEntity(AccountType.USERS))
-                .build();
-        accountRepository.save(usersEntity.getAccountEntity());
-        usersRepository.save(usersEntity);
+        usersEntityFactory.createUsersEntity("nickname");
     }
 
     @AfterEach
