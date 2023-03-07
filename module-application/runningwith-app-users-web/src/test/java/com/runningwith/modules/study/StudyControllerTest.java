@@ -65,8 +65,7 @@ class StudyControllerTest {
     void setUp() {
         UsersEntity usersEntity = createNewUser();
         StudyForm studyForm = studyEntityFactory.createStudyForm(TESTPATH, "testpath", "testpath", "testpath");
-        StudyEntity studyEntity = studyForm.toEntity();
-        studyService.createNewStudy(usersEntity, studyEntity);
+        studyEntityFactory.createStudyEntity(usersEntity, studyForm.toEntity());
     }
 
     @AfterEach
