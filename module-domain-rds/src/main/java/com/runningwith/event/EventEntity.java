@@ -178,4 +178,16 @@ public class EventEntity {
                 && enrollmentEntity.isAccepted();
     }
 
+    public void accept(EnrollmentEntity enrollmentEntity) {
+        if (this.eventType == EventType.CONFIRMATIVE
+                && this.limitOfEnrollments > this.getNumberOfAcceptedEnrollments()) {
+            enrollmentEntity.updateAccepted(true);
+        }
+    }
+
+    public void reject(EnrollmentEntity enrollmentEntity) {
+        if (this.eventType == EventType.CONFIRMATIVE) {
+            enrollmentEntity.updateAccepted(false);
+        }
+    }
 }

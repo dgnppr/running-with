@@ -42,6 +42,9 @@ public class EventController {
     public static final String URL_EVENT_DELETE = "/delete";
     public static final String URL_EVENT_ENROLL = "/enroll";
     public static final String URL_EVENT_DISENROLL = "/disenroll";
+    public static final String URL_ENROLLMENTS_PATH = "/enrollments/";
+    public static final String URL_ENROLLMENT_ACCEPT = "/accept";
+    public static final String URL_ENROLLMENT_REJECT = "/reject";
     private final StudyService studyService;
     private final EventService eventService;
     private final EventValidator eventValidator;
@@ -174,6 +177,22 @@ public class EventController {
 
         eventService.cancelEnrollment(eventEntity, usersEntity);
         return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_EVENTS_PATH + id;
+    }
+
+    @GetMapping(URL_EVENTS_PATH + "{id}" + URL_ENROLLMENTS_PATH + "{enrollmentId}" + URL_ENROLLMENT_ACCEPT)
+    public String acceptEnrollment(@CurrentUser UsersEntity usersEntity, @PathVariable String path,
+                                   @PathVariable("id") EventEntity eventEntity, @PathVariable("enrollmentId") EnrollmentEntity enrollmentEntity) {
+        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+        eventService.acceptEnrollment(eventEntity, enrollmentEntity);
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_EVENTS_PATH + eventEntity.getId();
+    }
+
+    @GetMapping(URL_EVENTS_PATH + "{id}" + URL_ENROLLMENTS_PATH + "{enrollmentId}" + URL_ENROLLMENT_REJECT)
+    public String rejectEnrollment(@CurrentUser UsersEntity usersEntity, @PathVariable String path,
+                                   @PathVariable("id") EventEntity eventEntity, @PathVariable("enrollmentId") EnrollmentEntity enrollmentEntity) {
+        StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
+        eventService.rejectEnrollment(eventEntity, enrollmentEntity);
+        return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_EVENTS_PATH + eventEntity.getId();
     }
 
 

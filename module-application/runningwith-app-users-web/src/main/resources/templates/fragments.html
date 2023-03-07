@@ -557,14 +557,16 @@
                     두가지 모집 방법이 있습니다.<br/>
                     <strong>선착순</strong>으로 모집하는 경우, 모집 인원 이내의 접수는 자동으로 확정되며, 제한 인원을 넘는 신청은 대기 신청이 되며 이후에 확정된 신청 중에 취소가
                     발생하면 선착순으로 대기 신청자를 확정 신청자도 변경합니다. 단, 등록 마감일 이후에는 취소해도 확정 여부가 바뀌지 않습니다.<br/>
-                    <strong>확인</strong>으로 모집하는 경우, 모임 및 스터디 관리자가 모임 신청 목록을 조회하고 직접 확정 여부를 정할 수 있습니다. 등록 마감일 이후에는 변경할 수
+                    <strong>관리자 확인</strong>으로 모집하는 경우, 모임 및 스터디 관리자가 모임 신청 목록을 조회하고 직접 확정 여부를 정할 수 있습니다. 등록 마감일 이후에는 변경할
+                    수
                     없습니다.
                 </small>
             </div>
             <div class="form-row">
                 <div class="form-group col-md-3">
                     <label for="limitOfEnrollments">모집 인원</label>
-                    <input aria-describedby="limitOfEnrollmentsHelp" class="form-control" id="limitOfEnrollments" placeholder="0"
+                    <input aria-describedby="limitOfEnrollmentsHelp" class="form-control" id="limitOfEnrollments"
+                           placeholder="0"
                            th:field="*{limitOfEnrollments}"
                            type="number">
                     <small class="form-text text-muted" id="limitOfEnrollmentsHelp">
@@ -611,7 +613,8 @@
             </div>
             <div class="form-group">
                 <label for="description">모임 설명</label>
-                <textarea aria-describedby="descriptionHelp" class="editor form-control" id="description" placeholder="모임을 자세히 설명해 주세요."
+                <textarea aria-describedby="descriptionHelp" class="editor form-control" id="description"
+                          placeholder="모임을 자세히 설명해 주세요."
                           required th:field="*{description}" type="textarea"></textarea>
                 <small class="form-text text-muted" id="descriptionHelp">
                     모임에서 다루는 주제, 장소, 진행 방식 등을 자세히 적어 주세요.

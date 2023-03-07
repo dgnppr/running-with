@@ -56,4 +56,11 @@ public class EventService {
     }
 
 
+    public void acceptEnrollment(EventEntity eventEntity, EnrollmentEntity enrollmentEntity) {
+        eventEntity.accept(enrollmentEntity);
+    }
+
+    public void rejectEnrollment(EventEntity eventEntity, EnrollmentEntity enrollmentEntity) {
+        eventEntity.reject(enrollmentEntity);
+    }
 }
