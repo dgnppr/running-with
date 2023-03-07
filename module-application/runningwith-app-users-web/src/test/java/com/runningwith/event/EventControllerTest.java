@@ -67,6 +67,16 @@ class EventControllerTest {
     @Autowired
     EnrollmentRepository enrollmentRepository;
 
+    // TODO 스터디 모임 신청 취소
+    private static void assertThatEventChanged(EventForm afterForm, EventEntity afterEvent) {
+        assertThat(afterEvent.getTitle()).isEqualTo(afterForm.getTitle());
+        assertThat(afterEvent.getEventType()).isEqualTo(afterForm.getEventType());
+        assertThat(afterEvent.getEndEnrollmentDateTime()).isEqualTo(afterForm.getEndEnrollmentDateTime());
+        assertThat(afterEvent.getStartDateTime()).isEqualTo(afterForm.getStartDateTime());
+        assertThat(afterEvent.getEndDateTime()).isEqualTo(afterForm.getEndDateTime());
+        assertThat(afterEvent.getLimitOfEnrollments()).isEqualTo(afterForm.getLimitOfEnrollments());
+    }
+
     private EventForm getEventForm(String eventFrom_description, String eventFrom_title, int limitOfEnrollments, LocalDateTime endEnrollmentDateTime, LocalDateTime startDateTime, LocalDateTime endDateTime, EventType eventType) {
         EventForm eventForm = new EventForm();
         eventForm.setEventType(eventType);
@@ -220,6 +230,8 @@ class EventControllerTest {
                 .andExpect(view().name(VIEW_EVENT_EDIT));
     }
 
+    // TODO 필드 검증 로직 추가
+
     @WithUser
     @DisplayName("스터디 모임 수정 - 입력값 정상")
     @Test
@@ -246,15 +258,10 @@ class EventControllerTest {
                 .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_EVENTS_PATH + beforeEvent.getId()));
 
         EventEntity afterEvent = eventRepository.findById(beforeEvent.getId()).get();
-        assertThat(afterEvent.getTitle()).isEqualTo(afterForm.getTitle());
-        assertThat(afterEvent.getEventType()).isEqualTo(afterForm.getEventType());
-        assertThat(afterEvent.getEndEnrollmentDateTime()).isEqualTo(afterForm.getEndEnrollmentDateTime());
-        assertThat(afterEvent.getStartDateTime()).isEqualTo(afterForm.getStartDateTime());
-        assertThat(afterEvent.getEndDateTime()).isEqualTo(afterForm.getEndDateTime());
-        assertThat(afterEvent.getLimitOfEnrollments()).isEqualTo(afterForm.getLimitOfEnrollments());
+        assertThatEventChanged(afterForm, afterEvent);
     }
+    // TODO 등록된 enrollment도 같이 삭제 확인
 
-    // TODO 필드 검증 로직 추가
     @WithUser
     @DisplayName("스터디 모임 수정 - 입력값 오류")
     @Test
@@ -283,7 +290,6 @@ class EventControllerTest {
                 .andExpect(view().name(VIEW_EVENT_EDIT));
     }
 
-    // TODO 등록된 enrollment도 같이 삭제 확인
     @WithUser
     @DisplayName("스터디 모임 삭제")
     @Test
@@ -349,17 +355,15 @@ class EventControllerTest {
         assertThatNotAccepted(eventEntity, applicant);
     }
 
+
+    // TODO 스터디 모임 신청 - 관리자 확인
+
     private void assertThatNotAccepted(EventEntity eventEntity, UsersEntity applicant) {
         Optional<EnrollmentEntity> optionalEnrollmentEntity = enrollmentRepository.findByEventEntityAndUsersEntity(eventEntity, applicant);
         assertThat(optionalEnrollmentEntity).isPresent();
         EnrollmentEntity enrollmentEntity = optionalEnrollmentEntity.get();
         assertThat(enrollmentEntity.isAccepted()).isFalse();
     }
-
-    // TODO 스터디 모임 신청 - 관리자 확인
-
-    // TODO 스터디 모임 신청 취소
-
 
     private void assertThatAccepted(EventEntity eventEntity, UsersEntity applicant) {
         Optional<EnrollmentEntity> optionalEnrollmentEntity = enrollmentRepository.findByEventEntityAndUsersEntity(eventEntity, applicant);
