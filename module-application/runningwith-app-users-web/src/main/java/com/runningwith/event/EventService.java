@@ -25,10 +25,11 @@ public class EventService {
         return eventRepository.save(eventEntity);
     }
 
-    // TODO 모집인원 늘릴 경우, 선착순 모임의 경우에 , 자동으로 추가하는 로직 추가
+
     public void updateEvent(EventEntity eventEntity, EventForm eventForm) {
         eventEntity.update(eventForm.getTitle(), eventForm.getDescription(), eventForm.getEventType(),
                 eventForm.getEndEnrollmentDateTime(), eventForm.getStartDateTime(), eventForm.getEndDateTime(), eventForm.getLimitOfEnrollments());
+        eventEntity.acceptWaitingList();
     }
 
     public void deleteEvent(EventEntity eventEntity) {

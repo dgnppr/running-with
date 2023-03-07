@@ -9,6 +9,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @EqualsAndHashCode(of = "id")
@@ -189,5 +190,17 @@ public class EventEntity {
         if (this.eventType == EventType.CONFIRMATIVE) {
             enrollmentEntity.updateAccepted(false);
         }
+    }
+
+    public void acceptWaitingList() {
+        if (this.isAbleToAcceptWaitingEnrollment()) {
+            List<EnrollmentEntity> waitingList = getWaitingList();
+            int numberToAccept = (int) Math.min(this.limitOfEnrollments - this.getNumberOfAcceptedEnrollments(), waitingList.size());
+            waitingList.subList(0, numberToAccept).forEach(e -> e.updateAccepted(true));
+        }
+    }
+
+    private List<EnrollmentEntity> getWaitingList() {
+        return this.enrollments.stream().filter(enrollment -> !enrollment.isAccepted()).collect(Collectors.toList());
     }
 }
