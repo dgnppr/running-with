@@ -102,17 +102,7 @@ class StudyControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT + URL_STUDY_PATH + encodedPath));
 
-        Optional<StudyEntity> studyEntityOptional = studyRepository.findByPath(newStudyForm.getPath());
-
-        assertThat(studyEntityOptional.isPresent()).isTrue();
-
-        StudyEntity studyEntity = studyEntityOptional.get();
-
-        assertThat(studyEntity.getPath()).isEqualTo(newStudyForm.getPath());
-        assertThat(studyEntity.getTitle()).isEqualTo(newStudyForm.getTitle());
-        assertThat(studyEntity.getShortDescription()).isEqualTo(newStudyForm.getShortDescription());
-        assertThat(studyEntity.getFullDescription()).isEqualTo(newStudyForm.getFullDescription());
-        assertThat(studyEntity.getManagers().contains(usersEntity)).isTrue();
+        assertThatStudyCreated(usersEntity, newStudyForm);
     }
 
     @WithUser
@@ -192,7 +182,7 @@ class StudyControllerTest {
 
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
-        Assertions.assertThat(studyEntity.getMembers()).contains(usersEntity);
+        assertThatIsStudyMember(usersEntity, studyEntity);
     }
 
     @WithUser
@@ -208,7 +198,7 @@ class StudyControllerTest {
                 .andExpect(redirectedUrl(URL_STUDY_PATH + TESTPATH + URL_STUDY_MEMBERS));
 
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
-        Assertions.assertThat(studyEntity.getMembers()).doesNotContain(usersEntity);
+        assertThatIsNotStudyMember(usersEntity, studyEntity);
     }
 
 
@@ -232,5 +222,24 @@ class StudyControllerTest {
         usersRepository.save(newUsersEntity);
 
         return newUsersEntity;
+    }
+
+    private void assertThatStudyCreated(UsersEntity usersEntity, StudyForm newStudyForm) {
+        Optional<StudyEntity> studyEntityOptional = studyRepository.findByPath(newStudyForm.getPath());
+        assertThat(studyEntityOptional.isPresent()).isTrue();
+        StudyEntity studyEntity = studyEntityOptional.get();
+        assertThat(studyEntity.getPath()).isEqualTo(newStudyForm.getPath());
+        assertThat(studyEntity.getTitle()).isEqualTo(newStudyForm.getTitle());
+        assertThat(studyEntity.getShortDescription()).isEqualTo(newStudyForm.getShortDescription());
+        assertThat(studyEntity.getFullDescription()).isEqualTo(newStudyForm.getFullDescription());
+        assertThat(studyEntity.getManagers().contains(usersEntity)).isTrue();
+    }
+
+    private void assertThatIsStudyMember(UsersEntity usersEntity, StudyEntity studyEntity) {
+        Assertions.assertThat(studyEntity.getMembers()).contains(usersEntity);
+    }
+
+    private void assertThatIsNotStudyMember(UsersEntity usersEntity, StudyEntity studyEntity) {
+        Assertions.assertThat(studyEntity.getMembers()).doesNotContain(usersEntity);
     }
 }
