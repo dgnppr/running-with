@@ -4,6 +4,7 @@ import com.runningwith.infra.MockMvcTest;
 import com.runningwith.modules.account.AccountEntity;
 import com.runningwith.modules.account.AccountRepository;
 import com.runningwith.modules.account.enumeration.AccountType;
+import com.runningwith.modules.study.factory.StudyEntityFactory;
 import com.runningwith.modules.study.form.StudyForm;
 import com.runningwith.modules.users.UsersEntity;
 import com.runningwith.modules.users.UsersRepository;
@@ -57,10 +58,13 @@ class StudyControllerTest {
     @Autowired
     AccountRepository accountRepository;
 
+    @Autowired
+    StudyEntityFactory studyEntityFactory;
+
     @BeforeEach
     void setUp() {
         UsersEntity usersEntity = createNewUser();
-        StudyForm studyForm = new StudyForm(TESTPATH, "testpath", "testpath", "testpath");
+        StudyForm studyForm = studyEntityFactory.createStudyForm(TESTPATH, "testpath", "testpath", "testpath");
         StudyEntity studyEntity = studyForm.toEntity();
         studyService.createNewStudy(usersEntity, studyEntity);
     }
@@ -89,7 +93,7 @@ class StudyControllerTest {
     void create_new_study_with_correct_inputs() throws Exception {
 
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
-        StudyForm newStudyForm = new StudyForm("teststudy", "testtitle", "short description", "full description");
+        StudyForm newStudyForm = studyEntityFactory.createStudyForm("teststudy", "testtitle", "short description", "full description");
         String encodedPath = URLEncoder.encode(newStudyForm.getPath(), StandardCharsets.UTF_8);
 
         mockMvc.perform(post(URL_NEW_STUDY)
@@ -110,7 +114,7 @@ class StudyControllerTest {
     @Test
     void create_new_study_with_wrong_inputs() throws Exception {
 
-        StudyForm newStudyForm = new StudyForm("1", "1", "1", "1");
+        StudyForm newStudyForm = studyEntityFactory.createStudyForm("1", "1", "1", "1");
 
         mockMvc.perform(post(URL_NEW_STUDY)
                         .param("path", newStudyForm.getPath())
