@@ -155,7 +155,7 @@ class EventControllerTest {
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         EventForm eventForm = eventEntityFactory.createEventForm("eventFrom description", "eventFrom title", 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), FCFS);
-        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
+        EventEntity eventEntity = eventEntityFactory.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
 
         mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + eventEntity.getId())
                         .with(csrf()))
@@ -201,7 +201,7 @@ class EventControllerTest {
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         EventForm eventForm = eventEntityFactory.createEventForm("eventFrom description", "eventFrom title", 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), FCFS);
-        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
+        EventEntity eventEntity = eventEntityFactory.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
 
         mockMvc.perform(get(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + eventEntity.getId() + URL_EVENT_EDIT))
                 .andExpect(model().attribute("user", usersEntity))
@@ -222,7 +222,7 @@ class EventControllerTest {
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         EventForm beforeForm = eventEntityFactory.createEventForm("eventFrom description", "eventFrom title",
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), FCFS);
-        EventEntity beforeEvent = eventService.createEvent(beforeForm.toEntity(), studyEntity, usersEntity);
+        EventEntity beforeEvent = eventEntityFactory.createEvent(beforeForm.toEntity(), studyEntity, usersEntity);
         EventForm afterForm = eventEntityFactory.createEventForm("event From description", "event From title",
                 3, now().plusDays(2), now().plusDays(3), now().plusDays(4), FCFS);
 
@@ -252,7 +252,7 @@ class EventControllerTest {
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         EventForm beforeForm = eventEntityFactory.createEventForm("eventFrom description", "eventFrom title",
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), FCFS);
-        EventEntity beforeEvent = eventService.createEvent(beforeForm.toEntity(), studyEntity, usersEntity);
+        EventEntity beforeEvent = eventEntityFactory.createEvent(beforeForm.toEntity(), studyEntity, usersEntity);
         EventForm afterForm = eventEntityFactory.createEventForm("event From description", "event From title",
                 3, now().minusDays(2), now().plusDays(3), now().plusDays(4), CONFIRMATIVE);
 
@@ -280,7 +280,7 @@ class EventControllerTest {
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         EventForm eventForm = eventEntityFactory.createEventForm("eventFrom description", "eventFrom title",
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), FCFS);
-        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
+        EventEntity eventEntity = eventEntityFactory.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
 
         mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + eventEntity.getId() + URL_EVENT_DELETE)
                         .with(csrf()))
@@ -299,7 +299,7 @@ class EventControllerTest {
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         EventForm eventForm = eventEntityFactory.createEventForm("eventFrom description", "eventFrom title",
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), FCFS);
-        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
+        EventEntity eventEntity = eventEntityFactory.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
 
         mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + eventEntity.getId() + URL_EVENT_ENROLL)
                         .with(csrf()))
@@ -320,7 +320,7 @@ class EventControllerTest {
         EventForm eventForm = eventEntityFactory.createEventForm("eventFrom description", "eventFrom title",
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), FCFS);
 
-        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, eventCreator);
+        EventEntity eventEntity = eventEntityFactory.createEvent(eventForm.toEntity(), studyEntity, eventCreator);
 
         UsersEntity test1 = createNewUser("test1");
         UsersEntity test2 = createNewUser("test2");
@@ -346,7 +346,7 @@ class EventControllerTest {
         EventForm eventForm = eventEntityFactory.createEventForm("eventFrom description", "eventFrom title",
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), FCFS);
 
-        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, eventCreator);
+        EventEntity eventEntity = eventEntityFactory.createEvent(eventForm.toEntity(), studyEntity, eventCreator);
 
         UsersEntity canceler = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
         UsersEntity applicant1 = createNewUser("applicant1");
@@ -378,7 +378,7 @@ class EventControllerTest {
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         EventForm eventForm = eventEntityFactory.createEventForm("eventFrom description", "eventFrom title",
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), FCFS);
-        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, eventCreator);
+        EventEntity eventEntity = eventEntityFactory.createEvent(eventForm.toEntity(), studyEntity, eventCreator);
 
         UsersEntity applicant1 = createNewUser("applicant1");
         UsersEntity applicant2 = createNewUser("applicant2");
@@ -410,7 +410,7 @@ class EventControllerTest {
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         EventForm eventForm = eventEntityFactory.createEventForm("eventFrom description", "eventFrom title",
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), CONFIRMATIVE);
-        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, eventCreator);
+        EventEntity eventEntity = eventEntityFactory.createEvent(eventForm.toEntity(), studyEntity, eventCreator);
 
         mockMvc.perform(post(URL_STUDY_PATH + TESTPATH + URL_EVENTS_PATH + eventEntity.getId() + URL_EVENT_ENROLL)
                         .with(csrf()))
@@ -430,7 +430,7 @@ class EventControllerTest {
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         EventForm eventForm = eventEntityFactory.createEventForm("eventFrom description", "eventFrom title",
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), CONFIRMATIVE);
-        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, manager);
+        EventEntity eventEntity = eventEntityFactory.createEvent(eventForm.toEntity(), studyEntity, manager);
 
         UsersEntity applicant = createNewUser("applicant");
         eventService.newEnrollment(eventEntity, applicant);
@@ -454,7 +454,7 @@ class EventControllerTest {
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         EventForm eventForm = eventEntityFactory.createEventForm("eventFrom description", "eventFrom title",
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), CONFIRMATIVE);
-        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, manager);
+        EventEntity eventEntity = eventEntityFactory.createEvent(eventForm.toEntity(), studyEntity, manager);
 
         UsersEntity applicant = createNewUser("applicant");
         eventService.newEnrollment(eventEntity, applicant);
@@ -478,7 +478,7 @@ class EventControllerTest {
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         EventForm eventForm = eventEntityFactory.createEventForm("eventFrom description", "eventFrom title",
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), FCFS);
-        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, manager);
+        EventEntity eventEntity = eventEntityFactory.createEvent(eventForm.toEntity(), studyEntity, manager);
 
         UsersEntity applicant = createNewUser("applicant");
         eventService.newEnrollment(eventEntity, applicant);
@@ -502,7 +502,7 @@ class EventControllerTest {
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         EventForm eventForm = eventEntityFactory.createEventForm("eventFrom description", "eventFrom title",
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), FCFS);
-        EventEntity eventEntity = eventService.createEvent(eventForm.toEntity(), studyEntity, manager);
+        EventEntity eventEntity = eventEntityFactory.createEvent(eventForm.toEntity(), studyEntity, manager);
 
         UsersEntity applicant = createNewUser("applicant");
         eventService.newEnrollment(eventEntity, applicant);

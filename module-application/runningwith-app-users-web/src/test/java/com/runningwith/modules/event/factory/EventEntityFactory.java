@@ -23,8 +23,8 @@ public class EventEntityFactory {
     @Autowired
     EventRepository eventRepository;
 
-    public EventEntity createEvent(EventForm eventForm, StudyEntity studyEntity, UsersEntity usersEntity) {
-        return eventService.createEvent(eventForm.toEntity(), studyEntity, usersEntity);
+    public EventEntity createEvent(EventEntity eventEntity, StudyEntity studyEntity, UsersEntity usersEntity) {
+        return eventService.createEvent(eventEntity, studyEntity, usersEntity);
     }
 
     public EventForm createEventForm(String eventFrom_description, String eventFrom_title, int limitOfEnrollments, LocalDateTime endEnrollmentDateTime, LocalDateTime startDateTime, LocalDateTime endDateTime, EventType eventType) {
