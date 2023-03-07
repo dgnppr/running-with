@@ -1,14 +1,12 @@
 package com.runningwith.modules.study;
 
 import com.runningwith.infra.MockMvcTest;
-import com.runningwith.modules.account.AccountEntity;
-import com.runningwith.modules.account.AccountRepository;
-import com.runningwith.modules.account.enumeration.AccountType;
 import com.runningwith.modules.study.factory.StudyEntityFactory;
 import com.runningwith.modules.study.form.StudyForm;
 import com.runningwith.modules.users.UsersEntity;
 import com.runningwith.modules.users.UsersRepository;
 import com.runningwith.modules.users.WithUser;
+import com.runningwith.modules.users.factory.UsersEntityFactory;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,17 +17,13 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 import static com.runningwith.infra.utils.CustomStringUtils.WITH_USER_NICKNAME;
 import static com.runningwith.infra.utils.CustomStringUtils.getEncodedUrl;
 import static com.runningwith.infra.utils.WebUtils.REDIRECT;
 import static com.runningwith.modules.AppExceptionHandler.VIEW_ERROR;
 import static com.runningwith.modules.study.StudyController.*;
-import static com.runningwith.modules.users.WithUserSecurityContextFactory.EMAIL;
-import static com.runningwith.modules.users.WithUserSecurityContextFactory.PASSWORD;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,14 +50,14 @@ class StudyControllerTest {
     StudyService studyService;
 
     @Autowired
-    AccountRepository accountRepository;
+    StudyEntityFactory studyEntityFactory;
 
     @Autowired
-    StudyEntityFactory studyEntityFactory;
+    UsersEntityFactory usersEntityFactory;
 
     @BeforeEach
     void setUp() {
-        UsersEntity usersEntity = createNewUser();
+        UsersEntity usersEntity = usersEntityFactory.createUsersEntity("nickname");
         StudyForm studyForm = studyEntityFactory.createStudyForm(TESTPATH, "testpath", "testpath", "testpath");
         studyEntityFactory.createStudyEntity(usersEntity, studyForm.toEntity());
     }
@@ -183,9 +177,7 @@ class StudyControllerTest {
                 .andExpect(authenticated())
                 .andExpect(redirectedUrl(URL_STUDY_PATH + TESTPATH + URL_STUDY_MEMBERS));
 
-        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
-        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
-        assertThatIsStudyMember(usersEntity, studyEntity);
+        assertThatIsStudyMember(WITH_USER_NICKNAME, TESTPATH);
     }
 
     @WithUser
@@ -200,32 +192,9 @@ class StudyControllerTest {
                 .andExpect(authenticated())
                 .andExpect(redirectedUrl(URL_STUDY_PATH + TESTPATH + URL_STUDY_MEMBERS));
 
-        StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
-        assertThatIsNotStudyMember(usersEntity, studyEntity);
+        assertThatIsNotStudyMember(usersEntity, TESTPATH);
     }
 
-
-    private UsersEntity createNewUser() {
-        UsersEntity newUsersEntity = UsersEntity.builder()
-                .nickname("nickname")
-                .email("nickname" + EMAIL)
-                .password(PASSWORD)
-                .emailCheckToken(UUID.randomUUID().toString())
-                .emailCheckTokenGeneratedAt(LocalDateTime.now())
-                .studyCreatedByWeb(true)
-                .studyEnrollmentResultByWeb(true)
-                .studyUpdatedByWeb(true)
-                .studyCreatedByEmail(false)
-                .studyEnrollmentResultByEmail(false)
-                .studyUpdatedByEmail(false)
-                .emailCheckTokenGeneratedAt(LocalDateTime.now().minusHours(2))
-                .accountEntity(new AccountEntity(AccountType.USERS))
-                .build();
-        accountRepository.save(newUsersEntity.getAccountEntity());
-        usersRepository.save(newUsersEntity);
-
-        return newUsersEntity;
-    }
 
     private void assertThatStudyCreated(UsersEntity usersEntity, StudyForm newStudyForm) {
         Optional<StudyEntity> studyEntityOptional = studyRepository.findByPath(newStudyForm.getPath());
@@ -238,11 +207,14 @@ class StudyControllerTest {
         assertThat(studyEntity.getManagers().contains(usersEntity)).isTrue();
     }
 
-    private void assertThatIsStudyMember(UsersEntity usersEntity, StudyEntity studyEntity) {
+    private void assertThatIsStudyMember(String nickname, String path) {
+        UsersEntity usersEntity = usersRepository.findByNickname(nickname).get();
+        StudyEntity studyEntity = studyRepository.findByPath(path).get();
         Assertions.assertThat(studyEntity.getMembers()).contains(usersEntity);
     }
 
-    private void assertThatIsNotStudyMember(UsersEntity usersEntity, StudyEntity studyEntity) {
+    private void assertThatIsNotStudyMember(UsersEntity usersEntity, String path) {
+        StudyEntity studyEntity = studyRepository.findByPath(path).get();
         Assertions.assertThat(studyEntity.getMembers()).doesNotContain(usersEntity);
     }
 }

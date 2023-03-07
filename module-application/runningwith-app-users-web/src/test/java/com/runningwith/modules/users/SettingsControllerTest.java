@@ -102,12 +102,7 @@ class SettingsControllerTest {
                 .andExpect(view().name(REDIRECT + URL_SETTINGS_PROFILE));
 
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
-
-        assertThat(usersEntity.getBio()).isEqualTo(profile.getBio());
-        assertThat(usersEntity.getProfileUrl()).isEqualTo(profile.getProfileUrl());
-        assertThat(usersEntity.getOccupation()).isEqualTo(profile.getOccupation());
-        assertThat(usersEntity.getLocation()).isEqualTo(profile.getLocation());
-        assertThat(usersEntity.getProfileImage()).isEqualTo(profile.getProfileImage());
+        assertThatUsersProfileUpdated(profile, usersEntity);
     }
 
     @WithUser
@@ -170,10 +165,9 @@ class SettingsControllerTest {
 
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
 
-        assertThat(usersEntity.getPassword()).isNotEqualTo(beforeChangedPW); // check whether password is changed
-        assertThat(usersEntity.getPassword()).isNotEqualTo(passwordForm.getNewPassword()); // check whether password is encoded
-        assertThat(passwordEncoder.matches(passwordForm.getNewPassword(), usersEntity.getPassword())).isTrue();
+        assertThatPasswordChanged(beforeChangedPW, passwordForm, usersEntity);
     }
+
 
     @WithUser
     @DisplayName("비밀번호 수정 - 입력값 에러")
@@ -303,14 +297,7 @@ class SettingsControllerTest {
                 .andExpect(authenticated())
                 .andExpect(status().isOk());
 
-        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
-        Optional<TagEntity> optionalTag = tagRepository.findByTitle("newTag");
-
-        assertThat(optionalTag).isPresent();
-
-        TagEntity tagEntity = optionalTag.get();
-
-        assertThat(usersEntity.getTags().contains(tagEntity)).isTrue();
+        assertThatUsersTagsAdded();
     }
 
     @WithUser
@@ -333,7 +320,7 @@ class SettingsControllerTest {
                 .andExpect(authenticated())
                 .andExpect(status().isOk());
 
-        assertThat(usersEntity.getTags().contains(tagEntity)).isFalse();
+        assertThatUsersTagRemoved(usersEntity, tagEntity);
     }
 
     @WithUser
@@ -368,9 +355,7 @@ class SettingsControllerTest {
                 .andExpect(authenticated())
                 .andExpect(status().isOk());
 
-        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
-        ZoneEntity zoneEntity = zoneRepository.findByCityAndProvince(testZone.getCity(), testZone.getProvince()).get();
-        assertThat(usersEntity.getZones().contains(zoneEntity)).isTrue();
+        assertThatUsersZoneAdded();
     }
 
     @WithUser
@@ -387,9 +372,45 @@ class SettingsControllerTest {
                 .andExpect(authenticated())
                 .andExpect(status().isOk());
 
+        assertThatUsersZoneRemoved();
+    }
+
+    private void assertThatUsersZoneRemoved() {
         ZoneEntity zoneEntity = zoneRepository.findByCityAndProvince(testZone.getCity(), testZone.getProvince()).get();
         UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
         assertThat(usersEntity.getZones().contains(zoneEntity)).isFalse();
+    }
+
+    private void assertThatUsersTagRemoved(UsersEntity usersEntity, TagEntity tagEntity) {
+        assertThat(usersEntity.getTags().contains(tagEntity)).isFalse();
+    }
+
+    private void assertThatUsersZoneAdded() {
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        ZoneEntity zoneEntity = zoneRepository.findByCityAndProvince(testZone.getCity(), testZone.getProvince()).get();
+        assertThat(usersEntity.getZones().contains(zoneEntity)).isTrue();
+    }
+
+    private void assertThatUsersProfileUpdated(Profile profile, UsersEntity usersEntity) {
+        assertThat(usersEntity.getBio()).isEqualTo(profile.getBio());
+        assertThat(usersEntity.getProfileUrl()).isEqualTo(profile.getProfileUrl());
+        assertThat(usersEntity.getOccupation()).isEqualTo(profile.getOccupation());
+        assertThat(usersEntity.getLocation()).isEqualTo(profile.getLocation());
+        assertThat(usersEntity.getProfileImage()).isEqualTo(profile.getProfileImage());
+    }
+
+    private void assertThatPasswordChanged(String beforeChangedPW, PasswordForm passwordForm, UsersEntity usersEntity) {
+        assertThat(usersEntity.getPassword()).isNotEqualTo(beforeChangedPW); // check whether password is changed
+        assertThat(usersEntity.getPassword()).isNotEqualTo(passwordForm.getNewPassword()); // check whether password is encoded
+        assertThat(passwordEncoder.matches(passwordForm.getNewPassword(), usersEntity.getPassword())).isTrue();
+    }
+
+    private void assertThatUsersTagsAdded() {
+        UsersEntity usersEntity = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
+        Optional<TagEntity> optionalTag = tagRepository.findByTitle("newTag");
+        assertThat(optionalTag).isPresent();
+        TagEntity tagEntity = optionalTag.get();
+        assertThat(usersEntity.getTags().contains(tagEntity)).isTrue();
     }
 
 

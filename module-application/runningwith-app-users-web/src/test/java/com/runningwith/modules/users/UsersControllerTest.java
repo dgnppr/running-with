@@ -3,7 +3,6 @@ package com.runningwith.modules.users;
 import com.runningwith.infra.MockMvcTest;
 import com.runningwith.infra.mail.EmailMessage;
 import com.runningwith.infra.mail.EmailService;
-import com.runningwith.modules.account.AccountRepository;
 import com.runningwith.modules.users.factory.UsersEntityFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,12 +42,13 @@ class UsersControllerTest {
     MockMvc mockMvc;
     @Autowired
     UsersRepository usersRepository;
-    @Autowired
-    AccountRepository accountRepository;
+
     @Autowired
     UsersService usersService;
+
     @Autowired
     UsersEntityFactory usersEntityFactory;
+
     @MockBean
     EmailService emailService;
 
@@ -254,7 +254,6 @@ class UsersControllerTest {
     @DisplayName("이메일 로그인 - 토큰 오류")
     @Test
     void login_with_wrong_token() throws Exception {
-        UsersEntity usersEntity = usersRepository.findByEmail("nickname" + EMAIL).get();
         mockMvc.perform(get(URL_LOGIN_BY_EMAIL)
                         .queryParam("email", "nickname" + EMAIL)
                         .queryParam("token", "token"))

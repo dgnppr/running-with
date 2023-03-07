@@ -2,9 +2,6 @@ package com.runningwith.modules.study;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.runningwith.infra.MockMvcTest;
-import com.runningwith.modules.account.AccountEntity;
-import com.runningwith.modules.account.AccountRepository;
-import com.runningwith.modules.account.enumeration.AccountType;
 import com.runningwith.modules.study.factory.StudyEntityFactory;
 import com.runningwith.modules.study.form.StudyDescriptionForm;
 import com.runningwith.modules.study.form.StudyForm;
@@ -14,6 +11,7 @@ import com.runningwith.modules.tag.TagRepository;
 import com.runningwith.modules.users.UsersEntity;
 import com.runningwith.modules.users.UsersRepository;
 import com.runningwith.modules.users.WithUser;
+import com.runningwith.modules.users.factory.UsersEntityFactory;
 import com.runningwith.modules.users.form.ZoneForm;
 import com.runningwith.modules.zone.ZoneEntity;
 import com.runningwith.modules.zone.ZoneRepository;
@@ -26,9 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.runningwith.infra.utils.CustomStringUtils.*;
@@ -37,8 +33,6 @@ import static com.runningwith.infra.utils.WebUtils.URL_ROOT;
 import static com.runningwith.modules.AppExceptionHandler.VIEW_ERROR;
 import static com.runningwith.modules.study.StudyController.URL_STUDY_PATH;
 import static com.runningwith.modules.study.StudySettingsController.*;
-import static com.runningwith.modules.users.WithUserSecurityContextFactory.EMAIL;
-import static com.runningwith.modules.users.WithUserSecurityContextFactory.PASSWORD;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,8 +55,6 @@ class StudySettingsControllerTest {
     @Autowired
     StudyService studyService;
     @Autowired
-    AccountRepository accountRepository;
-    @Autowired
     TagRepository tagRepository;
     @Autowired
     ObjectMapper objectMapper;
@@ -70,6 +62,8 @@ class StudySettingsControllerTest {
     ZoneRepository zoneRepository;
     @Autowired
     StudyEntityFactory studyEntityFactory;
+    @Autowired
+    UsersEntityFactory usersEntityFactory;
 
     @BeforeEach
     void setUp() {
@@ -83,7 +77,6 @@ class StudySettingsControllerTest {
     void tearDown() {
         studyRepository.deleteAll();
         usersRepository.deleteAll();
-        accountRepository.deleteAll();
     }
 
     @WithUser
@@ -106,10 +99,10 @@ class StudySettingsControllerTest {
     @DisplayName("스터디 소개글 수정 뷰 - by other")
     @Test
     void view_study_setting_description_by_other() throws Exception {
-        UsersEntity otherUser = saveOtherUser();
+        UsersEntity other = usersEntityFactory.createUsersEntity("nickname");
         StudyForm studyForm = studyEntityFactory.createStudyForm("ttestpath", "testpath", "testpath", "testpath");
         StudyEntity studyEntity = studyForm.toEntity();
-        studyEntityFactory.createStudyEntity(otherUser, studyEntity);
+        studyEntityFactory.createStudyEntity(other, studyEntity);
 
         mockMvc.perform(get(URL_STUDY_PATH + "ttestpath" + URL_STUDY_SETTINGS_DESCRIPTION))
                 .andExpect(status().isOk())
@@ -628,25 +621,4 @@ class StudySettingsControllerTest {
 
     // TODO 스터디 삭제 로직 추가
 
-    private UsersEntity saveOtherUser() {
-        UsersEntity newUsersEntity = UsersEntity.builder()
-                .nickname("nickname")
-                .email("nickname" + EMAIL)
-                .password(PASSWORD)
-                .emailCheckToken(UUID.randomUUID().toString())
-                .emailCheckTokenGeneratedAt(LocalDateTime.now())
-                .studyCreatedByWeb(true)
-                .studyEnrollmentResultByWeb(true)
-                .studyUpdatedByWeb(true)
-                .studyCreatedByEmail(false)
-                .studyEnrollmentResultByEmail(false)
-                .studyUpdatedByEmail(false)
-                .emailCheckTokenGeneratedAt(LocalDateTime.now().minusHours(2))
-                .accountEntity(new AccountEntity(AccountType.USERS))
-                .build();
-        accountRepository.save(newUsersEntity.getAccountEntity());
-        usersRepository.save(newUsersEntity);
-
-        return newUsersEntity;
-    }
 }

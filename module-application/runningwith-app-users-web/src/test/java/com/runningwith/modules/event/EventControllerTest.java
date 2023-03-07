@@ -1,9 +1,6 @@
 package com.runningwith.modules.event;
 
 import com.runningwith.infra.MockMvcTest;
-import com.runningwith.modules.account.AccountEntity;
-import com.runningwith.modules.account.AccountRepository;
-import com.runningwith.modules.account.enumeration.AccountType;
 import com.runningwith.modules.event.factory.EventEntityFactory;
 import com.runningwith.modules.event.form.EventForm;
 import com.runningwith.modules.study.StudyEntity;
@@ -13,6 +10,7 @@ import com.runningwith.modules.study.form.StudyForm;
 import com.runningwith.modules.users.UsersEntity;
 import com.runningwith.modules.users.UsersRepository;
 import com.runningwith.modules.users.WithUser;
+import com.runningwith.modules.users.factory.UsersEntityFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static com.runningwith.infra.utils.CustomStringUtils.WITH_USER_NICKNAME;
 import static com.runningwith.infra.utils.CustomStringUtils.getEncodedUrl;
@@ -30,8 +27,6 @@ import static com.runningwith.modules.event.EventController.*;
 import static com.runningwith.modules.event.enumeration.EventType.CONFIRMATIVE;
 import static com.runningwith.modules.event.enumeration.EventType.FCFS;
 import static com.runningwith.modules.study.StudyController.URL_STUDY_PATH;
-import static com.runningwith.modules.users.WithUserSecurityContextFactory.EMAIL;
-import static com.runningwith.modules.users.WithUserSecurityContextFactory.PASSWORD;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -64,13 +59,13 @@ class EventControllerTest {
     EventService eventService;
 
     @Autowired
-    AccountRepository accountRepository;
-
-    @Autowired
     EnrollmentRepository enrollmentRepository;
 
     @Autowired
     EventEntityFactory eventEntityFactory;
+
+    @Autowired
+    UsersEntityFactory usersEntityFactory;
 
     @BeforeEach
     void setUp() {
@@ -295,7 +290,7 @@ class EventControllerTest {
     @DisplayName("선착순 스터디 모임 참가 신청 - 자동 수락")
     @Test
     void submit_new_enrollment_to_FCFS_accepted() throws Exception {
-        UsersEntity usersEntity = createNewUser("nickname");
+        UsersEntity usersEntity = usersEntityFactory.createUsersEntity("nickname");
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         EventForm eventForm = eventEntityFactory.createEventForm("eventFrom description", "eventFrom title",
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), FCFS);
@@ -315,15 +310,15 @@ class EventControllerTest {
     @DisplayName("선착순 스터디 모임 참가 신청 - 대기(인원 차 있는 상태)")
     @Test
     void submit_new_enrollment_to_FCFS_waiting() throws Exception {
-        UsersEntity eventCreator = createNewUser("nickname");
+        UsersEntity eventCreator = usersEntityFactory.createUsersEntity("nickname");
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         EventForm eventForm = eventEntityFactory.createEventForm("eventFrom description", "eventFrom title",
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), FCFS);
 
         EventEntity eventEntity = eventEntityFactory.createEvent(eventForm.toEntity(), studyEntity, eventCreator);
 
-        UsersEntity test1 = createNewUser("test1");
-        UsersEntity test2 = createNewUser("test2");
+        UsersEntity test1 = usersEntityFactory.createUsersEntity("test1");
+        UsersEntity test2 = usersEntityFactory.createUsersEntity("test2");
         eventService.newEnrollment(eventEntity, test1);
         eventService.newEnrollment(eventEntity, test2);
 
@@ -341,7 +336,7 @@ class EventControllerTest {
     @DisplayName("선착순 모임 참가 신청 취소 by 참가 신청 확정자 when 대기자가 있는 경우")
     @Test
     void accept_next_applicant_to_FCFS_event_when_accepted_applicant_cancel() throws Exception {
-        UsersEntity eventCreator = createNewUser("nickname");
+        UsersEntity eventCreator = usersEntityFactory.createUsersEntity("nickname");
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         EventForm eventForm = eventEntityFactory.createEventForm("eventFrom description", "eventFrom title",
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), FCFS);
@@ -349,8 +344,8 @@ class EventControllerTest {
         EventEntity eventEntity = eventEntityFactory.createEvent(eventForm.toEntity(), studyEntity, eventCreator);
 
         UsersEntity canceler = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
-        UsersEntity applicant1 = createNewUser("applicant1");
-        UsersEntity applicant2 = createNewUser("applicant2");
+        UsersEntity applicant1 = usersEntityFactory.createUsersEntity("applicant1");
+        UsersEntity applicant2 = usersEntityFactory.createUsersEntity("applicant2");
         eventService.newEnrollment(eventEntity, canceler);
         eventService.newEnrollment(eventEntity, applicant1);
         eventService.newEnrollment(eventEntity, applicant2);
@@ -374,14 +369,14 @@ class EventControllerTest {
     @DisplayName("선착순 모임 참가 신청 취소 by 참기 신청 대기자")
     @Test
     void not_accepted_user_cancel_enrollment_to_FCFS() throws Exception {
-        UsersEntity eventCreator = createNewUser("nickname");
+        UsersEntity eventCreator = usersEntityFactory.createUsersEntity("nickname");
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         EventForm eventForm = eventEntityFactory.createEventForm("eventFrom description", "eventFrom title",
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), FCFS);
         EventEntity eventEntity = eventEntityFactory.createEvent(eventForm.toEntity(), studyEntity, eventCreator);
 
-        UsersEntity applicant1 = createNewUser("applicant1");
-        UsersEntity applicant2 = createNewUser("applicant2");
+        UsersEntity applicant1 = usersEntityFactory.createUsersEntity("applicant1");
+        UsersEntity applicant2 = usersEntityFactory.createUsersEntity("applicant2");
         UsersEntity canceler = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
         eventService.newEnrollment(eventEntity, applicant1);
         eventService.newEnrollment(eventEntity, applicant2);
@@ -406,7 +401,7 @@ class EventControllerTest {
     @DisplayName("관리자 확인 모임 참가 신청 - 대기 상태")
     @Test
     void submit_new_enrollment_to_confirmative_waiting() throws Exception {
-        UsersEntity eventCreator = createNewUser("nickname");
+        UsersEntity eventCreator = usersEntityFactory.createUsersEntity("nickname");
         StudyEntity studyEntity = studyRepository.findByPath(TESTPATH).get();
         EventForm eventForm = eventEntityFactory.createEventForm("eventFrom description", "eventFrom title",
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), CONFIRMATIVE);
@@ -432,7 +427,7 @@ class EventControllerTest {
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), CONFIRMATIVE);
         EventEntity eventEntity = eventEntityFactory.createEvent(eventForm.toEntity(), studyEntity, manager);
 
-        UsersEntity applicant = createNewUser("applicant");
+        UsersEntity applicant = usersEntityFactory.createUsersEntity("applicant");
         eventService.newEnrollment(eventEntity, applicant);
         assertThatNotAccepted(eventEntity, applicant);
 
@@ -456,7 +451,7 @@ class EventControllerTest {
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), CONFIRMATIVE);
         EventEntity eventEntity = eventEntityFactory.createEvent(eventForm.toEntity(), studyEntity, manager);
 
-        UsersEntity applicant = createNewUser("applicant");
+        UsersEntity applicant = usersEntityFactory.createUsersEntity("applicant");
         eventService.newEnrollment(eventEntity, applicant);
         assertThatNotAccepted(eventEntity, applicant);
 
@@ -480,7 +475,7 @@ class EventControllerTest {
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), FCFS);
         EventEntity eventEntity = eventEntityFactory.createEvent(eventForm.toEntity(), studyEntity, manager);
 
-        UsersEntity applicant = createNewUser("applicant");
+        UsersEntity applicant = usersEntityFactory.createUsersEntity("applicant");
         eventService.newEnrollment(eventEntity, applicant);
         assertThatAccepted(eventEntity, applicant);
 
@@ -504,7 +499,7 @@ class EventControllerTest {
                 2, now().plusDays(1), now().plusDays(2), now().plusDays(3), FCFS);
         EventEntity eventEntity = eventEntityFactory.createEvent(eventForm.toEntity(), studyEntity, manager);
 
-        UsersEntity applicant = createNewUser("applicant");
+        UsersEntity applicant = usersEntityFactory.createUsersEntity("applicant");
         eventService.newEnrollment(eventEntity, applicant);
         assertThatAccepted(eventEntity, applicant);
         EnrollmentEntity enrollmentEntity = enrollmentRepository.findByEventEntityAndUsersEntity(eventEntity, applicant).get();
@@ -563,28 +558,6 @@ class EventControllerTest {
         assertThat(afterEvent.getStartDateTime()).isEqualTo(afterForm.getStartDateTime());
         assertThat(afterEvent.getEndDateTime()).isEqualTo(afterForm.getEndDateTime());
         assertThat(afterEvent.getLimitOfEnrollments()).isEqualTo(afterForm.getLimitOfEnrollments());
-    }
-
-    private UsersEntity createNewUser(String nickname) {
-        UsersEntity newUsersEntity = UsersEntity.builder()
-                .nickname(nickname)
-                .email(nickname + EMAIL)
-                .password(PASSWORD)
-                .emailCheckToken(UUID.randomUUID().toString())
-                .emailCheckTokenGeneratedAt(now())
-                .studyCreatedByWeb(true)
-                .studyEnrollmentResultByWeb(true)
-                .studyUpdatedByWeb(true)
-                .studyCreatedByEmail(false)
-                .studyEnrollmentResultByEmail(false)
-                .studyUpdatedByEmail(false)
-                .emailCheckTokenGeneratedAt(now().minusHours(2))
-                .accountEntity(new AccountEntity(AccountType.USERS))
-                .build();
-        accountRepository.save(newUsersEntity.getAccountEntity());
-        usersRepository.save(newUsersEntity);
-
-        return newUsersEntity;
     }
 
 }
