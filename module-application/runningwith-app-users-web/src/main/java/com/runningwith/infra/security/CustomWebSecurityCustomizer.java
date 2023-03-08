@@ -1,6 +1,6 @@
 package com.runningwith.infra.security;
 
-import com.runningwith.modules.users.UsersService;
+import com.runningwith.domain.users.UsersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;

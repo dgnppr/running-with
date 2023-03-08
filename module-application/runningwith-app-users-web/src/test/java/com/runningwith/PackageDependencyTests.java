@@ -11,18 +11,18 @@ import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.sli
 public class PackageDependencyTests {
 
     private static final String ROOT_PACKAGE = "com.runningwith";
-    private static final String EVENT = "..modules.event..";
-    private static final String MAIN = "..modules.main..";
-    private static final String STUDY = "..modules.study..";
-    private static final String TAG = "..modules.tag..";
-    private static final String USERS = "..modules.users..";
-    private static final String ZONE = "..modules.zone..";
+    private static final String EVENT = "..domain.event..";
+    private static final String MAIN = "..domain.main..";
+    private static final String STUDY = "..domain.study..";
+    private static final String TAG = "..domain.tag..";
+    private static final String USERS = "..domain.users..";
+    private static final String ZONE = "..domain.zone..";
 
 
     @ArchTest
-    ArchRule modulesPackageRule = classes().that().resideInAPackage(ROOT_PACKAGE + ".modules..")
+    ArchRule domainPackageRule = classes().that().resideInAPackage(ROOT_PACKAGE + ".domain..")
             .should().onlyBeAccessed().byClassesThat()
-            .resideInAnyPackage(ROOT_PACKAGE + ".modules..");
+            .resideInAnyPackage(ROOT_PACKAGE + ".domain..");
 
     @ArchTest
     ArchRule studyPackageRule = classes().that().resideInAPackage(STUDY)
@@ -38,7 +38,7 @@ public class PackageDependencyTests {
             .should().accessClassesThat().resideInAnyPackage(TAG, ZONE, USERS);
 
     @ArchTest
-    ArchRule cycleCheck = slices().matching(ROOT_PACKAGE + ".modules.(*)..")
+    ArchRule cycleCheck = slices().matching(ROOT_PACKAGE + ".domain.(*)..")
             .should().beFreeOfCycles();
 
 }
