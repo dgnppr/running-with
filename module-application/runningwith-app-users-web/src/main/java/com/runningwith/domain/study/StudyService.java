@@ -1,5 +1,6 @@
 package com.runningwith.domain.study;
 
+import com.runningwith.domain.study.event.StudyCreatedEvent;
 import com.runningwith.domain.study.form.StudyDescriptionForm;
 import com.runningwith.domain.study.form.StudyForm;
 import com.runningwith.domain.tag.TagEntity;
@@ -7,6 +8,7 @@ import com.runningwith.domain.users.UsersEntity;
 import com.runningwith.domain.zone.ZoneEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ import java.util.Set;
 public class StudyService {
 
     private final StudyRepository studyRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     private static void checkIfManager(UsersEntity usersEntity, StudyEntity studyEntity) {
         if (!studyEntity.isManager(usersEntity)) {
@@ -109,6 +112,7 @@ public class StudyService {
     public void publishStudy(UsersEntity usersEntity, String path) {
         StudyEntity studyEntity = getStudyToUpdateStatus(usersEntity, path);
         studyEntity.publish();
+        eventPublisher.publishEvent(new StudyCreatedEvent(studyEntity));
     }
 
     public void closeStudy(UsersEntity usersEntity, String path) {
