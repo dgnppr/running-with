@@ -1,6 +1,7 @@
 package com.runningwith.domain.study;
 
 import com.runningwith.domain.study.event.StudyCreatedEvent;
+import com.runningwith.domain.study.event.StudyUpdatedEvent;
 import com.runningwith.domain.study.form.StudyDescriptionForm;
 import com.runningwith.domain.study.form.StudyForm;
 import com.runningwith.domain.tag.TagEntity;
@@ -118,6 +119,7 @@ public class StudyService {
     public void closeStudy(UsersEntity usersEntity, String path) {
         StudyEntity studyEntity = getStudyToUpdateStatus(usersEntity, path);
         studyEntity.close();
+        eventPublisher.publishEvent(new StudyUpdatedEvent(studyEntity, "스터디를 종료했습니다."));
     }
 
     public StudyEntity getStudyToUpdateStatus(UsersEntity usersEntity, String path) {
@@ -135,10 +137,12 @@ public class StudyService {
 
     public void startStudyRecruit(StudyEntity studyEntity) {
         studyEntity.startRecruit();
+        eventPublisher.publishEvent(new StudyUpdatedEvent(studyEntity, "스터디 참여자 모집을 시작합니다."));
     }
 
     public void stopStudyRecruit(StudyEntity studyEntity) {
         studyEntity.stopRecruit();
+        eventPublisher.publishEvent(new StudyUpdatedEvent(studyEntity, "스터디 참여자 모집을 종료합니다."));
     }
 
     public void updateStudyPath(StudyEntity studyEntity, String newPath) {

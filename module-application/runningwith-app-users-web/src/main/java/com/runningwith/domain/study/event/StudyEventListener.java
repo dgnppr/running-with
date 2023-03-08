@@ -22,6 +22,8 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.runningwith.infra.utils.CustomStringUtils.getEncodedUrl;
 
@@ -42,7 +44,7 @@ public class StudyEventListener {
 
     @EventListener
     public void handleStudyCreatedEvent(StudyCreatedEvent studyCreatedEvent) {
-        StudyEntity studyEntity = studyRepository.findStudyEntityWithTagsAndZonesById(studyCreatedEvent.getStudyEntity().getId()).get();
+        StudyEntity studyEntity = studyRepository.findStudyEntityWithTagsAndZonesById(studyCreatedEvent.studyEntity().getId()).get();
 
         Iterable<UsersEntity> users = usersRepository.findAll(UsersPredicates.findByTagsAndZones(studyEntity.getTags(), studyEntity.getZones()));
 
@@ -56,6 +58,57 @@ public class StudyEventListener {
             }
         });
     }
+
+
+    @EventListener
+    public void handleStudyUpdatedEvent(StudyUpdatedEvent studyUpdatedEvent) {
+        StudyEntity studyEntity = studyRepository.findStudyEntityWithManagersAndMembersById(studyUpdatedEvent.studyEntity().getId()).get();
+        Set<UsersEntity> studyParticipants = getStudyParticipants(studyEntity);
+
+        studyParticipants.forEach(usersEntity -> {
+            if (usersEntity.isStudyUpdatedByEmail()) {
+                sendStudyUpdatedEmail(studyEntity, usersEntity, studyUpdatedEvent.message());
+            }
+
+            if (usersEntity.isStudyUpdatedByWeb()) {
+                sendStudyUpdatedWeb(studyEntity, usersEntity, studyUpdatedEvent.message());
+            }
+        });
+
+    }
+
+    private void sendStudyUpdatedWeb(StudyEntity studyEntity, UsersEntity usersEntity, String message) {
+        NotificationEntity notificationEntity = NotificationEntity.builder()
+                .title(studyEntity.getTitle())
+                .link("/study/" + getEncodedUrl(studyEntity.getPath()))
+                .checked(false)
+                .createdTime(LocalDateTime.now())
+                .message(message)
+                .usersEntity(usersEntity)
+                .notificationType(NotificationType.STUDY_UPDATED)
+                .build();
+
+        notificationRepository.save(notificationEntity);
+    }
+
+    private void sendStudyUpdatedEmail(StudyEntity studyEntity, UsersEntity usersEntity, String updatedMessage) {
+        Context context = new Context();
+        context.setVariable("nickname", usersEntity.getNickname());
+        context.setVariable("link", "/study/" + getEncodedUrl(studyEntity.getPath()));
+        context.setVariable("linkName", studyEntity.getTitle());
+        context.setVariable("message", updatedMessage);
+        context.setVariable("host", appProperties.getHost());
+        String message = templateEngine.process("mail/simple-link", context);
+
+        EmailMessage emailMessage = EmailMessage.builder()
+                .subject(appMessages.getDomainName() + " " + studyEntity.getTitle() + " " + updatedMessage)
+                .to(usersEntity.getEmail())
+                .message(message)
+                .build();
+
+        emailService.sendEmail(emailMessage);
+    }
+
 
     private void sendStudyCreatedWeb(StudyEntity studyEntity, UsersEntity usersEntity) {
         NotificationEntity notificationEntity = NotificationEntity.builder()
@@ -87,5 +140,12 @@ public class StudyEventListener {
                 .build();
 
         emailService.sendEmail(emailMessage);
+    }
+
+    private Set<UsersEntity> getStudyParticipants(StudyEntity studyEntity) {
+        Set<UsersEntity> users = new HashSet<>();
+        users.addAll(studyEntity.getMembers());
+        users.addAll(studyEntity.getManagers());
+        return users;
     }
 }
