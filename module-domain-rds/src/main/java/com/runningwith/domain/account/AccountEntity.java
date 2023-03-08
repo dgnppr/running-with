@@ -3,12 +3,13 @@ package com.runningwith.domain.account;
 
 import com.runningwith.domain.account.enumeration.AccountType;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @EqualsAndHashCode(of = "id")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "account")
 public class AccountEntity {
