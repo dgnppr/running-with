@@ -531,10 +531,6 @@ class StudySettingsControllerTest {
         assertThatStudyPathUpdated(newPath);
     }
 
-    private void assertThatStudyPathUpdated(String newPath) {
-        assertThat(studyRepository.findStudyEntityWithManagersByPath(newPath).isPresent()).isTrue();
-    }
-
     @WithUser
     @DisplayName("스터디 경로 수정 - 입력값 오류")
     @Test
@@ -651,7 +647,6 @@ class StudySettingsControllerTest {
 
     private void assertThatBannerImageChanged(String origin) {
         String changed = studyRepository.findByPath(TEST_PATH).get().getBannerImage();
-
         assertThat(changed).isNotEqualTo(origin);
     }
 
@@ -681,5 +676,9 @@ class StudySettingsControllerTest {
         StudyEntity study = studyRepository.findByPath(TEST_PATH).get();
         assertThat(study.getShortDescription()).isEqualTo(form.getShortDescription());
         assertThat(study.getFullDescription()).isEqualTo(form.getFullDescription());
+    }
+
+    private void assertThatStudyPathUpdated(String newPath) {
+        assertThat(studyRepository.findStudyEntityWithManagersByPath(newPath).isPresent()).isTrue();
     }
 }

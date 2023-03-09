@@ -1,5 +1,8 @@
 package com.runningwith.domain.event;
 
+import com.runningwith.domain.event.event.EnrollmentAcceptedEvent;
+import com.runningwith.domain.event.event.EnrollmentEventListener;
+import com.runningwith.domain.event.event.EnrollmentRejectedEvent;
 import com.runningwith.domain.event.factory.EventEntityFactory;
 import com.runningwith.domain.event.form.EventForm;
 import com.runningwith.domain.study.StudyEntity;
@@ -16,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
@@ -29,6 +33,8 @@ import static com.runningwith.infra.utils.CustomStringUtils.WITH_USER_NICKNAME;
 import static com.runningwith.infra.utils.CustomStringUtils.getEncodedUrl;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.then;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -66,6 +72,9 @@ class EventControllerTest {
 
     @Autowired
     UsersEntityFactory usersEntityFactory;
+
+    @MockBean
+    EnrollmentEventListener enrollmentEventListener;
 
     @BeforeEach
     void setUp() {
@@ -439,6 +448,7 @@ class EventControllerTest {
                 .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_EVENTS_PATH + eventEntity.getId()));
 
         assertThatAccepted(eventEntity, applicant);
+        then(enrollmentEventListener).should().handleEnrollmentEvent(any(EnrollmentAcceptedEvent.class));
     }
 
     @WithUser
@@ -463,6 +473,7 @@ class EventControllerTest {
                 .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TESTPATH) + URL_EVENTS_PATH + eventEntity.getId()));
 
         assertThatNotAccepted(eventEntity, applicant);
+        then(enrollmentEventListener).should().handleEnrollmentEvent(any(EnrollmentRejectedEvent.class));
     }
 
     @WithUser

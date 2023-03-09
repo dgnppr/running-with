@@ -6,7 +6,6 @@ import com.runningwith.domain.notification.NotificationEntity;
 import com.runningwith.domain.notification.NotificationRepository;
 import com.runningwith.domain.study.StudyEntity;
 import com.runningwith.domain.users.UsersEntity;
-import com.runningwith.domain.users.UsersRepository;
 import com.runningwith.infra.config.AppMessages;
 import com.runningwith.infra.config.AppProperties;
 import com.runningwith.infra.mail.EmailMessage;
@@ -32,7 +31,6 @@ import static com.runningwith.infra.utils.CustomStringUtils.getEncodedUrl;
 @RequiredArgsConstructor
 public class EnrollmentEventListener {
 
-    private final UsersRepository usersRepository;
     private final EmailService emailService;
     private final TemplateEngine templateEngine;
     private final AppProperties appProperties;
@@ -41,7 +39,7 @@ public class EnrollmentEventListener {
 
     @EventListener
     public void handleEnrollmentEvent(EnrollmentEvent enrollmentEvent) {
-        EnrollmentEntity enrollmentEntity = enrollmentEvent.enrollmentEntity();
+        EnrollmentEntity enrollmentEntity = enrollmentEvent.getEnrollmentEntity();
         UsersEntity usersEntity = enrollmentEntity.getUsersEntity();
         EventEntity eventEntity = enrollmentEntity.getEventEntity();
         StudyEntity studyEntity = eventEntity.getStudyEntity();
@@ -62,7 +60,7 @@ public class EnrollmentEventListener {
                 .link("/study/" + getEncodedUrl(studyEntity.getPath()) + "/events/" + eventEntity.getId())
                 .checked(false)
                 .createdTime(LocalDateTime.now())
-                .message(enrollmentEvent.message())
+                .message(enrollmentEvent.getMessage())
                 .usersEntity(usersEntity)
                 .notificationType(EVENT_ENROLLMENT)
                 .build();
@@ -75,7 +73,7 @@ public class EnrollmentEventListener {
         context.setVariable("nickname", usersEntity.getNickname());
         context.setVariable("link", "/study/" + getEncodedUrl(studyEntity.getPath()) + "/events/" + eventEntity.getId());
         context.setVariable("linkName", studyEntity.getTitle());
-        context.setVariable("message", enrollmentEvent.message());
+        context.setVariable("message", enrollmentEvent.getMessage());
         context.setVariable("host", appProperties.getHost());
         String message = templateEngine.process("mail/simple-link", context);
 
