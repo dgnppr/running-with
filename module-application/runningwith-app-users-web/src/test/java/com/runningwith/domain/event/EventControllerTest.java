@@ -8,6 +8,7 @@ import com.runningwith.domain.event.form.EventForm;
 import com.runningwith.domain.study.StudyEntity;
 import com.runningwith.domain.study.StudyRepository;
 import com.runningwith.domain.study.StudyService;
+import com.runningwith.domain.study.factory.StudyEntityFactory;
 import com.runningwith.domain.study.form.StudyForm;
 import com.runningwith.domain.users.UsersEntity;
 import com.runningwith.domain.users.UsersRepository;
@@ -73,13 +74,16 @@ class EventControllerTest {
     @Autowired
     UsersEntityFactory usersEntityFactory;
 
+    @Autowired
+    StudyEntityFactory studyEntityFactory;
+
     @MockBean
     EnrollmentEventListener enrollmentEventListener;
 
     @BeforeEach
     void setUp() {
         UsersEntity studyCreator = usersRepository.findByNickname(WITH_USER_NICKNAME).get();
-        StudyForm studyForm = new StudyForm(TESTPATH, "testpath", "testpath", "testpath");
+        StudyForm studyForm = studyEntityFactory.createStudyForm(TESTPATH, "testpath", "testpath", "testpath");
         StudyEntity studyEntity = studyForm.toEntity();
         studyService.createNewStudy(studyCreator, studyEntity);
     }
