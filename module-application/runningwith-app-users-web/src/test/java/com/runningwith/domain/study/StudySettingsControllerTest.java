@@ -139,6 +139,10 @@ class StudySettingsControllerTest {
                 .andExpect(authenticated())
                 .andExpect(view().name(REDIRECT + URL_STUDY_PATH + getEncodedUrl(studyEntity.getPath()) + URL_STUDY_SETTINGS_DESCRIPTION));
 
+        assertThatStudyDescriptionUpdated(form);
+    }
+
+    private void assertThatStudyDescriptionUpdated(StudyDescriptionForm form) {
         StudyEntity study = studyRepository.findByPath(TEST_PATH).get();
         assertThat(study.getShortDescription()).isEqualTo(form.getShortDescription());
         assertThat(study.getFullDescription()).isEqualTo(form.getFullDescription());
@@ -193,9 +197,7 @@ class StudySettingsControllerTest {
                 .andExpect(flash().attribute("message", "배너 이미지 수정 완료"))
                 .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TEST_PATH) + URL_STUDY_SETTINGS_BANNER));
 
-        String changed = studyRepository.findByPath(TEST_PATH).get().getBannerImage();
-
-        assertThat(changed).isNotEqualTo(origin);
+        assertThatBannerImageChanged(origin);
     }
 
     @WithUser
@@ -262,9 +264,7 @@ class StudySettingsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(authenticated());
 
-        TagEntity tagEntity = tagRepository.findByTitle(tagForm.getTagTitle()).get();
-        StudyEntity studyEntity = studyRepository.findByPath(TEST_PATH).get();
-        assertThat(studyEntity.getTags()).containsOnly(tagEntity);
+        assertThatStudyTagsAdded(tagForm);
     }
 
     @WithUser
@@ -285,8 +285,7 @@ class StudySettingsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(authenticated());
 
-        StudyEntity studyEntity = studyRepository.findByPath(TEST_PATH).get();
-        assertThat(studyEntity.getTags()).doesNotContain(tagEntity);
+        assertThatStudyTagsRemoved(tagEntity);
     }
 
     @WithUser
@@ -341,10 +340,9 @@ class StudySettingsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(authenticated());
 
-        ZoneEntity zone = zoneRepository.findByCityAndProvince(zoneForm.getCityName(), zoneForm.getProvinceName()).get();
-        StudyEntity studyEntity = studyRepository.findByPath(TEST_PATH).get();
-        assertThat(studyEntity.getZones()).containsOnly(zone);
+        assertThatStudyZonesAdded(zoneForm);
     }
+
 
     @WithUser
     @DisplayName("스터디 장소 삭제 - 입력값 정상")
@@ -364,9 +362,9 @@ class StudySettingsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(authenticated());
 
-        ZoneEntity zone = zoneRepository.findByCityAndProvince(zoneForm.getCityName(), zoneForm.getProvinceName()).get();
-        assertThat(studyEntity.getZones()).doesNotContain(zone);
+        assertThatStudyZonesRemoved(studyEntity, zoneForm);
     }
+
 
     @WithUser
     @DisplayName("스터디 장소 삭제 - 입력값 오류(존재하지 않는 장소)")
@@ -459,6 +457,7 @@ class StudySettingsControllerTest {
                 .andExpect(authenticated())
                 .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TEST_PATH) + URL_STUDY_SETTING));
 
+        assertThatStudyClosed();
         then(studyEventListener).should().handleStudyUpdatedEvent(any(StudyUpdatedEvent.class));
     }
 
@@ -534,7 +533,11 @@ class StudySettingsControllerTest {
                 .andExpect(authenticated())
                 .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(newPath) + URL_STUDY_SETTING));
 
-        assertThat(studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).isEmpty()).isTrue();
+        assertThatStudyNotPresent(TEST_PATH);
+        assertThatStudyPathUpdated(newPath);
+    }
+
+    private void assertThatStudyPathUpdated(String newPath) {
         assertThat(studyRepository.findStudyEntityWithManagersByPath(newPath).isPresent()).isTrue();
     }
 
@@ -556,8 +559,8 @@ class StudySettingsControllerTest {
                 .andExpect(authenticated())
                 .andExpect(view().name(VIEW_STUDY_SETTINGS_STUDY));
 
-        assertThat(studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).isPresent()).isTrue();
-        assertThat(studyRepository.findStudyEntityWithManagersByPath(wrongPath).isEmpty()).isTrue();
+        assertThatStudyIsPresent();
+        assertThatStudyNotPresent(wrongPath);
     }
 
     @WithUser
@@ -610,7 +613,7 @@ class StudySettingsControllerTest {
                 .andExpect(authenticated())
                 .andExpect(redirectedUrl(URL_ROOT));
 
-        assertThat(studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).isEmpty()).isTrue();
+        assertThatStudyNotPresent(TEST_PATH);
     }
 
 
@@ -633,9 +636,50 @@ class StudySettingsControllerTest {
                 })
                 .andExpect(view().name(VIEW_ERROR));
 
-        assertThat(studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).isPresent()).isTrue();
+        assertThatStudyIsPresent();
     }
 
+
     // TODO 스터디 삭제 로직 추가
-    
+
+    private void assertThatStudyIsPresent() {
+        assertThatStudyPathUpdated(TEST_PATH);
+    }
+
+    private void assertThatStudyNotPresent(String wrongPath) {
+        assertThat(studyRepository.findStudyEntityWithManagersByPath(wrongPath).isEmpty()).isTrue();
+    }
+
+    private void assertThatStudyClosed() {
+        StudyEntity afterStudyEntity = studyRepository.findByPath(TEST_PATH).get();
+        assertThat(afterStudyEntity.isClosed()).isTrue();
+    }
+
+    private void assertThatBannerImageChanged(String origin) {
+        String changed = studyRepository.findByPath(TEST_PATH).get().getBannerImage();
+
+        assertThat(changed).isNotEqualTo(origin);
+    }
+
+    private void assertThatStudyTagsAdded(TagForm tagForm) {
+        TagEntity tagEntity = tagRepository.findByTitle(tagForm.getTagTitle()).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TEST_PATH).get();
+        assertThat(studyEntity.getTags()).containsOnly(tagEntity);
+    }
+
+    private void assertThatStudyTagsRemoved(TagEntity tagEntity) {
+        StudyEntity studyEntity = studyRepository.findByPath(TEST_PATH).get();
+        assertThat(studyEntity.getTags()).doesNotContain(tagEntity);
+    }
+
+    private void assertThatStudyZonesAdded(ZoneForm zoneForm) {
+        ZoneEntity zone = zoneRepository.findByCityAndProvince(zoneForm.getCityName(), zoneForm.getProvinceName()).get();
+        StudyEntity studyEntity = studyRepository.findByPath(TEST_PATH).get();
+        assertThat(studyEntity.getZones()).containsOnly(zone);
+    }
+
+    private void assertThatStudyZonesRemoved(StudyEntity studyEntity, ZoneForm zoneForm) {
+        ZoneEntity zone = zoneRepository.findByCityAndProvince(zoneForm.getCityName(), zoneForm.getProvinceName()).get();
+        assertThat(studyEntity.getZones()).doesNotContain(zone);
+    }
 }
