@@ -37,13 +37,13 @@ public class NotificationController {
     }
 
     @GetMapping(URL_NOTIFICATIONS_MARKED)
-    public String getOldNotifications(@CurrentUser UsersEntity usersEntity, Model model) {
+    public String viewMarkedNotifications(@CurrentUser UsersEntity usersEntity, Model model) {
         List<NotificationEntity> checkedNotifications = getMarkedNotifications(usersEntity);
         long numberOfNotChecked = notificationRepository.countByUsersEntityAndChecked(usersEntity, false);
 
         putCategorizedNotifications(model, checkedNotifications, checkedNotifications.size(), numberOfNotChecked);
         model.addAttribute("isNew", false);
-        
+
         return VIEW_NOTIFICATION_LIST;
     }
 
