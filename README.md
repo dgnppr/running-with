@@ -29,5 +29,6 @@ RunningWith
 
 ### 5. Future Updates
 
+- 네이버, 구글 OAuth 로그인
 - 오프라인 스터디 설정 시 장소 검색 연동
 - 온라인 스터디 설정 시 WebRTC 기반 영상 통신
