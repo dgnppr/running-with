@@ -142,12 +142,6 @@ class StudySettingsControllerTest {
         assertThatStudyDescriptionUpdated(form);
     }
 
-    private void assertThatStudyDescriptionUpdated(StudyDescriptionForm form) {
-        StudyEntity study = studyRepository.findByPath(TEST_PATH).get();
-        assertThat(study.getShortDescription()).isEqualTo(form.getShortDescription());
-        assertThat(study.getFullDescription()).isEqualTo(form.getFullDescription());
-    }
-
     @WithUser
     @DisplayName("스터디 소개글 업데이트 - 입력값 오류")
     @Test
@@ -681,5 +675,11 @@ class StudySettingsControllerTest {
     private void assertThatStudyZonesRemoved(StudyEntity studyEntity, ZoneForm zoneForm) {
         ZoneEntity zone = zoneRepository.findByCityAndProvince(zoneForm.getCityName(), zoneForm.getProvinceName()).get();
         assertThat(studyEntity.getZones()).doesNotContain(zone);
+    }
+
+    private void assertThatStudyDescriptionUpdated(StudyDescriptionForm form) {
+        StudyEntity study = studyRepository.findByPath(TEST_PATH).get();
+        assertThat(study.getShortDescription()).isEqualTo(form.getShortDescription());
+        assertThat(study.getFullDescription()).isEqualTo(form.getFullDescription());
     }
 }
