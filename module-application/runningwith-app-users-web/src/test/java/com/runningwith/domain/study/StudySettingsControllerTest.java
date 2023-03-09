@@ -1,6 +1,9 @@
 package com.runningwith.domain.study;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.runningwith.domain.study.event.StudyCreatedEvent;
+import com.runningwith.domain.study.event.StudyEventListener;
+import com.runningwith.domain.study.event.StudyUpdatedEvent;
 import com.runningwith.domain.study.factory.StudyEntityFactory;
 import com.runningwith.domain.study.form.StudyDescriptionForm;
 import com.runningwith.domain.study.form.StudyForm;
@@ -20,6 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.web.servlet.MockMvc;
@@ -36,6 +40,8 @@ import static com.runningwith.infra.utils.WebUtils.URL_ROOT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.then;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -64,6 +70,8 @@ class StudySettingsControllerTest {
     StudyEntityFactory studyEntityFactory;
     @Autowired
     UsersEntityFactory usersEntityFactory;
+    @MockBean
+    StudyEventListener studyEventListener;
 
     @BeforeEach
     void setUp() {
@@ -406,6 +414,11 @@ class StudySettingsControllerTest {
                 .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TEST_PATH) + URL_STUDY_SETTING));
 
         StudyEntity afterStudyEntity = studyRepository.findByPath(TEST_PATH).get();
+        assertThatStudyPublished(prevStatus, afterStudyEntity);
+        then(studyEventListener).should().handleStudyCreatedEvent(any(StudyCreatedEvent.class));
+    }
+
+    private void assertThatStudyPublished(boolean prevStatus, StudyEntity afterStudyEntity) {
         boolean afterStatus = afterStudyEntity.isPublished();
 
         assertThat(prevStatus).isFalse();
@@ -445,6 +458,8 @@ class StudySettingsControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(authenticated())
                 .andExpect(redirectedUrl(URL_STUDY_PATH + getEncodedUrl(TEST_PATH) + URL_STUDY_SETTING));
+
+        then(studyEventListener).should().handleStudyUpdatedEvent(any(StudyUpdatedEvent.class));
     }
 
     @WithUser
@@ -481,6 +496,7 @@ class StudySettingsControllerTest {
 
         StudyEntity afterStudy = studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).get();
         assertThat(afterStudy.isRecruiting()).isTrue();
+        then(studyEventListener).should().handleStudyUpdatedEvent(any(StudyUpdatedEvent.class));
     }
 
     @WithUser
@@ -499,6 +515,7 @@ class StudySettingsControllerTest {
 
         StudyEntity afterStudy = studyRepository.findStudyEntityWithManagersByPath(TEST_PATH).get();
         assertThat(afterStudy.isRecruiting()).isFalse();
+        then(studyEventListener).should().handleStudyUpdatedEvent(any(StudyUpdatedEvent.class));
     }
 
 
@@ -620,7 +637,5 @@ class StudySettingsControllerTest {
     }
 
     // TODO 스터디 삭제 로직 추가
-
-    // TODO eventPublisher publishEvent 로직 추가
-
+    
 }

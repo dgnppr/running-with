@@ -37,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class StudyControllerTest {
 
     public static final String TESTPATH = "testpath";
+
     @Autowired
     MockMvc mockMvc;
 
