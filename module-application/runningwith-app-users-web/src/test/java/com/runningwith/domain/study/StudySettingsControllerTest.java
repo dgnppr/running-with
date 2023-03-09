@@ -621,4 +621,6 @@ class StudySettingsControllerTest {
 
     // TODO 스터디 삭제 로직 추가
 
+    // TODO eventPublisher publishEvent 로직 추가
+
 }

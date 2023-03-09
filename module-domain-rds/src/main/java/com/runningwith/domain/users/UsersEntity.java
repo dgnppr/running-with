@@ -26,7 +26,7 @@ public class UsersEntity {
     @Column(name = "id_users", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "id_account")
     private AccountEntity accountEntity;
 

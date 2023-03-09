@@ -29,4 +29,10 @@ public class AppExceptionHandler {
         return VIEW_ERROR;
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public String handleRuntimeException(RuntimeException ex, Model model) {
+        model.addAttribute("error", "나중에 다시 요청해주세요.");
+        return VIEW_ERROR;
+    }
+
 }

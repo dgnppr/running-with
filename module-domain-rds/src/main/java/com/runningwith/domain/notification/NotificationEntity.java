@@ -37,7 +37,10 @@ public class NotificationEntity {
     private LocalDateTime createdTime;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "notification_type")
+    @Column(nullable = false, name = "notification_type")
     private NotificationType notificationType;
 
+    public void updateChecked(boolean checked) {
+        this.checked = checked;
+    }
 }
