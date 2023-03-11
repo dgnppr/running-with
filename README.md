@@ -4,6 +4,7 @@ RunningWith
 ### 0. Description
 
 - 온라인/오프라인 스터디 모집 및 관리 웹 어플리케이션
+- [trouble-shooting]()
 
 ### 1. TECH
 
