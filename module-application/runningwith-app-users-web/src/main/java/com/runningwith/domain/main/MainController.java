@@ -5,11 +5,13 @@ import com.runningwith.domain.study.StudyRepository;
 import com.runningwith.domain.users.CurrentUser;
 import com.runningwith.domain.users.UsersEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import java.util.List;
 
 import static com.runningwith.infra.utils.WebUtils.URL_ROOT;
 import static com.runningwith.infra.utils.WebUtils.VIEW_INDEX;
@@ -41,10 +43,11 @@ public class MainController {
     }
 
     @GetMapping(URL_SEARCH_STUDY)
-    public String searchStudy(String keyword, Model model) {
-        List<StudyEntity> studyList = studyRepository.findByKeyword(keyword);
+    public String searchStudy(String keyword, Model model,
+                              @PageableDefault(size = 9, sort = "publishedDatetime", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<StudyEntity> studyPage = studyRepository.findByKeyword(keyword, pageable);
 
-        model.addAttribute("studyList", studyList);
+        model.addAttribute("studyPage", studyPage);
         model.addAttribute("keyword", keyword);
 
         return VIEW_SEARCH;
