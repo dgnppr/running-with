@@ -26,15 +26,10 @@ public class StudyService {
     private final StudyRepository studyRepository;
     private final ApplicationEventPublisher eventPublisher;
 
-    private static void checkIfManager(UsersEntity usersEntity, StudyEntity studyEntity) {
-        if (!studyEntity.isManager(usersEntity)) {
-            throw new AccessDeniedException("권한을 가지고 있지 않습니다.");
-        }
-    }
 
     public StudyEntity getStudy(String path) {
         Optional<StudyEntity> optionalStudy = studyRepository.findByPath(path);
-        StudyEntity studyEntity = optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
+        StudyEntity studyEntity = checkIfExistingStudy(optionalStudy);
         return studyEntity;
     }
 
@@ -46,21 +41,21 @@ public class StudyService {
 
     public StudyEntity getStudyToUpdate(UsersEntity usersEntity, String path) {
         Optional<StudyEntity> optionalStudy = studyRepository.findByPath(path);
-        StudyEntity studyEntity = optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
+        StudyEntity studyEntity = checkIfExistingStudy(optionalStudy);
         checkIfManager(usersEntity, studyEntity);
         return studyEntity;
     }
 
     public StudyEntity getStudyToUpdateTag(UsersEntity usersEntity, String path) {
         Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityWithTagsByPath(path);
-        StudyEntity studyEntity = optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
+        StudyEntity studyEntity = checkIfExistingStudy(optionalStudy);
         checkIfManager(usersEntity, studyEntity);
         return studyEntity;
     }
 
     public StudyEntity getStudyToUpdateZone(UsersEntity usersEntity, String path) {
         Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityWithZonesByPath(path);
-        StudyEntity studyEntity = optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
+        StudyEntity studyEntity = checkIfExistingStudy(optionalStudy);
         checkIfManager(usersEntity, studyEntity);
         return studyEntity;
     }
@@ -120,14 +115,14 @@ public class StudyService {
 
     public StudyEntity getStudyToUpdateStatus(UsersEntity usersEntity, String path) {
         Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityWithManagersByPath(path);
-        StudyEntity studyEntity = optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
+        StudyEntity studyEntity = checkIfExistingStudy(optionalStudy);
         checkIfManager(usersEntity, studyEntity);
         return studyEntity;
     }
 
     public StudyEntity getStudyToEnroll(String path) {
         Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityOnlyByPath(path);
-        StudyEntity studyEntity = optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
+        StudyEntity studyEntity = checkIfExistingStudy(optionalStudy);
         return studyEntity;
     }
 
@@ -172,15 +167,23 @@ public class StudyService {
 
     public void removeMember(String path, UsersEntity usersEntity) {
         Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityWithMembersByPath(path);
-        optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
-        StudyEntity studyEntity = optionalStudy.get();
+        StudyEntity studyEntity = checkIfExistingStudy(optionalStudy);
         studyEntity.removeMember(usersEntity);
     }
 
     public void addMember(String path, UsersEntity usersEntity) {
         Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityWithMembersByPath(path);
-        optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
-        StudyEntity studyEntity = optionalStudy.get();
+        StudyEntity studyEntity = checkIfExistingStudy(optionalStudy);
         studyEntity.addMember(usersEntity);
+    }
+
+    private void checkIfManager(UsersEntity usersEntity, StudyEntity studyEntity) {
+        if (!studyEntity.isManager(usersEntity)) {
+            throw new AccessDeniedException("권한을 가지고 있지 않습니다.");
+        }
+    }
+
+    private StudyEntity checkIfExistingStudy(Optional<StudyEntity> optionalStudy) {
+        return optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
     }
 }
