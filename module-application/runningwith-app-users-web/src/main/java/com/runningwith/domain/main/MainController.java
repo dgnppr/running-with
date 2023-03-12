@@ -1,9 +1,11 @@
 package com.runningwith.domain.main;
 
+import com.runningwith.domain.event.EnrollmentRepository;
 import com.runningwith.domain.study.StudyEntity;
 import com.runningwith.domain.study.StudyRepository;
 import com.runningwith.domain.users.CurrentUser;
 import com.runningwith.domain.users.UsersEntity;
+import com.runningwith.domain.users.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,13 +26,21 @@ public class MainController {
     public static final String PAGE_LOGIN = "login";
     public static final String URL_SEARCH_STUDY = "/search/study";
     public static final String VIEW_SEARCH = "search";
+    public static final String VIEW_INDEX_AFTER_LOGIN = "index-after-login";
     private final StudyRepository studyRepository;
+    private final UsersRepository usersRepository;
+    private final EnrollmentRepository enrollmentRepository;
 
     @GetMapping(URL_ROOT)
     public String index(@CurrentUser UsersEntity usersEntity, Model model) {
+
         if (usersEntity != null) {
-            model.addAttribute("user", usersEntity);
+            UsersEntity usersLoaded = usersRepository.findUsersEntityWithTagsAndZonesById(usersEntity.getId());
+            putStudyInfoRelatedToUsers(usersEntity, model, usersLoaded);
+            return VIEW_INDEX_AFTER_LOGIN;
         }
+
+        model.addAttribute("studyList", studyRepository.findFirst9ByPublishedAndClosedOrderByPublishedDatetimeDesc(true, false));
         return VIEW_INDEX;
     }
 
@@ -49,7 +59,20 @@ public class MainController {
 
         model.addAttribute("studyPage", studyPage);
         model.addAttribute("keyword", keyword);
-
+        model.addAttribute("sortProperty",
+                pageable.getSort().toString().contains("publishedDateTime") ? "publishedDateTime" : "memberCount");
         return VIEW_SEARCH;
+    }
+
+    private void putStudyInfoRelatedToUsers(UsersEntity usersEntity, Model model, UsersEntity usersLoaded) {
+        model.addAttribute("user", usersLoaded);
+        model.addAttribute("enrollmentList", enrollmentRepository.findByUsersEntityAndAcceptedOrderByEnrolledAtDesc(usersLoaded, true));
+        model.addAttribute("studyList", studyRepository.findByUsers(
+                usersLoaded.getTags(),
+                usersLoaded.getZones()));
+        model.addAttribute("studyManagerOf",
+                studyRepository.findFirst5ByManagersContainingAndClosedOrderByPublishedDatetimeDesc(usersEntity, false));
+        model.addAttribute("studyMemberOf",
+                studyRepository.findFirst5ByMembersContainingAndClosedOrderByPublishedDatetimeDesc(usersEntity, false));
     }
 }

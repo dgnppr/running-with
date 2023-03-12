@@ -6,6 +6,14 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+
+@NamedEntityGraph(
+        name = "Enrollment.withEventAndStudy",
+        attributeNodes = {
+                @NamedAttributeNode(value = "eventEntity", subgraph = "studyEntity")
+        },
+        subgraphs = @NamedSubgraph(name = "studyEntity", attributeNodes = @NamedAttributeNode("studyEntity"))
+)
 @EqualsAndHashCode(of = "id")
 @AllArgsConstructor
 @Builder

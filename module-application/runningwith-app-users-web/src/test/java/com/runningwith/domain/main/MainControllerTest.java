@@ -113,6 +113,6 @@ class MainControllerTest {
     }
 
     // TODO study search result view
-
+    // TODO index study result model
 
 }

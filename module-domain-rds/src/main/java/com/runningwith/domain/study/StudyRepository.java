@@ -1,9 +1,11 @@
 package com.runningwith.domain.study;
 
+import com.runningwith.domain.users.UsersEntity;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Transactional(readOnly = true)
@@ -32,4 +34,10 @@ public interface StudyRepository extends JpaRepository<StudyEntity, Long>, Study
 
     @EntityGraph(attributePaths = {"managers", "members"})
     Optional<StudyEntity> findStudyEntityWithManagersAndMembersById(Long id);
+
+    List<StudyEntity> findFirst9ByPublishedAndClosedOrderByPublishedDatetimeDesc(boolean published, boolean closed);
+
+    List<StudyEntity> findFirst5ByManagersContainingAndClosedOrderByPublishedDatetimeDesc(UsersEntity usersEntity, boolean closed);
+
+    List<StudyEntity> findFirst5ByMembersContainingAndClosedOrderByPublishedDatetimeDesc(UsersEntity usersEntity, boolean closed);
 }
