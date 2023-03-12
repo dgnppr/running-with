@@ -25,10 +25,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
 
-import static com.runningwith.domain.AppExceptionHandler.VIEW_ERROR;
 import static com.runningwith.domain.event.EventController.*;
 import static com.runningwith.domain.event.enumeration.EventType.CONFIRMATIVE;
 import static com.runningwith.domain.event.enumeration.EventType.FCFS;
+import static com.runningwith.domain.main.ExceptionAdvice.VIEW_ERROR;
 import static com.runningwith.domain.study.StudyController.URL_STUDY_PATH;
 import static com.runningwith.infra.utils.CustomStringUtils.WITH_USER_NICKNAME;
 import static com.runningwith.infra.utils.CustomStringUtils.getEncodedUrl;

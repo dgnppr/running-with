@@ -19,7 +19,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-import static com.runningwith.domain.AppExceptionHandler.VIEW_ERROR;
+import static com.runningwith.domain.main.ExceptionAdvice.VIEW_ERROR;
 import static com.runningwith.domain.study.StudyController.*;
 import static com.runningwith.infra.utils.CustomStringUtils.WITH_USER_NICKNAME;
 import static com.runningwith.infra.utils.CustomStringUtils.getEncodedUrl;

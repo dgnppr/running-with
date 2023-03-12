@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.UUID;
 
 import static com.runningwith.domain.main.MainController.URL_LOGIN;
+import static com.runningwith.domain.main.MainController.VIEW_INDEX_AFTER_LOGIN;
 import static com.runningwith.domain.users.WithUserSecurityContextFactory.EMAIL;
 import static com.runningwith.domain.users.WithUserSecurityContextFactory.PASSWORD;
 import static com.runningwith.infra.utils.CustomStringUtils.WITH_USER_NICKNAME;
@@ -55,6 +56,7 @@ class MainControllerTest {
         usersRepository.deleteAll();
     }
 
+    // TODO add model expect after login
     @WithUser
     @DisplayName("인덱스 뷰 - 인증 유저")
     @Test
@@ -64,7 +66,7 @@ class MainControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("user", usersEntity))
                 .andExpect(authenticated())
-                .andExpect(view().name(VIEW_INDEX));
+                .andExpect(view().name(VIEW_INDEX_AFTER_LOGIN));
     }
 
     @DisplayName("인덱스 뷰 - 익명 유저")

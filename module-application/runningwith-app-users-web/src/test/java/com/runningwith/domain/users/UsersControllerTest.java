@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.runningwith.domain.AppExceptionHandler.VIEW_ERROR;
+import static com.runningwith.domain.main.ExceptionAdvice.VIEW_ERROR;
 import static com.runningwith.domain.users.UsersController.*;
 import static com.runningwith.domain.users.WithUserSecurityContextFactory.EMAIL;
 import static com.runningwith.infra.utils.CustomStringUtils.RANDOM_STRING;

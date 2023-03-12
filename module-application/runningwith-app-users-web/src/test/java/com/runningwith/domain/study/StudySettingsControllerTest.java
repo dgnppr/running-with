@@ -31,7 +31,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.runningwith.domain.AppExceptionHandler.VIEW_ERROR;
+import static com.runningwith.domain.main.ExceptionAdvice.VIEW_ERROR;
 import static com.runningwith.domain.study.StudyController.URL_STUDY_PATH;
 import static com.runningwith.domain.study.StudySettingsController.*;
 import static com.runningwith.infra.utils.CustomStringUtils.*;
