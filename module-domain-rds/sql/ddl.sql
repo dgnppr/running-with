@@ -1,11 +1,11 @@
-create table account
+create table runningwith.account
 (
     id_account bigint auto_increment
         primary key,
     type       char(20) not null
 );
 
-create table persistent_logins
+create table runningwith.persistent_logins
 (
     username  varchar(64) not null,
     series    varchar(64) not null
@@ -14,7 +14,7 @@ create table persistent_logins
     last_used timestamp   not null
 );
 
-create table study
+create table runningwith.study
 (
     id_study                    bigint auto_increment
         primary key,
@@ -30,11 +30,12 @@ create table study
     recruiting                  bit          null,
     closed                      bit          null,
     use_banner                  bit          null,
+    member_count                int          not null,
     constraint UQ_study_path
         unique (path)
 );
 
-create table tag
+create table runningwith.tag
 (
     id_tag bigint auto_increment
         primary key,
@@ -43,17 +44,17 @@ create table tag
         unique (title)
 );
 
-create table study_tags
+create table runningwith.study_tags
 (
     id_study bigint not null,
     id_tag   bigint not null,
     constraint FK_study_study_tags
-        foreign key (id_study) references study (id_study),
+        foreign key (id_study) references runningwith.study (id_study),
     constraint FK_tag_study_tags
-        foreign key (id_tag) references tag (id_tag)
+        foreign key (id_tag) references runningwith.tag (id_tag)
 );
 
-create table users
+create table runningwith.users
 (
     id_users                         bigint auto_increment
         primary key,
@@ -81,10 +82,10 @@ create table users
     constraint users_nickname
         unique (nickname),
     constraint FK_account_users
-        foreign key (id_account) references account (id_account)
+        foreign key (id_account) references runningwith.account (id_account)
 );
 
-create table event
+create table runningwith.event
 (
     id_event                 bigint auto_increment
         primary key,
@@ -99,12 +100,12 @@ create table event
     start_date_time          datetime    null,
     end_date_time            datetime    null,
     constraint FK_study_event
-        foreign key (id_study) references study (id_study),
+        foreign key (id_study) references runningwith.study (id_study),
     constraint FK_users_event
-        foreign key (id_users) references users (id_users)
+        foreign key (id_users) references runningwith.users (id_users)
 );
 
-create table enrollment
+create table runningwith.enrollment
 (
     id_enrollment bigint auto_increment
         primary key,
@@ -114,12 +115,12 @@ create table enrollment
     id_users      bigint   not null,
     id_event      bigint   not null,
     constraint FK_event_enrollment
-        foreign key (id_event) references event (id_event),
+        foreign key (id_event) references runningwith.event (id_event),
     constraint FK_users_enrollment
-        foreign key (id_users) references users (id_users)
+        foreign key (id_users) references runningwith.users (id_users)
 );
 
-create table notification
+create table runningwith.notification
 (
     id_notification   bigint auto_increment
         primary key,
@@ -131,40 +132,40 @@ create table notification
     notification_type varchar(45)  not null,
     id_users          bigint       not null,
     constraint FK_users_notification
-        foreign key (id_users) references users (id_users)
+        foreign key (id_users) references runningwith.users (id_users)
 );
 
-create table study_managers
+create table runningwith.study_managers
 (
     id_study bigint not null,
     id_users bigint not null,
     constraint FK_managers_study_managers
-        foreign key (id_users) references users (id_users),
+        foreign key (id_users) references runningwith.users (id_users),
     constraint FK_study_study_managers
-        foreign key (id_study) references study (id_study)
+        foreign key (id_study) references runningwith.study (id_study)
 );
 
-create table study_members
+create table runningwith.study_members
 (
     id_study bigint null,
     id_users bigint null,
     constraint FK_members_study_members
-        foreign key (id_users) references users (id_users),
+        foreign key (id_users) references runningwith.users (id_users),
     constraint FK_study_study_members
-        foreign key (id_study) references study (id_study)
+        foreign key (id_study) references runningwith.study (id_study)
 );
 
-create table users_tags
+create table runningwith.users_tags
 (
     id_tag   bigint not null,
     id_users bigint not null,
     constraint FK_tag_users_tags
-        foreign key (id_tag) references tag (id_tag),
+        foreign key (id_tag) references runningwith.tag (id_tag),
     constraint FK_users_users_tags
-        foreign key (id_users) references users (id_users)
+        foreign key (id_users) references runningwith.users (id_users)
 );
 
-create table zone
+create table runningwith.zone
 (
     id_zone            bigint auto_increment
         primary key,
@@ -173,23 +174,23 @@ create table zone
     province           varchar(45) null
 );
 
-create table study_zones
+create table runningwith.study_zones
 (
     id_study bigint not null,
     id_zone  bigint not null,
     constraint FK_study_study_zones
-        foreign key (id_study) references study (id_study),
+        foreign key (id_study) references runningwith.study (id_study),
     constraint FK_zone_sutdy_zones
-        foreign key (id_zone) references zone (id_zone)
+        foreign key (id_zone) references runningwith.zone (id_zone)
 );
 
-create table users_zones
+create table runningwith.users_zones
 (
     id_users bigint not null,
     id_zone  bigint null,
     constraint FK_users_users_zones
-        foreign key (id_users) references users (id_users),
+        foreign key (id_users) references runningwith.users (id_users),
     constraint FK_zone_users_zones
-        foreign key (id_zone) references zone (id_zone)
+        foreign key (id_zone) references runningwith.zone (id_zone)
 );
 
