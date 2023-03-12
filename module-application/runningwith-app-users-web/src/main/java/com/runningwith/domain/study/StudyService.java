@@ -34,7 +34,7 @@ public class StudyService {
 
     public StudyEntity getStudy(String path) {
         Optional<StudyEntity> optionalStudy = studyRepository.findByPath(path);
-        StudyEntity studyEntity = getIfExistingStudy(optionalStudy);
+        StudyEntity studyEntity = optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
         return studyEntity;
     }
 
@@ -46,27 +46,23 @@ public class StudyService {
 
     public StudyEntity getStudyToUpdate(UsersEntity usersEntity, String path) {
         Optional<StudyEntity> optionalStudy = studyRepository.findByPath(path);
-        StudyEntity studyEntity = getIfExistingStudy(optionalStudy);
+        StudyEntity studyEntity = optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
         checkIfManager(usersEntity, studyEntity);
         return studyEntity;
     }
 
     public StudyEntity getStudyToUpdateTag(UsersEntity usersEntity, String path) {
         Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityWithTagsByPath(path);
-        StudyEntity studyEntity = getIfExistingStudy(optionalStudy);
+        StudyEntity studyEntity = optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
         checkIfManager(usersEntity, studyEntity);
         return studyEntity;
     }
 
     public StudyEntity getStudyToUpdateZone(UsersEntity usersEntity, String path) {
         Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityWithZonesByPath(path);
-        StudyEntity studyEntity = getIfExistingStudy(optionalStudy);
+        StudyEntity studyEntity = optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
         checkIfManager(usersEntity, studyEntity);
         return studyEntity;
-    }
-
-    public StudyEntity getIfExistingStudy(Optional<StudyEntity> optionalStudy) {
-        return optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
     }
 
     public Set<TagEntity> getStudyTags(StudyEntity studyEntity) {
@@ -124,14 +120,14 @@ public class StudyService {
 
     public StudyEntity getStudyToUpdateStatus(UsersEntity usersEntity, String path) {
         Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityWithManagersByPath(path);
-        StudyEntity studyEntity = getIfExistingStudy(optionalStudy);
+        StudyEntity studyEntity = optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
         checkIfManager(usersEntity, studyEntity);
         return studyEntity;
     }
 
     public StudyEntity getStudyToEnroll(String path) {
         Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityOnlyByPath(path);
-        StudyEntity studyEntity = getIfExistingStudy(optionalStudy);
+        StudyEntity studyEntity = optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
         return studyEntity;
     }
 
@@ -176,15 +172,15 @@ public class StudyService {
 
     public void removeMember(String path, UsersEntity usersEntity) {
         Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityWithMembersByPath(path);
-        getIfExistingStudy(optionalStudy);
+        optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
         StudyEntity studyEntity = optionalStudy.get();
-        studyEntity.getMembers().remove(usersEntity);
+        studyEntity.removeMember(usersEntity);
     }
 
     public void addMember(String path, UsersEntity usersEntity) {
         Optional<StudyEntity> optionalStudy = studyRepository.findStudyEntityWithMembersByPath(path);
-        getIfExistingStudy(optionalStudy);
+        optionalStudy.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다."));
         StudyEntity studyEntity = optionalStudy.get();
-        studyEntity.getMembers().add(usersEntity);
+        studyEntity.addMember(usersEntity);
     }
 }
