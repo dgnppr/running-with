@@ -4,7 +4,7 @@ RunningWith
 ### 0. Description
 
 - 온라인/오프라인 스터디 모집 및 관리 웹 어플리케이션
-- [trouble-shooting]()
+- [Troubleshoot]()
 
 ### 1. TECH
 
@@ -18,7 +18,7 @@ RunningWith
 
 - 멀티 모듈 기반 그래들 프로젝트
 - `module-application:runningwith-app-users-web` is the Web Application Server for Users
-- [자세한 모듈 설계](https://yoonyonghyun.notion.site/Multi-Module-0e90daefef574fdeac10c01c8bd3941e)
+- [자세한 모듈 설계 설명](./docs/module/README.md)
 
 ### 3. How to build project
 
