@@ -13,7 +13,7 @@
 
 ---
 
-# 2. [Added Modules](./build.gradle)
+# [2. Added Modules](./build.gradle)
 
 - `spring-data-jpa`
 - `querydsl`

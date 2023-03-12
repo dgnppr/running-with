@@ -11,8 +11,10 @@
 
 # 1. Module Rules
 
-- 뷰는 가급적 재사용한다.
-- 모든 트랜잭션은 `@Service` 계층에서 한다.
+- View uses a fragment if it can be reused.
+- All transactions are made at the '@Service' layer.
+- [URL Description]()
+- [View Description]()
 
 ---
 
@@ -22,5 +24,5 @@
 
 # 3. ETC
 
-- 뷰를 서버 사이드 렌더링하므로 프론트엔드 라이브러리를 [build.gradle](./build.gradle) 빌드하며 관리한다
-- [프론트엔드 라이브러리](./src/main/resources/static/package.json)
+- Because the view is server-side rendered, the front-end library is built and managed in [build.gradle](./build.gradle)
+- [FrontEnd Library](./src/main/resources/static/package.json)
