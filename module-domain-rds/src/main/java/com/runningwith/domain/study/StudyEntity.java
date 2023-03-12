@@ -76,6 +76,9 @@ public class StudyEntity {
     @Column(name = "use_banner")
     private boolean useBanner = false;
 
+    @Column(name = "member_count")
+    private int memberCount = 0;
+
     public void addManager(UsersEntity usersEntity) {
         this.managers.add(usersEntity);
     }
@@ -161,5 +164,15 @@ public class StudyEntity {
 
     public boolean isRemovable() {
         return !this.published;
+    }
+
+    public void addMember(UsersEntity usersEntity) {
+        this.getMembers().add(usersEntity);
+        this.memberCount += 1;
+    }
+
+    public void removeMember(UsersEntity usersEntity) {
+        this.getMembers().remove(usersEntity);
+        this.memberCount -= 1;
     }
 }
