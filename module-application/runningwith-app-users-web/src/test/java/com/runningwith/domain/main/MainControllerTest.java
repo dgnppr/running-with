@@ -112,5 +112,7 @@ class MainControllerTest {
                 .andExpect(unauthenticated());
     }
 
+    // TODO study search result view
+
 
 }

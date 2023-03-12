@@ -1,12 +1,14 @@
 package com.runningwith.domain.study;
 
+import com.querydsl.core.QueryResults;
 import com.querydsl.jpa.JPQLQuery;
 import com.runningwith.domain.tag.QTagEntity;
 import com.runningwith.domain.users.QUsersEntity;
 import com.runningwith.domain.zone.QZoneEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
-
-import java.util.List;
 
 public class StudyRepositoryExtensionImpl extends QuerydslRepositorySupport implements StudyRepositoryExtension {
 
@@ -15,7 +17,7 @@ public class StudyRepositoryExtensionImpl extends QuerydslRepositorySupport impl
     }
 
     @Override
-    public List<StudyEntity> findByKeyword(String keyword) {
+    public Page<StudyEntity> findByKeyword(String keyword, Pageable pageable) {
         QStudyEntity studyEntity = QStudyEntity.studyEntity;
 
         JPQLQuery<StudyEntity> query = from(studyEntity).where(studyEntity.published.isTrue()
@@ -26,7 +28,11 @@ public class StudyRepositoryExtensionImpl extends QuerydslRepositorySupport impl
                 .leftJoin(studyEntity.zones, QZoneEntity.zoneEntity).fetchJoin()
                 .leftJoin(studyEntity.members, QUsersEntity.usersEntity).fetchJoin()
                 .distinct();
-        
-        return query.fetch();
+
+
+        JPQLQuery<StudyEntity> pageableQuery = getQuerydsl().applyPagination(pageable, query);
+
+        QueryResults<StudyEntity> fetchResults = pageableQuery.fetchResults();
+        return new PageImpl<>(fetchResults.getResults(), pageable, fetchResults.getTotal());
     }
 }
