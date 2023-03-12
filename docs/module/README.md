@@ -55,13 +55,13 @@
 
 - 저장소, 도메인 외 시스템에서 필요한 모듈을 이 계층에 둘 것이다.
     - ex) `runningwith-core-web`: Web 설정을 사용하는 프로젝트에서 사용하는 모듈들(웹에 대한 공통 설정, 웹 보안, 로깅 등)
-    - ex) `runningwith-xxx-event-publisher` :  특정 이벤트에 대한 처리를 담당하는 모듈등
+    - ex) `runningwith-xxx-event-publisher` :  특정 이벤트에 대한 처리를 담당하는 모듈 등
     - ex) `runningwith-xxx-client` : 외부의 xxx 시스템과 통신을 책임지는 모듈이며 각 외부 시스템별로 따로 모듈을 만들 것이다.
 - 이 계층은 **어플리케이션,도메인 비즈니스를 모르게 할 것이다.**
 
 ---
 
-# In System Available(어플리케이션 모듈 계층)
+# [System Application(어플리케이션 모듈 계층)](../../module-application/runningwith-app-users-web/README.md)
 
 - 어플리케이션 모듈은 하위 계층에 있는 모듈을 조립하여 서비스 비즈니스를 완성시키는 계층이다.
 - ex) `runningwith-external-api` , `runningwith-app-web`

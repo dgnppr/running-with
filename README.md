@@ -12,13 +12,12 @@ RunningWith
 - CI/CD: [Github Actions](https://docs.github.com/ko/actions)
 - Infrastructure: AWS ECS with Fargate
 
-### 2. Structure
+### 2. [Module-Structure](./docs/module/README.md)
 
 <img src="./docs/images/module-architecture.png" width="500" height="400"/>
 
-- 멀티 모듈 기반 그래들 프로젝트
+- gradle based on multi-module
 - `module-application:runningwith-app-users-web` is the Web Application Server for Users
-- [자세한 모듈 설계 설명](./docs/module/README.md)
 
 ### 3. How to build project
 
