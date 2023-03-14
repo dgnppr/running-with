@@ -137,11 +137,10 @@ class MainControllerTest {
                 .andExpect(unauthenticated());
     }
 
-    // TODO study search with pagination
     @DisplayName("스터디 서치 - with pagination")
     @Test
     void search_study_with_pagination() throws Exception {
-        
+        // TODO study search with pagination
     }
 
     private void checkMockBeanExecutedAfterLogin() {

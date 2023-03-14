@@ -66,13 +66,14 @@ public class StudySettingsController {
     private final TagService tagService;
     private final ObjectMapper objectMapper;
 
-    // TODO 뷰 수정(DRAFT OFF)
+
     @GetMapping(URL_STUDY_SETTINGS_DESCRIPTION)
     public String studyDescriptionSettingView(@CurrentUser UsersEntity usersEntity, @PathVariable String path, Model model) {
         StudyEntity studyEntity = studyService.getStudyToUpdate(usersEntity, path);
         model.addAttribute("user", usersEntity);
         model.addAttribute("study", studyEntity);
         model.addAttribute(new StudyDescriptionForm(studyEntity));
+        // TODO redesign view (part: DRAFT OFF)
         return VIEW_STUDY_SETTINGS_DESCRIPTION;
     }
 

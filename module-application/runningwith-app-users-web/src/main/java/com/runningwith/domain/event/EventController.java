@@ -82,7 +82,7 @@ public class EventController {
         return REDIRECT + URL_STUDY_PATH + getEncodedUrl(path) + URL_EVENTS + URL_SLASH + eventEntity.getId();
     }
 
-    // TODO event view redesign
+
     @GetMapping(URL_EVENTS_PATH + "{id}")
     public String viewEvent(@CurrentUser UsersEntity usersEntity, @PathVariable String path, @PathVariable Long id, Model model) {
 
@@ -93,6 +93,7 @@ public class EventController {
         model.addAttribute("event", eventEntity);
         model.addAttribute("study", studyEntity);
 
+        // TODO event view redesign
         return VIEW_EVENT_VIEW;
     }
 

@@ -221,7 +221,6 @@ class EventControllerTest {
                 .andExpect(view().name(VIEW_EVENT_EDIT));
     }
 
-    // TODO 필드 검증 로직 추가
     @WithUser
     @DisplayName("스터디 모임 수정 - 입력값 정상")
     @Test
@@ -250,7 +249,7 @@ class EventControllerTest {
         EventEntity afterEvent = eventRepository.findById(beforeEvent.getId()).get();
         assertThatEventChanged(afterForm, afterEvent);
     }
-    // TODO 등록된 enrollment도 같이 삭제 확인
+    // TODO check removed with enrollments
 
     @WithUser
     @DisplayName("스터디 모임 수정 - 입력값 오류")

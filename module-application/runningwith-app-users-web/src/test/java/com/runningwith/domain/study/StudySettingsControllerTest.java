@@ -603,6 +603,7 @@ class StudySettingsControllerTest {
                 .andExpect(authenticated())
                 .andExpect(redirectedUrl(URL_ROOT));
 
+        // TODO check removed with Events
         assertThatStudyNotPresent(TEST_PATH);
     }
 
@@ -628,9 +629,6 @@ class StudySettingsControllerTest {
 
         assertThatStudyIsPresent();
     }
-
-
-    // TODO 스터디 삭제 로직 추가
 
     private void assertThatStudyIsPresent() {
         assertThatStudyPathUpdated(TEST_PATH);
