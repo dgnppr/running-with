@@ -18,6 +18,8 @@ import java.util.Set;
 @Table(name = "study")
 public class StudyEntity {
 
+    // TODO add study maximum column
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_study", nullable = false)
