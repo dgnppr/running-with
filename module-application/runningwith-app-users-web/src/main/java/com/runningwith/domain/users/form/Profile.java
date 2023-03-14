@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.URL;
 
 @EqualsAndHashCode(of = {"bio", "profileUrl", "occupation", "location", "profileImage"})
 @Data
@@ -17,6 +18,7 @@ public class Profile {
     private String bio;
 
     @Length(max = 50)
+    @URL
     private String profileUrl;
 
     @Length(max = 50)

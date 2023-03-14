@@ -152,7 +152,7 @@ class SettingsControllerTest {
     void update_password_with_correct_inputs() throws Exception {
 
         String beforeChangedPW = usersRepository.findByNickname(WITH_USER_NICKNAME).get().getPassword();
-        String correctpassword = "correctpassword";
+        String correctpassword = "Correctpassword1@3";
 
         PasswordForm passwordForm = new PasswordForm(correctpassword, correctpassword);
         mockMvc.perform(post(URL_SETTINGS_PASSWORD)

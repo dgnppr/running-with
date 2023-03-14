@@ -12,7 +12,7 @@ import org.springframework.security.test.context.support.WithSecurityContextFact
 @RequiredArgsConstructor
 public class WithUserSecurityContextFactory implements WithSecurityContextFactory<WithUser> {
 
-    public static final String PASSWORD = "12345678";
+    public static final String PASSWORD = "ValidPass123!";
     public static final String EMAIL = "@email.com";
     private final UsersService usersService;
     private final PasswordEncoder passwordEncoder;
