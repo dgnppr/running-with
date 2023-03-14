@@ -11,18 +11,21 @@
 
 # 1. Module Rules
 
-- View uses a fragment if it can be reused.
+- View uses fragments if it can be reused.
 - All transactions are made at the '@Service' layer.
-- [URL Description]()
-- [View Description]()
+- [Click here for additional rules.](./docs/rules.md)
 
 ---
 
 # 2. [Added Modules](./build.gradle)
 
+- Because the view is server-side rendered, the front-end library is built and managed in [build.gradle](./build.gradle)
+- [FrontEnd Library](./src/main/resources/static/package.json)
+
 ---
 
 # 3. ETC
 
-- Because the view is server-side rendered, the front-end library is built and managed in [build.gradle](./build.gradle)
-- [FrontEnd Library](./src/main/resources/static/package.json)
+- This app is designed to be domain-driven.
+- User is being authenticated in a session.
+- The authentication may be changed later for scalability.
