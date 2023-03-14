@@ -156,7 +156,6 @@ public class StudyService {
         studyEntity.updateTitle(newTitle);
     }
 
-    // TODO 모임 진행 했던 스터디 제거 방지 로직 추가
     public void removeStudy(StudyEntity studyEntity) {
         if (studyEntity.isRemovable()) {
             studyRepository.delete(studyEntity);

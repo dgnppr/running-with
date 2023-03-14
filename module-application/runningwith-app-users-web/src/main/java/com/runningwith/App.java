@@ -9,6 +9,5 @@ public class App {
         SpringApplication.run(App.class, args);
     }
 
-    // TODO add email check interceptor
     // TODO setting study maximum
 }

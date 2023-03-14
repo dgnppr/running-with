@@ -2,6 +2,6 @@ package com.runningwith.domain.study;
 
 class StudyRepositoryTest {
 
-    // TODO findByKeyword(String keyword) TEST
+    // TODO findByKeyword(String keyword)
 
 }

@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.*;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
@@ -42,11 +43,12 @@ public class CustomWebSecurityCustomizer implements WebSecurityCustomizer {
                 .anyRequest().authenticated()
                 .and()
                 .formLogin(getFormLoginConfigurerCustomizer())
+                .sessionManagement(getSessionManagementConfigurer())
                 .httpBasic(HttpBasicConfigurer::disable)
                 .rememberMe(getRememberMeConfigurer())
                 .logout(getLogoutConfigurer())
                 .securityContext(getSecurityContextConfigurer());
-        // TODO session id change
+
         return http.build();
     }
 
@@ -56,6 +58,11 @@ public class CustomWebSecurityCustomizer implements WebSecurityCustomizer {
                 .securityContextRepository(securityContextRepository);
     }
 
+    private Customizer<SessionManagementConfigurer<HttpSecurity>> getSessionManagementConfigurer() {
+        return (SessionManagementConfigurer) -> SessionManagementConfigurer
+                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+                .sessionFixation().changeSessionId();
+    }
 
     private Customizer<RememberMeConfigurer<HttpSecurity>> getRememberMeConfigurer() {
         return (rememberMeConfigurer) -> rememberMeConfigurer
