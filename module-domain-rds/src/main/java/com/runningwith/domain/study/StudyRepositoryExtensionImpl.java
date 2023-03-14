@@ -34,7 +34,6 @@ public class StudyRepositoryExtensionImpl extends QuerydslRepositorySupport impl
                 .leftJoin(studyEntity.members, QUsersEntity.usersEntity).fetchJoin()
                 .distinct();
 
-
         JPQLQuery<StudyEntity> pageableQuery = getQuerydsl().applyPagination(pageable, query);
 
         QueryResults<StudyEntity> fetchResults = pageableQuery.fetchResults();
