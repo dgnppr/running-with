@@ -56,7 +56,6 @@ public class MainController {
     public String searchStudy(String keyword, Model model,
                               @PageableDefault(size = 9, sort = "publishedDatetime", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<StudyEntity> studyPage = studyRepository.findByKeyword(keyword, pageable);
-
         model.addAttribute("studyPage", studyPage);
         model.addAttribute("keyword", keyword);
         model.addAttribute("sortProperty",
