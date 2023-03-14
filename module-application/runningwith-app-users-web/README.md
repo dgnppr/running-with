@@ -20,7 +20,7 @@
 # 2. [Added Modules](./build.gradle)
 
 - Because the view is server-side rendered, the front-end library is built and managed in [build.gradle](./build.gradle)
-- [FrontEnd Library](./src/main/resources/static/package.json)
+- [Frontend libraries being managed in gradle](./src/main/resources/static/package.json)
 
 ---
 

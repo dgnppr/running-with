@@ -18,7 +18,7 @@ RunningWith
 - Gradle project based on multi-modules.
 - [Application Layer: module-application:runningwith-app-users-web](./module-application/runningwith-app-users-web/README.md)
 
-### 3. How to build project and run
+### 3. How to build and run project
 
 - `module-application:runningwith-app-users-web`: `./gradlew :module-application:runningwith-app-users-web:build`
 - Local, dev profiles use DB as MariaDB docker image.
