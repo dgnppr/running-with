@@ -9,7 +9,7 @@ RunningWith
 
 - Backend: Java 17, SpringBoot 3, Junit5, Mockito, JPA with QueryDSL
 - CI/CD: [Github Actions](https://docs.github.com/ko/actions)
-- Infrastructure: AWS ECS with Fargate
+- Infrastructure: AWS EC2 With Elastic Beanstalk
 
 ### [2. Module-Structure](./docs/module/README.md)
 
