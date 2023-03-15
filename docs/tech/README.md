@@ -26,5 +26,5 @@ Java 17, it was decided to use Java 17.
 
 ### Infrastructure
 
-- Even though I use the container, I decided to use ec2 instead of the target due to the cost.
+- Even though I use the container, I decided to use ec2 instead of the fargate due to the cost.
 - For the sake of management issue, decided EC2 With elastic beanstalk
