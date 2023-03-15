@@ -22,6 +22,7 @@ compileJava.dependsOn copyFrontLib
  */
 
 dependencies {
+    implementation project(":module-independent")
     implementation project(":module-insystem")
     implementation project(":module-core")
     implementation project(":module-domain-rds")
