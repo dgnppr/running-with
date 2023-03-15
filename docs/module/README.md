@@ -13,14 +13,14 @@
 
 ---
 
-# Independently Available(독립 모듈 계층)
+# [Independently Available(독립 모듈 계층)](../../module-independent/README.md)
 
 - 시스템과 무관하게 어디에서나 사용 가능한 라이브러리 성격의 모듈을 이 계층에 배치할 것이다.
 - **언제든 이 계층의 모듈을 대처할 탄탄한 라이브러리가 등장하면 이 모듈은 제거할 것이므로, 프로젝트 내에서 의존관계를 두지 않아야 한다.**
 
 ---
 
-# System Core(공통 모듈 계층)
+# [System Core(공통 모듈 계층)](../../module-core/README.md)
 
 - 독립 모듈 계층을 제외한 모든 모듈에서 사용할 수 있는 것들을 이 계층에 배치할 것이다.
     - ex) Type,Util 등을 정의
